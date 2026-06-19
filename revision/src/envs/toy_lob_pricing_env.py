@@ -123,13 +123,31 @@ class ToyLOBPricingEnv:
         self._advance_risk_state()
         return self._observations(), rewards, done, False, info
 
-    def state_for_agent(self, agent_id: int) -> Tuple[int, int, int]:
-        """Compact tabular state: risk, market spread bin, own last action bin."""
+    def state_for_agent(self, agent_id: int) -> Tuple[int, int, int, int, int]:
+        """Tabular state with enough market detail to reveal undercutting.
+
+        The first version only used risk, average spread, and own spread. With
+        N=10, one deviator can lower the best spread while barely moving the
+        average, making punishment/recovery dynamics invisible. The min-spread
+        and range bins expose that deviation signal to other agents.
+        """
+        levels = np.array(self.config.spread_levels)
         avg = float(np.mean(self.last_spreads))
-        avg_bin = int(np.argmin(np.abs(np.array(self.config.spread_levels) - avg)))
-        own_bin = int(np.argmin(np.abs(np.array(self.config.spread_levels) - self.last_spreads[agent_id])))
+        min_spread = float(np.min(self.last_spreads))
+        spread_range = float(np.max(self.last_spreads) - min_spread)
+        avg_bin = int(np.argmin(np.abs(levels - avg)))
+        own_bin = int(np.argmin(np.abs(levels - self.last_spreads[agent_id])))
+        min_bin = int(np.argmin(np.abs(levels - min_spread)))
+        range_bin = int(np.clip(round(spread_range / self._grid_step()), 0, self.config.n_actions - 1))
         risk_bin = 0 if self.risk_state == "low" else 1
-        return risk_bin, avg_bin, own_bin
+        return risk_bin, avg_bin, own_bin, min_bin, range_bin
+
+    def _grid_step(self) -> float:
+        levels = np.array(self.config.spread_levels, dtype=float)
+        if len(levels) < 2:
+            return 1.0
+        diffs = np.diff(np.sort(levels))
+        return float(np.min(diffs[diffs > 0])) if np.any(diffs > 0) else 1.0
 
     def _observations(self) -> Dict[int, np.ndarray]:
         risk_bin = 0.0 if self.risk_state == "low" else 1.0

@@ -41,6 +41,14 @@ def enrich_step(config: ToyLOBConfig, info: Dict[str, object]) -> Dict[str, obje
     enriched["alignment"] = spread_alignment(spreads, config.spread_levels)
     enriched["collusion_gap"] = risk_adjusted_collusion_gap(config, risk_state, avg_spread)
     enriched["demand_suppression"] = demand_suppression(config, risk_state, total_demand)
+    # Passive score for threshold calibration during no-intervention
+    # observation. This intentionally omits recent-intervention history because
+    # no intervention is being applied.
+    enriched["passive_risk_score"] = (
+        0.65 * float(enriched["collusion_gap"])
+        + 0.20 * float(enriched["alignment"])
+        + 0.15 * float(enriched["demand_suppression"])
+    )
     return enriched
 
 
@@ -56,6 +64,8 @@ def summarize_records(records: Iterable[Dict[str, object]]) -> Dict[str, float]:
         "total_demand",
         "mean_reward",
         "gate_active",
+        "gate_score",
+        "passive_risk_score",
         "routing_eta_boost",
     ]
     summary: Dict[str, float] = {"n_steps": float(len(rows))}
@@ -65,6 +75,42 @@ def summarize_records(records: Iterable[Dict[str, object]]) -> Dict[str, float]:
             summary[f"{field}_mean"] = float(np.mean(vals))
             summary[f"{field}_std"] = float(np.std(vals))
     return summary
+
+
+def gate_classification_metrics(records: Iterable[Dict[str, object]], tau: float = 0.3) -> Dict[str, float]:
+    """Risk-adjusted gate diagnostics.
+
+    False positive is a gate firing in high-risk, normal-spread windows.
+    True positive is a gate firing in low-risk, collusive-spread windows.
+    High risk is not automatically a negative class; high-risk windows with
+    large risk-adjusted collusion gaps are excluded from the FPR denominator.
+    """
+    rows = list(records)
+    high_normal = [
+        row for row in rows
+        if row.get("risk_state") == "high" and float(row.get("collusion_gap", 0.0)) < tau
+    ]
+    low_collusive = [
+        row for row in rows
+        if row.get("risk_state") == "low" and float(row.get("collusion_gap", 0.0)) > tau
+    ]
+    all_gate = [float(row.get("gate_active", 0.0)) for row in rows]
+    out = {
+        "gate_activation_rate": float(np.mean(all_gate)) if all_gate else 0.0,
+        "fpr_high_normal_tau": float(tau),
+        "fpr_high_normal_n": float(len(high_normal)),
+        "tpr_low_collusive_tau": float(tau),
+        "tpr_low_collusive_n": float(len(low_collusive)),
+    }
+    out["fpr_high_normal"] = (
+        float(np.mean([float(row.get("gate_active", 0.0)) for row in high_normal]))
+        if high_normal else 0.0
+    )
+    out["tpr_low_collusive"] = (
+        float(np.mean([float(row.get("gate_active", 0.0)) for row in low_collusive]))
+        if low_collusive else 0.0
+    )
+    return out
 
 
 def summarize_by_risk(records: Iterable[Dict[str, object]]) -> Dict[str, Dict[str, float]]:
@@ -90,4 +136,35 @@ def recovery_summary(probe_records: List[Dict[str, object]], pre_avg_spread: flo
         "mean_other_avg_spread": float(np.mean(other_spreads)),
         "mean_deviator_reward": float(np.mean(deviator_rewards)),
         "recovery_step": float(recovered[0]) if len(recovered) else -1.0,
+    }
+
+
+def paired_recovery_summary(
+    forced_records: List[Dict[str, object]],
+    control_records: List[Dict[str, object]],
+    pre_avg_spread: float,
+    actual_deviation: float,
+) -> Dict[str, float]:
+    forced = recovery_summary(forced_records, pre_avg_spread)
+    control = recovery_summary(control_records, pre_avg_spread)
+    if not forced_records or not control_records:
+        return {"actual_deviation": float(actual_deviation)}
+    n = min(len(forced_records), len(control_records))
+    forced_avg = np.array([float(row["avg_spread"]) for row in forced_records[:n]])
+    control_avg = np.array([float(row["avg_spread"]) for row in control_records[:n]])
+    forced_other = np.array([float(row["other_avg_spread"]) for row in forced_records[:n]])
+    control_other = np.array([float(row["other_avg_spread"]) for row in control_records[:n]])
+    forced_reward = np.array([float(row["deviator_reward"]) for row in forced_records[:n]])
+    control_reward = np.array([float(row["deviator_reward"]) for row in control_records[:n]])
+    return {
+        "actual_deviation": float(actual_deviation),
+        "forced_recovery_step": forced.get("recovery_step", -1.0),
+        "control_recovery_step": control.get("recovery_step", -1.0),
+        "mean_market_spread_delta_forced_minus_control": float(np.mean(forced_avg - control_avg)),
+        "mean_other_spread_delta_forced_minus_control": float(np.mean(forced_other - control_other)),
+        "mean_deviator_reward_delta_forced_minus_control": float(np.mean(forced_reward - control_reward)),
+        "forced_min_market_avg_spread": forced.get("min_market_avg_spread", 0.0),
+        "control_min_market_avg_spread": control.get("min_market_avg_spread", 0.0),
+        "forced_final_market_avg_spread": forced.get("final_market_avg_spread", 0.0),
+        "control_final_market_avg_spread": control.get("final_market_avg_spread", 0.0),
     }

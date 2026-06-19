@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import numpy as np
 
-State = Tuple[int, int, int]
+State = Tuple[int, ...]
 
 
 @dataclass

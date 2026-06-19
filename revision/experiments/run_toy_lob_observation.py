@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.agents.independent_q_learning import IndependentQLearners, QLearningConfig
 from src.envs.toy_lob_pricing_env import ToyLOBConfig, ToyLOBPricingEnv
-from src.utils.metrics import enrich_step, recovery_summary, summarize_by_risk, summarize_records
+from src.utils.metrics import enrich_step, paired_recovery_summary, summarize_by_risk, summarize_records
 
 
 def train_no_intervention(config: ToyLOBConfig, episodes: int, seed: int) -> Tuple[IndependentQLearners, List[Dict[str, object]]]:
@@ -60,24 +60,26 @@ def evaluate_no_intervention(config: ToyLOBConfig, agents: IndependentQLearners,
     return records
 
 
-def deviation_probe(config: ToyLOBConfig, agents: IndependentQLearners, seed: int, horizon: int = 30) -> Dict[str, float]:
-    env = ToyLOBPricingEnv(config.with_risk_mode("low"))
-    env.reset(seed=seed + 50_000)
-    warmup_records: List[Dict[str, object]] = []
-    for _ in range(40):
-        states = {i: env.state_for_agent(i) for i in range(config.n_agents)}
-        actions = {i: agents.act(i, states[i], explore=False) for i in range(config.n_agents)}
-        _, _, _, _, info = env.step(actions)
-        warmup_records.append(enrich_step(config, info))
-    pre_avg_spread = float(np.mean([float(row["avg_spread"]) for row in warmup_records[-10:]]))
-
+def _collect_probe_path(
+    env: ToyLOBPricingEnv,
+    agents: IndependentQLearners,
+    config: ToyLOBConfig,
+    deviator: int,
+    horizon: int,
+    force_first_deviation: bool,
+) -> tuple[List[Dict[str, object]], float]:
+    actual_deviation = 0.0
     records: List[Dict[str, object]] = []
-    deviator = 0
     for k in range(horizon):
         states = {i: env.state_for_agent(i) for i in range(config.n_agents)}
         actions = {i: agents.act(i, states[i], explore=False) for i in range(config.n_agents)}
-        if k == 0:
-            actions[deviator] = max(0, actions[deviator] - 1)
+        if k == 0 and force_first_deviation:
+            pre_action = actions[deviator]
+            post_action = max(0, pre_action - 1)
+            actions[deviator] = post_action
+            actual_deviation = (
+                config.spread_levels[pre_action] - config.spread_levels[post_action]
+            )
         _, _, _, _, info = env.step(actions)
         row = enrich_step(config, info)
         spreads = np.array(row["spreads"], dtype=float)
@@ -86,7 +88,48 @@ def deviation_probe(config: ToyLOBConfig, agents: IndependentQLearners, seed: in
         row["other_avg_spread"] = float(np.mean(np.delete(spreads, deviator)))
         row["deviator_reward"] = float(rewards[deviator])
         records.append(row)
-    return recovery_summary(records, pre_avg_spread)
+    return records, float(actual_deviation)
+
+
+def deviation_probe(config: ToyLOBConfig, agents: IndependentQLearners, seed: int, horizon: int = 30) -> Dict[str, object]:
+    warmup_seed = seed + 50_000
+    warmup_steps = 40
+    deviator = 0
+
+    warm_env = ToyLOBPricingEnv(config.with_risk_mode("low"))
+    warm_env.reset(seed=warmup_seed)
+    warmup_records: List[Dict[str, object]] = []
+    for _ in range(warmup_steps):
+        states = {i: warm_env.state_for_agent(i) for i in range(config.n_agents)}
+        actions = {i: agents.act(i, states[i], explore=False) for i in range(config.n_agents)}
+        _, _, _, _, info = warm_env.step(actions)
+        warmup_records.append(enrich_step(config, info))
+    pre_avg_spread = float(np.mean([float(row["avg_spread"]) for row in warmup_records[-10:]]))
+
+    # Recreate the same warmup state twice by replaying deterministic greedy
+    # actions from the same seed. Path A is control, path B forces one real
+    # one-level spread cut for the deviator at the first probe step.
+    control_env = ToyLOBPricingEnv(config.with_risk_mode("low"))
+    forced_env = ToyLOBPricingEnv(config.with_risk_mode("low"))
+    control_env.reset(seed=warmup_seed)
+    forced_env.reset(seed=warmup_seed)
+    for _ in range(warmup_steps):
+        for replay_env in (control_env, forced_env):
+            states = {i: replay_env.state_for_agent(i) for i in range(config.n_agents)}
+            actions = {i: agents.act(i, states[i], explore=False) for i in range(config.n_agents)}
+            replay_env.step(actions)
+
+    control_records, _ = _collect_probe_path(control_env, agents, config, deviator, horizon, False)
+    forced_records, actual_deviation = _collect_probe_path(forced_env, agents, config, deviator, horizon, True)
+    if actual_deviation <= 0.0:
+        return {
+            "actual_deviation": 0.0,
+            "probe_skipped": 1.0,
+            "reason": "deviator already at minimum spread",
+        }
+    out = paired_recovery_summary(forced_records, control_records, pre_avg_spread, actual_deviation)
+    out["probe_skipped"] = 0.0
+    return out
 
 
 def write_records(path: Path, records: List[Dict[str, object]]) -> None:

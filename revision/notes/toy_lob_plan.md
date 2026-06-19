@@ -38,6 +38,21 @@ Observation passes only if low-risk no-intervention produces a meaningful
 risk-adjusted collusion gap, spread alignment, demand suppression, and some
 evidence of punishment/recovery after a forced one-step spread cut.
 
+The tabular Q state is:
+
+- risk bin
+- average spread bin
+- own spread bin
+- market minimum spread bin
+- spread range bin
+
+The minimum spread and spread range are required because a one-agent undercut in
+an N=10 market may barely move the average spread.
+
+No-intervention records also include `passive_risk_score`, a non-intervening
+risk-aware gate score used later to calibrate thresholds from observed score
+distributions.
+
 ## Step 2: Baselines
 
 Only after Step 1 passes, compare:
@@ -48,6 +63,10 @@ Only after Step 1 passes, compare:
 - matched-rate random gate
 - risk-aware gated routing intervention
 
+Baseline runs should use a method x seed grid. The random gate should be
+matched to the realized risk-aware gate activation rate, not fixed at an
+arbitrary rate.
+
 ## Step 3: Gate Ablations
 
 Only after Step 2 passes, compare full gate against:
@@ -57,3 +76,7 @@ Only after Step 2 passes, compare full gate against:
 - no alignment feature
 - no demand suppression feature
 - no routing intervention
+
+The current intervention is a gated routing-sensitivity intervention: when the
+gate fires, the platform increases the order-flow advantage for lower spreads.
+It is not yet a temporal defector-protection mechanism.
