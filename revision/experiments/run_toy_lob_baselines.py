@@ -49,7 +49,10 @@ def run_gate_mode(
 ) -> Dict[str, object]:
     env = ToyLOBPricingEnv(config)
     agents = IndependentQLearners(QLearningConfig(n_agents=config.n_agents, n_actions=config.n_actions, seed=seed))
-    gate = InterventionGate(config, gate_config or GateConfig(seed=seed + 7), mode=gate_mode)
+    gate_run_config = gate_config or GateConfig(seed=seed + 7)
+    if gate_mode == "random" and gate_config is not None:
+        gate_run_config = GateConfig(**{**vars(gate_config), "seed": seed + 7})
+    gate = InterventionGate(config, gate_run_config, mode=gate_mode)
     routing = RoutingInterventionConfig(rho=routing_rho)
 
     for ep in range(episodes):

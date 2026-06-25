@@ -17,7 +17,8 @@ Raw outputs are under `revision/experiments/outputs/` and are ignored by git.
 - Confirmation evaluation seeds: `15-34`.
 - Training episodes: `1500`.
 - Evaluation episodes: `100`.
-- Baseline runtime: `1086.04s` elapsed with method-seed parallelism.
+- Baseline runtime: `1079.86s` elapsed with method-seed parallelism and
+  seed-specific random-gate RNG.
 - Ablation runtime: `923.65s` elapsed with method-seed parallelism.
 - Matched random rate: `0.145425`, matched to realized gated activation.
 
@@ -28,20 +29,20 @@ Raw outputs are under `revision/experiments/outputs/` and are ignored by git.
 | no_intervention | 0.2319 | [0.2175, 0.2465] | 0.0000 | 0.0000 | 0.0000 | 6.7146 |
 | always_on | -0.0255 | [-0.0480, -0.0017] | 1.0000 | 1.0000 | 1.0000 | 3.7316 |
 | threshold | 0.1385 | [0.1300, 0.1471] | 0.3235 | 0.8980 | 0.3717 | 5.9259 |
-| random_gate | 0.1961 | [0.1849, 0.2069] | 0.1416 | 0.1429 | 0.1415 | 6.3246 |
+| random_gate | 0.2082 | [0.1961, 0.2200] | 0.1459 | 0.1471 | 0.1462 | 6.3170 |
 | gated_intervention | 0.1334 | [0.1194, 0.1478] | 0.1454 | 0.1289 | 0.8414 | 6.3741 |
 | oracle_gate | 0.1395 | [0.1273, 0.1517] | 0.1173 | 0.0000 | 1.0000 | 6.2718 |
 
 Paired held-out comparison against matched random:
 
-- `random_gate - gated_intervention` collusion-gap delta mean: `0.062695609`.
-- Standard error of paired delta: `0.009575607`.
-- Positive improvement seeds: `18 / 20`.
+- `random_gate - gated_intervention` collusion-gap delta mean: `0.074807217`.
+- Standard error of paired delta: `0.008816181`.
+- Positive improvement seeds: `20 / 20`.
 
 Baseline pass/fail:
 
 - Pass: no-intervention has a stable positive collusion gap.
-- Pass: gated gap is lower than matched random, with 18 of 20 seed deltas positive.
+- Pass: gated gap is lower than matched random, with 20 of 20 seed deltas positive.
 - Pass: gated FPR is much lower than threshold FPR (`0.1289` vs `0.8980`).
 - Pass: gated reward is much higher than always-on reward (`6.3741` vs `3.7316`).
 - Pass: gated intervention rate is far below always-on (`0.1454` vs `1.0000`).
@@ -87,8 +88,8 @@ Do not use:
 
 ## Output Artifacts
 
-- Baseline summary: `revision/experiments/outputs/baselines_confirmation_sweep_v1/summary.json`
-- Baseline aggregate CSV: `revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_baseline_aggregate.csv`
+- Baseline summary: `revision/experiments/outputs/baselines_confirmation_sweep_v2_random_seeded/summary.json`
+- Baseline aggregate CSV: `revision/experiments/outputs/aggregated_confirmation_sweep_v2_random_seeded/toy_lob_baseline_aggregate.csv`
 - Ablation summary: `revision/experiments/outputs/ablation_confirmation_sweep_v1/summary.json`
 - Ablation aggregate CSV: `revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_ablation_aggregate.csv`
-- Figures: `revision/experiments/outputs/figures_confirmation_sweep_v1/`
+- Figures: `revision/experiments/outputs/figures_confirmation_sweep_v2_random_seeded/`

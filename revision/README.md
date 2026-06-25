@@ -81,3 +81,13 @@ The first full toy confirmation sweep used the frozen gate from
 
 The repo-visible summary is
 `revision/notes/toy_lob_confirmation_sweep_v1_summary.md`.
+
+## Toy Robustness Sweep
+
+After confirmation, run controlled robustness extensions before moving to full
+LOB or MAPPO/CRPO:
+
+`python3 revision/experiments/run_toy_lob_robustness.py --episodes 800 --eval-episodes 50 --seeds 35,36,37,38,39,40,41,42,43,44 --scenarios base_n10,n5,n20,cost_wide,risk_fast,long_horizon --jobs 32 --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/robustness_sweep_v1/summary.json`
+
+The first robustness summary is
+`revision/notes/toy_lob_robustness_sweep_v1_summary.md`.
