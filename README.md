@@ -48,6 +48,8 @@ The current toy-scale validation notes are under `revision/notes/`.
   the N-invariant feature diagnostic and gate-v2 plumbing.
 - `revision/notes/toy_lob_n20_v2_stress_protocol.md` records the formal N=20
   gate-v2 stress-test protocol.
+- `revision/notes/lob_marl_pilot_v1_summary.md` records the first local
+  matching-engine LOB/MARL pilot bridge. This is not a full MAPPO result.
 
 Gate-v2 feature diagnostic and calibration:
 
@@ -65,4 +67,22 @@ Formal N=20 gate-v2 stress-test runner:
 
 ```bash
 python revision/experiments/run_toy_lob_n20_v2_sweep.py --episodes 800 --eval-episodes 50 --seeds 90-109 --jobs 6 --gate-config revision/experiments/outputs/n_invariant_gate_diagnostic_v1/v2_gate_config.json --output-dir revision/experiments/outputs/n20_v2_formal_sweep_v1
+```
+
+## Local LOB/MARL Pilot
+
+The first migration pilot uses a local price-time priority matching engine and
+independent Q learners to verify the LOB measurement/intervention path before a
+MAPPO adapter is attached.
+
+Calibrate the LOB gate from no-intervention records:
+
+```bash
+python revision/experiments/calibrate_lob_gate.py --episodes 30 --eval-episodes 5 --episode-length 200 --n-agents 10 --seeds 0-4 --target-activation 0.05,0.35 --output-dir revision/experiments/outputs/lob_gate_calibration_v1
+```
+
+Run the pilot with the frozen gate config and matched random baseline:
+
+```bash
+python revision/experiments/run_lob_marl_pilot.py --episodes 30 --eval-episodes 5 --episode-length 200 --n-agents 10 --seeds 0-4 --jobs 5 --gate-config revision/experiments/outputs/lob_gate_calibration_v1/lob_gate_config.json --output revision/experiments/outputs/lob_marl_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_marl_pilot_v1/metrics.csv
 ```
