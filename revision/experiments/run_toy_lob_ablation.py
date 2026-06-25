@@ -68,6 +68,30 @@ def run_ablation_grid(
         return list(executor.map(_run_ablation_job, ablation_jobs))
 
 
+def run_ablation_methods_grid(
+    ablations: List[Tuple[str, GateMode, int, float]],
+    episodes: int,
+    eval_episodes: int,
+    seeds: List[int],
+    gate_config: GateConfig | None,
+    jobs: int,
+) -> Dict[str, List[Dict[str, object]]]:
+    ablation_jobs = [
+        (name, gate_mode, seed_offset, routing_rho, episodes, eval_episodes, seed, gate_config)
+        for name, gate_mode, seed_offset, routing_rho in ablations
+        for seed in seeds
+    ]
+    grouped: Dict[str, List[Dict[str, object]]] = {name: [] for name, _, _, _ in ablations}
+    if jobs <= 1 or len(ablation_jobs) <= 1:
+        results = [_run_ablation_job(job) for job in ablation_jobs]
+    else:
+        with ProcessPoolExecutor(max_workers=jobs) as executor:
+            results = list(executor.map(_run_ablation_job, ablation_jobs))
+    for result in results:
+        grouped[str(result["method"])].append(result)
+    return grouped
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--episodes", type=int, default=600)
@@ -87,6 +111,7 @@ def main() -> None:
             "eval_episodes": args.eval_episodes,
             "seeds": seeds,
             "jobs": args.jobs,
+            "parallelism": "method_seed",
             "gate_config_path": args.gate_config,
             "gate_config": vars(gate_config) if gate_config is not None else None,
         },
@@ -94,18 +119,16 @@ def main() -> None:
     }
     methods_out: Dict[str, object] = {}
     summary["methods"] = methods_out
-    for name, gate_mode, seed_offset, routing_rho in ABLATIONS:
-        results = run_ablation_grid(
-            name,
-            gate_mode,
-            seed_offset,
-            routing_rho,
-            args.episodes,
-            args.eval_episodes,
-            seeds,
-            gate_config,
-            args.jobs,
-        )
+    ablation_results = run_ablation_methods_grid(
+        ABLATIONS,
+        args.episodes,
+        args.eval_episodes,
+        seeds,
+        gate_config,
+        args.jobs,
+    )
+    for name, _, _, _ in ABLATIONS:
+        results = ablation_results[name]
         methods_out[name] = {
             "seed_results": results,
             "aggregate": aggregate_seed_results(results),

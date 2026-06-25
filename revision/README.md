@@ -63,3 +63,21 @@ minimum formal pass is:
 Promote to a stronger final sweep only after this pass is stable. The next
 scale-up should use 20 held-out evaluation seeds and 1500-3000 training
 episodes.
+
+## Toy Confirmation Sweep
+
+The first full toy confirmation sweep used the frozen gate from
+`gate_calibration_sweep_v1` and held out seeds `15-34`:
+
+1. Confirmation baselines:
+   `python3 revision/experiments/run_toy_lob_baselines.py --episodes 1500 --eval-episodes 100 --seeds 15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34 --jobs 32 --random-rate auto --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/baselines_confirmation_sweep_v1/summary.json`
+2. Confirmation ablations:
+   `python3 revision/experiments/run_toy_lob_ablation.py --episodes 1500 --eval-episodes 100 --seeds 15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34 --jobs 32 --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/ablation_confirmation_sweep_v1/summary.json`
+3. Aggregate:
+   `python3 revision/experiments/aggregate_toy_lob_results.py --input revision/experiments/outputs/baselines_confirmation_sweep_v1/summary.json --output-csv revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_baseline_aggregate.csv --output-json revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_baseline_aggregate.json`
+   `python3 revision/experiments/aggregate_toy_lob_results.py --input revision/experiments/outputs/ablation_confirmation_sweep_v1/summary.json --output-csv revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_ablation_aggregate.csv --output-json revision/experiments/outputs/aggregated_confirmation_sweep_v1/toy_lob_ablation_aggregate.json`
+4. Plot:
+   `python3 revision/experiments/plot_toy_lob_results.py --observation-dir revision/experiments/outputs/observation_calibration_sweep_v1 --baseline-summary revision/experiments/outputs/baselines_confirmation_sweep_v1/summary.json --ablation-summary revision/experiments/outputs/ablation_confirmation_sweep_v1/summary.json --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output-dir revision/experiments/outputs/figures_confirmation_sweep_v1`
+
+The repo-visible summary is
+`revision/notes/toy_lob_confirmation_sweep_v1_summary.md`.

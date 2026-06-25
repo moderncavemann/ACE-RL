@@ -150,6 +150,31 @@ def run_method_grid(
         return list(executor.map(_run_method_job, method_jobs))
 
 
+def run_methods_grid(
+    config: ToyLOBConfig,
+    methods: List[str],
+    episodes: int,
+    eval_episodes: int,
+    seeds: List[int],
+    gate_config: GateConfig | None,
+    jobs: int,
+) -> Dict[str, List[Dict[str, object]]]:
+    method_jobs = [
+        (config, method, episodes, eval_episodes, seed, gate_config)
+        for method in methods
+        for seed in seeds
+    ]
+    grouped: Dict[str, List[Dict[str, object]]] = {method: [] for method in methods}
+    if jobs <= 1 or len(method_jobs) <= 1:
+        results = [_run_method_job(job) for job in method_jobs]
+    else:
+        with ProcessPoolExecutor(max_workers=jobs) as executor:
+            results = list(executor.map(_run_method_job, method_jobs))
+    for result in results:
+        grouped[str(result["method"])].append(result)
+    return grouped
+
+
 def mean_se(values: Iterable[float]) -> Dict[str, float]:
     arr = np.array(list(values), dtype=float)
     if len(arr) == 0:
@@ -207,6 +232,7 @@ def main() -> None:
             "seeds": seeds,
             "random_rate": args.random_rate,
             "jobs": args.jobs,
+            "parallelism": "method_seed",
             "gate_config_path": args.gate_config,
             "gate_config": vars(gate_config) if gate_config is not None else None,
         },
@@ -215,17 +241,15 @@ def main() -> None:
     non_random_methods = ["no_intervention", "always_on", "threshold", "gated_intervention"]
     if not args.no_oracle:
         non_random_methods.append("oracle_gate")
-    method_results: Dict[str, List[Dict[str, object]]] = {}
-    for method in non_random_methods:
-        method_results[method] = run_method_grid(
-            config,
-            method,
-            args.episodes,
-            args.eval_episodes,
-            seeds,
-            gate_config,
-            args.jobs,
-        )
+    method_results = run_methods_grid(
+        config,
+        non_random_methods,
+        args.episodes,
+        args.eval_episodes,
+        seeds,
+        gate_config,
+        args.jobs,
+    )
 
     gated_rates = [
         float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]

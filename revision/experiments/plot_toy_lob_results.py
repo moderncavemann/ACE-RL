@@ -58,6 +58,9 @@ def method_aggregates(summary: Dict[str, object]) -> Dict[str, Dict[str, float]]
             "gate_activation_rate": metric(gate_metrics, "gate_activation_rate"),
             "fpr_high_normal": metric(gate_metrics, "fpr_high_normal"),
             "tpr_low_collusive": metric(gate_metrics, "tpr_low_collusive"),
+            "mean_reward": metric(eval_all, "mean_reward_mean"),
+            "total_demand": metric(eval_all, "total_demand_mean"),
+            "demand_suppression": metric(eval_all, "demand_suppression_mean"),
         }
     return out
 
@@ -128,6 +131,36 @@ def plot_tradeoff(methods: Dict[str, Dict[str, float]], output_dir: Path) -> Non
     save(fig, output_dir, "baseline_tradeoff")
 
 
+def plot_fpr_tradeoff(methods: Dict[str, Dict[str, float]], output_dir: Path) -> None:
+    if not methods:
+        return
+    fig, ax = plt.subplots(figsize=(7, 4))
+    for method, vals in sorted(methods.items()):
+        x = vals["fpr_high_normal"]
+        y = vals["collusion_gap"]
+        ax.scatter(x, y, s=55)
+        ax.annotate(method, (x, y), xytext=(5, 4), textcoords="offset points", fontsize=8)
+    ax.set_title("False-positive trade-off")
+    ax.set_xlabel("FPR in high-risk normal windows")
+    ax.set_ylabel("Mean collusion gap")
+    save(fig, output_dir, "fpr_gap_tradeoff")
+
+
+def plot_reward_tradeoff(methods: Dict[str, Dict[str, float]], output_dir: Path) -> None:
+    if not methods:
+        return
+    fig, ax = plt.subplots(figsize=(7, 4))
+    for method, vals in sorted(methods.items()):
+        x = vals["mean_reward"]
+        y = vals["collusion_gap"]
+        ax.scatter(x, y, s=55)
+        ax.annotate(method, (x, y), xytext=(5, 4), textcoords="offset points", fontsize=8)
+    ax.set_title("Market-quality trade-off")
+    ax.set_xlabel("Mean reward")
+    ax.set_ylabel("Mean collusion gap")
+    save(fig, output_dir, "reward_gap_tradeoff")
+
+
 def plot_gate_rates(methods: Dict[str, Dict[str, float]], output_dir: Path) -> None:
     if not methods:
         return
@@ -149,10 +182,72 @@ def plot_gate_rates(methods: Dict[str, Dict[str, float]], output_dir: Path) -> N
     save(fig, output_dir, "gate_fpr_tpr")
 
 
+def plot_paired_delta(summary: Dict[str, object], output_dir: Path) -> None:
+    methods = summary.get("methods", {})
+    if not isinstance(methods, dict) or "random_gate" not in methods or "gated_intervention" not in methods:
+        return
+
+    def seed_gap(method: str) -> Dict[int, float]:
+        rows = dict(methods[method]).get("seed_results", [])
+        return {
+            int(dict(row).get("seed", dict(row).get("base_seed", -1))): float(dict(dict(row).get("eval_all", {})).get("collusion_gap_mean", 0.0))
+            for row in rows
+            if isinstance(row, dict)
+        }
+
+    random_gap = seed_gap("random_gate")
+    gated_gap = seed_gap("gated_intervention")
+    seeds = sorted(set(random_gap) & set(gated_gap))
+    if not seeds:
+        return
+    deltas = [random_gap[seed] - gated_gap[seed] for seed in seeds]
+    colors = ["#2f7d4f" if delta > 0 else "#a94442" for delta in deltas]
+    fig, ax = plt.subplots(figsize=(max(7, len(seeds) * 0.35), 4))
+    ax.bar([str(seed) for seed in seeds], deltas, color=colors)
+    ax.axhline(0, color="black", linewidth=1)
+    ax.set_title(f"Paired gap delta: random - gated ({sum(delta > 0 for delta in deltas)}/{len(deltas)} positive)")
+    ax.set_xlabel("Held-out seed")
+    ax.set_ylabel("Collusion-gap reduction")
+    save(fig, output_dir, "paired_random_minus_gated_delta")
+
+
+def plot_ablation_gap(methods: Dict[str, Dict[str, float]], output_dir: Path) -> None:
+    if not methods:
+        return
+    names = list(sorted(methods.keys()))
+    x = np.arange(len(names))
+    fig, ax = plt.subplots(figsize=(max(7, len(names) * 0.9), 4))
+    ax.bar(x, [methods[name]["collusion_gap"] for name in names])
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, rotation=30, ha="right")
+    ax.set_title("Ablation collusion gap")
+    ax.set_ylabel("Mean collusion gap")
+    save(fig, output_dir, "ablation_collusion_gap")
+
+
+def plot_ablation_gate_rates(methods: Dict[str, Dict[str, float]], output_dir: Path) -> None:
+    if not methods:
+        return
+    names = list(sorted(methods.keys()))
+    x = np.arange(len(names))
+    width = 0.38
+    fig, ax = plt.subplots(figsize=(max(7, len(names) * 0.9), 4))
+    ax.bar(x - width / 2, [methods[name]["fpr_high_normal"] for name in names], width, label="FPR high-normal")
+    ax.bar(x + width / 2, [methods[name]["tpr_low_collusive"] for name in names], width, label="TPR low-collusive")
+    ax.set_xticks(x)
+    ax.set_xticklabels(names, rotation=30, ha="right")
+    ax.set_ylim(0, 1)
+    ax.set_title("Ablation gate diagnostics")
+    ax.set_ylabel("Rate")
+    ax.legend(frameon=False)
+    save(fig, output_dir, "ablation_gate_fpr_tpr")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--observation-dir", default="revision/experiments/outputs/observation")
     parser.add_argument("--baseline-summary", default="revision/experiments/outputs/baselines/summary.json")
+    parser.add_argument("--ablation-summary", default=None)
     parser.add_argument("--gate-config", default=None)
     parser.add_argument("--output-dir", default="revision/experiments/outputs/figures")
     args = parser.parse_args()
@@ -169,9 +264,19 @@ def main() -> None:
 
     baseline_path = Path(args.baseline_summary)
     if baseline_path.exists():
-        methods = method_aggregates(json.loads(baseline_path.read_text(encoding="utf-8")))
+        baseline_summary = json.loads(baseline_path.read_text(encoding="utf-8"))
+        methods = method_aggregates(baseline_summary)
         plot_tradeoff(methods, output_dir)
+        plot_fpr_tradeoff(methods, output_dir)
+        plot_reward_tradeoff(methods, output_dir)
         plot_gate_rates(methods, output_dir)
+        plot_paired_delta(baseline_summary, output_dir)
+
+    if args.ablation_summary and Path(args.ablation_summary).exists():
+        ablation_summary = json.loads(Path(args.ablation_summary).read_text(encoding="utf-8"))
+        ablation_methods = method_aggregates(ablation_summary)
+        plot_ablation_gap(ablation_methods, output_dir)
+        plot_ablation_gate_rates(ablation_methods, output_dir)
 
     print(f"Saved toy LOB figures to {output_dir}")
 
