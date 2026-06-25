@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import fields
 from pathlib import Path
 from typing import Dict, Iterable, List
 
@@ -19,6 +20,20 @@ from src.envs.toy_lob_pricing_env import ToyLOBConfig, ToyLOBPricingEnv
 from src.interventions.gates import GateConfig, GateMode, InterventionGate
 from src.interventions.routing_interventions import RoutingInterventionConfig, eta_boost_from_gate
 from src.utils.metrics import enrich_step, gate_classification_metrics, summarize_by_risk, summarize_records
+
+
+def load_gate_config(path: str | None) -> GateConfig | None:
+    if not path:
+        return None
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    config_block = raw.get("gate_config", raw)
+    valid_fields = {field.name for field in fields(GateConfig)}
+    kwargs = {
+        key: value
+        for key, value in dict(config_block).items()
+        if key in valid_fields
+    }
+    return GateConfig(**kwargs)
 
 
 def run_gate_mode(
@@ -99,6 +114,7 @@ def run_method(
         "no_intervention": "none",
         "always_on": "always",
         "threshold": "threshold",
+        "oracle_gate": "oracle",
         "random_gate": "random",
         "gated_intervention": "risk_aware",
     }[method]
@@ -150,25 +166,32 @@ def main() -> None:
     parser.add_argument("--eval-episodes", type=int, default=20)
     parser.add_argument("--seeds", default="0,1,2,3,4,5,6,7,8,9")
     parser.add_argument("--random-rate", default="auto", help="'auto' matches gated activation rate, or pass a float.")
+    parser.add_argument("--gate-config", default=None, help="Optional JSON output from calibrate_toy_lob_gate.py.")
+    parser.add_argument("--no-oracle", action="store_true", help="Skip diagnostic oracle_gate baseline.")
     parser.add_argument("--output", default="revision/experiments/outputs/baselines/summary.json")
     args = parser.parse_args()
 
     seeds = parse_seeds(args.seeds)
     config = ToyLOBConfig(seed=seeds[0] if seeds else 0, risk_mode="mixed")
+    gate_config = load_gate_config(args.gate_config)
     summary: Dict[str, object] = {
         "metadata": {
             "episodes": args.episodes,
             "eval_episodes": args.eval_episodes,
             "seeds": seeds,
             "random_rate": args.random_rate,
+            "gate_config_path": args.gate_config,
+            "gate_config": vars(gate_config) if gate_config is not None else None,
         },
         "methods": {},
     }
     non_random_methods = ["no_intervention", "always_on", "threshold", "gated_intervention"]
+    if not args.no_oracle:
+        non_random_methods.append("oracle_gate")
     method_results: Dict[str, List[Dict[str, object]]] = {}
     for method in non_random_methods:
         method_results[method] = [
-            run_method(config, method, args.episodes, args.eval_episodes, seed)
+            run_method(config, method, args.episodes, args.eval_episodes, seed, gate_config=gate_config)
             for seed in seeds
         ]
 
@@ -179,13 +202,16 @@ def main() -> None:
     matched_rate = float(np.mean(gated_rates)) if args.random_rate == "auto" else float(args.random_rate)
     matched_rate = float(np.clip(matched_rate, 0.0, 1.0))
     summary["metadata"]["matched_random_rate"] = matched_rate  # type: ignore[index]
-    random_gate_config = GateConfig(random_rate=matched_rate)
+    random_gate_config = gate_config or GateConfig()
+    random_gate_config = GateConfig(**{**vars(random_gate_config), "random_rate": matched_rate})
     method_results["random_gate"] = [
         run_method(config, "random_gate", args.episodes, args.eval_episodes, seed, gate_config=random_gate_config)
         for seed in seeds
     ]
 
     ordered_methods = ["no_intervention", "always_on", "threshold", "random_gate", "gated_intervention"]
+    if not args.no_oracle:
+        ordered_methods.append("oracle_gate")
     methods_out: Dict[str, object] = {}
     summary["methods"] = methods_out
     for method in ordered_methods:

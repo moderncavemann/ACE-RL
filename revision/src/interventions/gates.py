@@ -16,6 +16,7 @@ GateMode = Literal[
     "always",
     "threshold",
     "random",
+    "oracle",
     "risk_aware",
     "spread_only",
     "no_risk_adjustment",
@@ -29,6 +30,8 @@ class GateConfig:
     threshold_spread: float = 3.5
     random_rate: float = 0.30
     risk_threshold: float = 0.85
+    oracle_collusion_gap_tau: float = 0.30
+    oracle_alignment_tau: float = 0.0
     w_excess: float = 0.65
     w_alignment: float = 0.20
     w_demand: float = 0.15
@@ -65,6 +68,16 @@ class InterventionGate:
         elif self.mode == "random":
             score = self.gate_config.random_rate
             active = bool(self.rng.random() < self.gate_config.random_rate)
+        elif self.mode == "oracle":
+            # Diagnostic upper bound: uses the true risk-adjusted excess spread.
+            # This is not deployable evidence; it isolates whether routing can
+            # work when intervention timing is correct.
+            score = excess
+            active = (
+                risk_state == "low"
+                and excess > self.gate_config.oracle_collusion_gap_tau
+                and alignment >= self.gate_config.oracle_alignment_tau
+            )
         elif self.mode == "spread_only":
             score = excess
             active = score > self.gate_config.risk_threshold
