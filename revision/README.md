@@ -91,3 +91,20 @@ LOB or MAPPO/CRPO:
 
 The first robustness summary is
 `revision/notes/toy_lob_robustness_sweep_v1_summary.md`.
+
+## N=20 Follow-up
+
+The first targeted N=20 follow-up keeps the frozen calibration threshold and
+checks whether the larger-N caveat is training length or feature-distribution
+shift:
+
+1. N=20 longer-training follow-up:
+   `python3 revision/experiments/run_toy_lob_robustness.py --episodes 1500 --eval-episodes 100 --seeds 45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64 --scenarios n20 --methods no_intervention,always_on,threshold,gated_intervention,spread_only_gate --jobs 32 --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/n20_followup_1500_v1/summary.json`
+2. N=10 and N=20 no-intervention diagnostics:
+   `python3 revision/experiments/run_toy_lob_observation.py --episodes 800 --eval-episodes 50 --seeds 45,46,47,48,49,50,51,52,53,54 --jobs 10 --n-agents 10 --output-dir revision/experiments/outputs/observation_n10_diagnostic_v1`
+   `python3 revision/experiments/run_toy_lob_observation.py --episodes 800 --eval-episodes 50 --seeds 45,46,47,48,49,50,51,52,53,54 --jobs 10 --n-agents 20 --output-dir revision/experiments/outputs/observation_n20_diagnostic_v1`
+3. N diagnostic plots:
+   `python3 revision/experiments/plot_toy_lob_n_diagnostics.py --inputs n10=revision/experiments/outputs/observation_n10_diagnostic_v1,n20=revision/experiments/outputs/observation_n20_diagnostic_v1 --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --robustness-summary revision/experiments/outputs/n20_followup_1500_v1/summary.json --robustness-scenarios n20 --output-dir revision/experiments/outputs/n20_diagnostics_v1`
+
+The repo-visible summary is
+`revision/notes/toy_lob_n20_followup_v1_summary.md`.

@@ -40,6 +40,7 @@ METHODS: Dict[str, Tuple[GateMode, float]] = {
     "always_on": ("always", 0.75),
     "threshold": ("threshold", 0.75),
     "gated_intervention": ("risk_aware", 0.75),
+    "spread_only_gate": ("spread_only", 0.75),
     "oracle_gate": ("oracle", 0.75),
     "no_risk_adjustment": ("no_risk_adjustment", 0.75),
     "no_routing_intervention": ("risk_aware", 0.0),

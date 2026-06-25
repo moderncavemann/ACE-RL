@@ -173,9 +173,10 @@ def run_observation_seed(
     n_sweep: str,
     n_sweep_episodes: int,
     legacy_names: bool,
+    base_config: ToyLOBConfig | None = None,
 ) -> Dict[str, object]:
-    base = ToyLOBConfig(seed=seed)
-    summary: Dict[str, object] = {"metadata": {"seed": seed}}
+    base = replace(base_config, seed=seed) if base_config is not None else ToyLOBConfig(seed=seed)
+    summary: Dict[str, object] = {"metadata": {"seed": seed, "config": vars(base)}}
 
     for risk_mode in ["low", "high", "mixed"]:
         config = base.with_risk_mode(risk_mode)  # type: ignore[arg-type]
@@ -210,8 +211,8 @@ def run_observation_seed(
     return summary
 
 
-def _run_observation_job(job: Tuple[int, int, int, Path, str, int, bool]) -> Tuple[int, Dict[str, object]]:
-    seed, episodes, eval_episodes, output_dir, n_sweep, n_sweep_episodes, legacy_names = job
+def _run_observation_job(job: Tuple[int, int, int, Path, str, int, bool, ToyLOBConfig]) -> Tuple[int, Dict[str, object]]:
+    seed, episodes, eval_episodes, output_dir, n_sweep, n_sweep_episodes, legacy_names, base_config = job
     return seed, run_observation_seed(
         seed,
         episodes,
@@ -220,6 +221,7 @@ def _run_observation_job(job: Tuple[int, int, int, Path, str, int, bool]) -> Tup
         n_sweep,
         n_sweep_episodes,
         legacy_names,
+        base_config,
     )
 
 
@@ -230,6 +232,13 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--seeds", default=None, help="Optional comma-separated seeds. Overrides --seed.")
     parser.add_argument("--output-dir", default="revision/experiments/outputs/observation")
+    parser.add_argument("--n-agents", type=int, default=10)
+    parser.add_argument("--c-low", type=float, default=0.50)
+    parser.add_argument("--c-high", type=float, default=2.50)
+    parser.add_argument("--demand-alpha", type=float, default=0.20)
+    parser.add_argument("--p-low-to-high", type=float, default=0.05)
+    parser.add_argument("--p-high-to-low", type=float, default=0.10)
+    parser.add_argument("--episode-length", type=int, default=200)
     parser.add_argument("--n-sweep", default="", help="Optional comma-separated N values for low-risk observation.")
     parser.add_argument("--n-sweep-episodes", type=int, default=300)
     parser.add_argument("--jobs", type=int, default=1, help="Parallel worker processes across seeds.")
@@ -239,8 +248,18 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     seeds = parse_seeds(args.seeds) if args.seeds else [args.seed]
     legacy_names = args.seeds is None and len(seeds) == 1
+    base_config = ToyLOBConfig(
+        n_agents=args.n_agents,
+        c_low=args.c_low,
+        c_high=args.c_high,
+        demand_alpha=args.demand_alpha,
+        p_low_to_high=args.p_low_to_high,
+        p_high_to_low=args.p_high_to_low,
+        episode_length=args.episode_length,
+        seed=seeds[0] if seeds else args.seed,
+    )
     observation_jobs = [
-        (seed, args.episodes, args.eval_episodes, output_dir, args.n_sweep, args.n_sweep_episodes, legacy_names)
+        (seed, args.episodes, args.eval_episodes, output_dir, args.n_sweep, args.n_sweep_episodes, legacy_names, base_config)
         for seed in seeds
     ]
     if args.jobs <= 1 or len(observation_jobs) <= 1:
@@ -260,6 +279,7 @@ def main() -> None:
                 "jobs": args.jobs,
                 "n_sweep": args.n_sweep,
                 "n_sweep_episodes": args.n_sweep_episodes,
+                "config": vars(base_config),
             },
             "seeds": {str(seed): seed_summary for seed, seed_summary in sorted(seed_summaries)},
         }
