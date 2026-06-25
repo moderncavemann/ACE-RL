@@ -74,8 +74,7 @@ class InterventionGate:
             # work when intervention timing is correct.
             score = excess
             active = (
-                risk_state == "low"
-                and excess > self.gate_config.oracle_collusion_gap_tau
+                excess > self.gate_config.oracle_collusion_gap_tau
                 and alignment >= self.gate_config.oracle_alignment_tau
             )
         elif self.mode == "spread_only":

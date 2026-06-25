@@ -6,9 +6,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import fields
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Tuple
 
 import numpy as np
 
@@ -125,6 +126,30 @@ def parse_seeds(raw: str) -> List[int]:
     return [int(x.strip()) for x in raw.split(",") if x.strip()]
 
 
+def _run_method_job(job: Tuple[ToyLOBConfig, str, int, int, int, GateConfig | None]) -> Dict[str, object]:
+    config, method, episodes, eval_episodes, seed, gate_config = job
+    return run_method(config, method, episodes, eval_episodes, seed, gate_config=gate_config)
+
+
+def run_method_grid(
+    config: ToyLOBConfig,
+    method: str,
+    episodes: int,
+    eval_episodes: int,
+    seeds: List[int],
+    gate_config: GateConfig | None,
+    jobs: int,
+) -> List[Dict[str, object]]:
+    method_jobs = [
+        (config, method, episodes, eval_episodes, seed, gate_config)
+        for seed in seeds
+    ]
+    if jobs <= 1 or len(method_jobs) <= 1:
+        return [_run_method_job(job) for job in method_jobs]
+    with ProcessPoolExecutor(max_workers=jobs) as executor:
+        return list(executor.map(_run_method_job, method_jobs))
+
+
 def mean_se(values: Iterable[float]) -> Dict[str, float]:
     arr = np.array(list(values), dtype=float)
     if len(arr) == 0:
@@ -168,6 +193,7 @@ def main() -> None:
     parser.add_argument("--random-rate", default="auto", help="'auto' matches gated activation rate, or pass a float.")
     parser.add_argument("--gate-config", default=None, help="Optional JSON output from calibrate_toy_lob_gate.py.")
     parser.add_argument("--no-oracle", action="store_true", help="Skip diagnostic oracle_gate baseline.")
+    parser.add_argument("--jobs", type=int, default=1, help="Parallel worker processes across seeds.")
     parser.add_argument("--output", default="revision/experiments/outputs/baselines/summary.json")
     args = parser.parse_args()
 
@@ -180,6 +206,7 @@ def main() -> None:
             "eval_episodes": args.eval_episodes,
             "seeds": seeds,
             "random_rate": args.random_rate,
+            "jobs": args.jobs,
             "gate_config_path": args.gate_config,
             "gate_config": vars(gate_config) if gate_config is not None else None,
         },
@@ -190,10 +217,15 @@ def main() -> None:
         non_random_methods.append("oracle_gate")
     method_results: Dict[str, List[Dict[str, object]]] = {}
     for method in non_random_methods:
-        method_results[method] = [
-            run_method(config, method, args.episodes, args.eval_episodes, seed, gate_config=gate_config)
-            for seed in seeds
-        ]
+        method_results[method] = run_method_grid(
+            config,
+            method,
+            args.episodes,
+            args.eval_episodes,
+            seeds,
+            gate_config,
+            args.jobs,
+        )
 
     gated_rates = [
         float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
@@ -204,10 +236,15 @@ def main() -> None:
     summary["metadata"]["matched_random_rate"] = matched_rate  # type: ignore[index]
     random_gate_config = gate_config or GateConfig()
     random_gate_config = GateConfig(**{**vars(random_gate_config), "random_rate": matched_rate})
-    method_results["random_gate"] = [
-        run_method(config, "random_gate", args.episodes, args.eval_episodes, seed, gate_config=random_gate_config)
-        for seed in seeds
-    ]
+    method_results["random_gate"] = run_method_grid(
+        config,
+        "random_gate",
+        args.episodes,
+        args.eval_episodes,
+        seeds,
+        random_gate_config,
+        args.jobs,
+    )
 
     ordered_methods = ["no_intervention", "always_on", "threshold", "random_gate", "gated_intervention"]
     if not args.no_oracle:

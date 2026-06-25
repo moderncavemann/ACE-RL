@@ -41,3 +41,25 @@ a deployable method.
 The tabular learner state includes risk, average spread, own spread, market
 minimum spread, and spread range. The last two terms are required so a one-agent
 undercut can be visible in an N-agent market.
+
+## Formal Toy Sweep
+
+Use separate seeds for threshold calibration and intervention evaluation. A
+minimum formal pass is:
+
+1. Calibration observation:
+   `python3 revision/experiments/run_toy_lob_observation.py --episodes 1000 --eval-episodes 50 --seeds 0,1,2,3,4 --jobs 5 --output-dir revision/experiments/outputs/observation_calibration_sweep_v1`
+2. Freeze gate threshold:
+   `python3 revision/experiments/calibrate_toy_lob_gate.py --observation-dir revision/experiments/outputs/observation_calibration_sweep_v1 --output revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json`
+3. Evaluate held-out baselines:
+   `python3 revision/experiments/run_toy_lob_baselines.py --episodes 1000 --eval-episodes 50 --seeds 5,6,7,8,9,10,11,12,13,14 --jobs 10 --random-rate auto --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/baselines_sweep_v1/summary.json`
+4. Aggregate held-out baselines:
+   `python3 revision/experiments/aggregate_toy_lob_results.py --input revision/experiments/outputs/baselines_sweep_v1/summary.json --output-csv revision/experiments/outputs/aggregated_sweep_v1/toy_lob_baseline_aggregate.csv --output-json revision/experiments/outputs/aggregated_sweep_v1/toy_lob_baseline_aggregate.json`
+5. Plot held-out diagnostics:
+   `python3 revision/experiments/plot_toy_lob_results.py --observation-dir revision/experiments/outputs/observation_calibration_sweep_v1 --baseline-summary revision/experiments/outputs/baselines_sweep_v1/summary.json --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output-dir revision/experiments/outputs/figures_sweep_v1`
+6. If the baseline sweep passes, run held-out ablations:
+   `python3 revision/experiments/run_toy_lob_ablation.py --episodes 1000 --eval-episodes 50 --seeds 5,6,7,8,9,10,11,12,13,14 --jobs 10 --gate-config revision/experiments/outputs/gate_calibration_sweep_v1/gate_config.json --output revision/experiments/outputs/ablation_sweep_v1/summary.json`
+
+Promote to a stronger final sweep only after this pass is stable. The next
+scale-up should use 20 held-out evaluation seeds and 1500-3000 training
+episodes.

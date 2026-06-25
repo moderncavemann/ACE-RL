@@ -125,18 +125,45 @@ def choose_threshold(
     negative_tau: float,
     target_activation: Tuple[float, float],
     max_fpr: float,
+    grid_size: int,
 ) -> Tuple[Dict[str, float], List[Dict[str, float]]]:
     scores = np.array([float(row["passive_risk_score"]) for row in records], dtype=float)
     if len(scores) == 0:
         raise ValueError("No usable records found for gate calibration")
 
+    risk_states = np.array([str(row["risk_state"]) for row in records])
+    collusion_gaps = np.array([float(row["collusion_gap"]) for row in records], dtype=float)
+    low_all = risk_states == "low"
+    high_all = risk_states == "high"
+    low_positive = low_all & (collusion_gaps > positive_tau)
+    high_negative = high_all & (collusion_gaps < negative_tau)
+
+    def mask_rate(active: np.ndarray, mask: np.ndarray) -> float:
+        if not bool(np.any(mask)):
+            return 0.0
+        return float(np.mean(active[mask]))
+
+    def evaluate_array_threshold(threshold: float) -> Dict[str, float]:
+        active = scores > threshold
+        return {
+            "threshold": float(threshold),
+            "activation_rate": float(np.mean(active)) if len(active) else 0.0,
+            "low_activation_rate": mask_rate(active, low_all),
+            "high_activation_rate": mask_rate(active, high_all),
+            "tpr_low_collusive": mask_rate(active, low_positive),
+            "tpr_low_collusive_n": float(np.sum(low_positive)),
+            "fpr_high_normal": mask_rate(active, high_negative),
+            "fpr_high_normal_n": float(np.sum(high_negative)),
+        }
+
     eps = 1e-9
-    candidates = set(float(x) for x in scores)
-    candidates.update(float(np.percentile(scores, q)) for q in range(1, 100))
+    if grid_size < 2:
+        raise ValueError("--grid-size must be at least 2")
+    candidates = set(float(np.percentile(scores, q)) for q in np.linspace(0, 100, grid_size))
     candidates.add(float(np.min(scores) - eps))
     candidates.add(float(np.max(scores) + eps))
     table = [
-        evaluate_threshold(records, threshold, positive_tau, negative_tau)
+        evaluate_array_threshold(threshold)
         for threshold in sorted(candidates)
     ]
 
@@ -193,6 +220,7 @@ def main() -> None:
     parser.add_argument("--negative-tau", type=float, default=0.20)
     parser.add_argument("--target-activation", default="0.20,0.40")
     parser.add_argument("--max-fpr", type=float, default=0.10)
+    parser.add_argument("--grid-size", type=int, default=1001, help="Number of score quantiles to test as thresholds.")
     parser.add_argument("--output", default="revision/experiments/outputs/gate_calibration/gate_config.json")
     parser.add_argument("--table-output", default=None)
     args = parser.parse_args()
@@ -209,6 +237,7 @@ def main() -> None:
         negative_tau=args.negative_tau,
         target_activation=target_activation,
         max_fpr=args.max_fpr,
+        grid_size=args.grid_size,
     )
 
     gate_config = GateConfig(
@@ -242,6 +271,7 @@ def main() -> None:
                 "high": target_activation[1],
             },
             "max_fpr": args.max_fpr,
+            "grid_size": args.grid_size,
         },
         "gate_config": asdict(gate_config),
         "selected_threshold": selected,
