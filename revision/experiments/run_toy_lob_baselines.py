@@ -121,6 +121,10 @@ def run_method(
         "oracle_gate": "oracle",
         "random_gate": "random",
         "gated_intervention": "risk_aware",
+        "spread_only_gate": "spread_only",
+        "v2_entropy_gate": "v2_entropy",
+        "v2_fraction_near_min_gate": "v2_fraction_near_min",
+        "v2_two_stage_gate": "v2_two_stage",
     }[method]
     return run_gate_mode(config, method, gate_mode, episodes, eval_episodes, seed, gate_config=gate_config)
 

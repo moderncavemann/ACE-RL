@@ -41,6 +41,9 @@ METHODS: Dict[str, Tuple[GateMode, float]] = {
     "threshold": ("threshold", 0.75),
     "gated_intervention": ("risk_aware", 0.75),
     "spread_only_gate": ("spread_only", 0.75),
+    "v2_entropy_gate": ("v2_entropy", 0.75),
+    "v2_fraction_near_min_gate": ("v2_fraction_near_min", 0.75),
+    "v2_two_stage_gate": ("v2_two_stage", 0.75),
     "oracle_gate": ("oracle", 0.75),
     "no_risk_adjustment": ("no_risk_adjustment", 0.75),
     "no_routing_intervention": ("risk_aware", 0.0),
@@ -135,6 +138,15 @@ def write_metrics_csv(path: Path, summary: Dict[str, object]) -> None:
                 "demand_suppression_mean",
                 "avg_spread_mean",
                 "alignment_mean",
+                "near_min_spread_fraction_mean",
+                "sparse_near_min_spread_fraction_mean",
+                "spread_entropy_mean",
+                "spread_concentration_mean",
+                "spread_iqr_norm_mean",
+                "flow_concentration_mean",
+                "v2_entropy_score_mean",
+                "v2_fraction_near_min_score_mean",
+                "v2_two_stage_score_mean",
                 "total_demand_mean",
                 "mean_reward_mean",
                 "gate_active_mean",
@@ -252,7 +264,10 @@ def main() -> None:
             float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
             for result in scenario_results.get("gated_intervention", [])
         ]
-        matched_rate = float(np.mean(gated_rates)) if args.random_rate == "auto" else float(args.random_rate)
+        if args.random_rate == "auto":
+            matched_rate = float(np.mean(gated_rates)) if gated_rates else 0.0
+        else:
+            matched_rate = float(args.random_rate)
         matched_rate = float(np.clip(matched_rate, 0.0, 1.0))
         matched_rates[scenario] = matched_rate
         random_gate_config = gate_config or GateConfig()

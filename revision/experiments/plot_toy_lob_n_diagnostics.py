@@ -19,6 +19,17 @@ METRICS = [
     "collusion_gap",
     "alignment",
     "demand_suppression",
+    "near_min_spread_fraction",
+    "sparse_near_min_spread_fraction",
+    "spread_entropy",
+    "spread_concentration",
+    "spread_iqr_norm",
+    "spread_q90_q10_norm",
+    "modal_spread_fraction",
+    "flow_concentration",
+    "v2_entropy_score",
+    "v2_fraction_near_min_score",
+    "v2_two_stage_score",
 ]
 
 
@@ -47,14 +58,34 @@ def read_records(inputs: List[Tuple[str, Path]]) -> List[Dict[str, object]]:
         for path in sorted(directory.glob("*_eval_records.csv")):
             with path.open(newline="", encoding="utf-8") as f:
                 for row in csv.DictReader(f):
-                    records.append({
+                    record = {
                         "label": label,
                         "risk_state": row.get("risk_state", ""),
-                        "passive_risk_score": as_float(row, "passive_risk_score"),
-                        "collusion_gap": as_float(row, "collusion_gap"),
-                        "alignment": as_float(row, "alignment"),
-                        "demand_suppression": as_float(row, "demand_suppression"),
-                    })
+                    }
+                    for metric in METRICS:
+                        record[metric] = as_float(row, metric)
+                    record["sparse_near_min_spread_fraction"] = (
+                        1.0 - float(record["near_min_spread_fraction"])
+                    )
+                    record["v2_entropy_score"] = (
+                        0.65 * float(record["collusion_gap"])
+                        + 0.15 * float(record["spread_entropy"])
+                        + 0.10 * float(record["flow_concentration"])
+                        + 0.15 * float(record["demand_suppression"])
+                    )
+                    record["v2_fraction_near_min_score"] = (
+                        0.65 * float(record["collusion_gap"])
+                        + 0.15 * float(record["sparse_near_min_spread_fraction"])
+                        + 0.10 * float(record["flow_concentration"])
+                        + 0.15 * float(record["demand_suppression"])
+                    )
+                    record["v2_two_stage_score"] = (
+                        0.75 * float(record["collusion_gap"])
+                        + 0.10 * float(record["spread_entropy"])
+                        + 0.10 * float(record["flow_concentration"])
+                        + 0.05 * float(record["demand_suppression"])
+                    )
+                    records.append(record)
     return records
 
 

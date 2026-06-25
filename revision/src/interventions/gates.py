@@ -9,7 +9,7 @@ import numpy as np
 
 from src.envs.toy_lob_pricing_env import ToyLOBConfig
 from src.utils.benchmarks import benchmark_for_risk
-from src.utils.metrics import demand_suppression, risk_adjusted_collusion_gap, spread_alignment
+from src.utils.metrics import demand_suppression, n_invariant_gate_scores, risk_adjusted_collusion_gap, spread_alignment
 
 GateMode = Literal[
     "none",
@@ -22,6 +22,9 @@ GateMode = Literal[
     "no_risk_adjustment",
     "no_alignment",
     "no_demand",
+    "v2_entropy",
+    "v2_fraction_near_min",
+    "v2_two_stage",
 ]
 
 
@@ -35,7 +38,13 @@ class GateConfig:
     w_excess: float = 0.65
     w_alignment: float = 0.20
     w_demand: float = 0.15
+    w_distribution: float = 0.15
+    w_flow: float = 0.10
     w_recent_intervention: float = 0.10
+    v2_entropy_threshold: float | None = None
+    v2_fraction_near_min_threshold: float | None = None
+    v2_two_stage_threshold: float | None = None
+    v2_base_excess_threshold: float | None = None
     seed: int = 123
 
 
@@ -57,6 +66,18 @@ class InterventionGate:
             total_demand = float(self.config.q0 * np.exp(-self.config.demand_alpha * avg_spread))
         ds = demand_suppression(self.config, risk_state, total_demand)
         excess = risk_adjusted_collusion_gap(self.config, risk_state, avg_spread)
+        v2_scores = n_invariant_gate_scores(
+            self.config,
+            risk_state,
+            spreads,
+            total_demand,
+            recent_intervention=self.recent_intervention,
+            w_excess=self.gate_config.w_excess,
+            w_distribution=self.gate_config.w_distribution,
+            w_flow=self.gate_config.w_flow,
+            w_demand=self.gate_config.w_demand,
+            w_recent_intervention=self.gate_config.w_recent_intervention,
+        )
 
         if self.mode == "none":
             score, active = 0.0, False
@@ -86,6 +107,17 @@ class InterventionGate:
             unadjusted_excess = (avg_spread - float(low_bench["s_comp"])) / denom
             score = self._risk_aware_score(unadjusted_excess, alignment, ds)
             active = score > self.gate_config.risk_threshold
+        elif self.mode == "v2_entropy":
+            score = float(v2_scores["v2_entropy_score"])
+            active = score > self._threshold(self.gate_config.v2_entropy_threshold)
+        elif self.mode == "v2_fraction_near_min":
+            score = float(v2_scores["v2_fraction_near_min_score"])
+            active = score > self._threshold(self.gate_config.v2_fraction_near_min_threshold)
+        elif self.mode == "v2_two_stage":
+            score = float(v2_scores["v2_two_stage_score"])
+            base_threshold = self._threshold(self.gate_config.v2_base_excess_threshold)
+            score_threshold = self._threshold(self.gate_config.v2_two_stage_threshold)
+            active = excess > base_threshold and score > score_threshold
         else:
             score = self._risk_aware_score(excess, alignment, ds)
             active = score > self.gate_config.risk_threshold
@@ -100,7 +132,11 @@ class InterventionGate:
             "demand_suppression": float(ds),
             "s_comp": float(bench["s_comp"]),
             "s_coll": float(bench["s_coll"]),
+            **{key: float(value) for key, value in v2_scores.items()},
         }
+
+    def _threshold(self, value: float | None) -> float:
+        return self.gate_config.risk_threshold if value is None else float(value)
 
     def _risk_aware_score(self, excess: float, alignment: float, ds: float) -> float:
         cfg = self.gate_config
