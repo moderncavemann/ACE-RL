@@ -46,6 +46,8 @@ The current toy-scale validation notes are under `revision/notes/`.
   follow-up.
 - `revision/notes/toy_lob_n_invariant_gate_diagnostic_v1_summary.md` records
   the N-invariant feature diagnostic and gate-v2 plumbing.
+- `revision/notes/toy_lob_n20_v2_stress_protocol.md` records the formal N=20
+  gate-v2 stress-test protocol.
 
 Gate-v2 feature diagnostic and calibration:
 
@@ -57,4 +59,10 @@ N=20 gate-v2 engineering smoke:
 
 ```bash
 python revision/experiments/run_toy_lob_robustness.py --episodes 5 --eval-episodes 1 --seeds 85 --scenarios n20 --methods no_intervention,gated_intervention,spread_only_gate,v2_entropy_gate,v2_fraction_near_min_gate,v2_two_stage_gate --gate-config revision/experiments/outputs/n_invariant_gate_diagnostic_v1/v2_gate_config.json --jobs 1 --output revision/experiments/outputs/n20_v2_gate_smoke_v1/summary.json --metrics-csv revision/experiments/outputs/n20_v2_gate_smoke_v1/metrics.csv
+```
+
+Formal N=20 gate-v2 stress-test runner:
+
+```bash
+python revision/experiments/run_toy_lob_n20_v2_sweep.py --episodes 800 --eval-episodes 50 --seeds 90-109 --jobs 6 --gate-config revision/experiments/outputs/n_invariant_gate_diagnostic_v1/v2_gate_config.json --output-dir revision/experiments/outputs/n20_v2_formal_sweep_v1
 ```

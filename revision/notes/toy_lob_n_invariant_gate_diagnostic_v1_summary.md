@@ -106,6 +106,9 @@ This diagnostic supports a gate-v2 representation update:
   mass, and normalized flow concentration as confidence/veto features;
 - do not claim that v2 solves N=20 until a held-out intervention sweep is run.
 
+The formal follow-up protocol is recorded in
+`revision/notes/toy_lob_n20_v2_stress_protocol.md`.
+
 ## Reproduction
 
 Observation records:
