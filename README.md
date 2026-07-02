@@ -52,6 +52,9 @@ The current toy-scale validation notes are under `revision/notes/`.
   gate-v2 stress-test protocol.
 - `revision/notes/lob_marl_pilot_v1_summary.md` records the first local
   matching-engine LOB/MARL pilot bridge. This is not a full MAPPO result.
+- `revision/notes/lob_mappo_pilot_v1_summary.md` records the first local
+  LOB/MAPPO-style pilot. The pipeline runs, but full main experiments are
+  blocked by MAPPO gate activation drift.
 
 Gate-v2 feature diagnostic and calibration:
 
