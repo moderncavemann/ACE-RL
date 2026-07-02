@@ -362,7 +362,7 @@ def main() -> None:
     parser.add_argument("--methods", default="no_intervention,always_on,threshold,gated_intervention")
     parser.add_argument("--random-rate", default="auto")
     parser.add_argument("--gate-config", default=None)
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--update-epochs", type=int, default=4)

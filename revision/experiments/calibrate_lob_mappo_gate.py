@@ -117,7 +117,7 @@ def main() -> None:
     parser.add_argument("--max-fpr", type=float, default=0.25)
     parser.add_argument("--grid-size", type=int, default=1001)
     parser.add_argument("--high-spread-tau", type=float, default=4.0)
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--update-epochs", type=int, default=4)

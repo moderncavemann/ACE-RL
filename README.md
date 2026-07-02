@@ -91,3 +91,7 @@ Run the pilot with the frozen gate config and matched random baseline:
 ```bash
 python revision/experiments/run_lob_marl_pilot.py --episodes 30 --eval-episodes 5 --episode-length 200 --n-agents 10 --seeds 0-4 --jobs 5 --gate-config revision/experiments/outputs/lob_gate_calibration_v1/lob_gate_config.json --output revision/experiments/outputs/lob_marl_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_marl_pilot_v1/metrics.csv
 ```
+
+For MAPPO-style local LOB pilot scripts, `--device` defaults to `auto`.
+On Apple Silicon this selects PyTorch MPS when available; pass `--device cpu`
+to exactly reproduce CPU pilot runs recorded in the notes.
