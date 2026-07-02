@@ -40,6 +40,8 @@ The current toy-scale validation notes are under `revision/notes/`.
 
 - `revision/notes/toy_lob_confirmation_sweep_v1_summary.md` records the
   toy-scale confirmation sweep.
+- `revision/notes/toy_full_n10_experiment_v1_summary.md` records the
+  paper-ready N=10 toy full confirmation package.
 - `revision/notes/toy_lob_robustness_sweep_v1_summary.md` records the
   controlled robustness sweep and the N=20 caveat.
 - `revision/notes/toy_lob_n20_followup_v1_summary.md` records the longer N=20
