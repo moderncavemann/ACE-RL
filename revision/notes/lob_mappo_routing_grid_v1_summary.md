@@ -235,6 +235,11 @@ python revision/experiments/run_lob_mappo_pilot.py \
   --hidden-dim 64 \
   --update-epochs 4 \
   --minibatch-size 512 \
-  --output revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/summary.json \
-  --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/metrics.csv
+  --output revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_seeded_random_v1/summary.json \
+  --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_seeded_random_v1/metrics.csv
 ```
+
+The follow-up result is recorded in
+`revision/notes/lob_mappo_boost_only_validation_v1_summary.md`: the 20/5
+seeded-random pilot passes, but the 50/10 longer pilot does not preserve a
+timing advantage over matched random.

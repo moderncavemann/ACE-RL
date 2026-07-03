@@ -271,6 +271,12 @@ def run_grid(
         if routing_rho_override is not None and gate_mode != "none":
             routing_rho = float(routing_rho_override)
         for seed in seeds:
+            seed_gate_config = gate_config
+            if gate_mode == "random":
+                seed_gate_config = LOBGateConfig(**{
+                    **vars(gate_config),
+                    "seed": int(gate_config.seed + 10_000 + 9973 * seed),
+                })
             grouped[method].append(
                 run_method_seed(
                     replace(config, seed=seed),
@@ -280,7 +286,7 @@ def run_grid(
                     episodes,
                     eval_episodes,
                     seed,
-                    gate_config,
+                    seed_gate_config,
                     mappo_config,
                 )
             )

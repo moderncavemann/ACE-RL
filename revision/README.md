@@ -157,6 +157,16 @@ Current routing-grid decision: `routing_rho=0.75`,
 MAPPO-local-LOB pilot candidate. It should be rerun with normal baselines before
 any full main experiment.
 
-Candidate normal-baseline pilot command:
+Boost-only validation follow-up:
 
-`python revision/experiments/run_lob_mappo_pilot.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention_controlled --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/metrics.csv`
+1. Seeded-random 20/5 normal-baseline pilot:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention_controlled --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_seeded_random_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_seeded_random_v1/metrics.csv`
+2. Longer 50/10 pilot:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention_controlled --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_candidate_boost_only_longer_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_longer_pilot_v1/metrics.csv`
+
+The repo-visible boost-only validation summary is
+`revision/notes/lob_mappo_boost_only_validation_v1_summary.md`.
+
+Current boost-only validation decision: the 20/5 pilot passes, but the 50/10
+pilot does not preserve a timing advantage over matched random. Do not launch
+full LOB/MAPPO main experiments yet.
