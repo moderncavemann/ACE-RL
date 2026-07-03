@@ -108,3 +108,34 @@ shift:
 
 The repo-visible summary is
 `revision/notes/toy_lob_n20_followup_v1_summary.md`.
+
+## Local LOB/MAPPO Pilot
+
+The local LOB/MAPPO stage is a pilot bridge after toy validation. It is not the
+full main experiment.
+
+Initial MAPPO pilot:
+
+1. MAPPO gate calibration:
+   `python revision/experiments/calibrate_lob_mappo_gate.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --target-activation 0.05,0.15 --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1`
+2. MAPPO pilot:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_pilot_conservative_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_pilot_conservative_v1/metrics.csv`
+
+The repo-visible summary is
+`revision/notes/lob_mappo_pilot_v1_summary.md`.
+
+Gate-drift diagnostic and activation-controlled pilot:
+
+1. Diagnose passive score distributions:
+   `python revision/experiments/diagnose_lob_mappo_gate_drift.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,gated_intervention,random_gate --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_gate_drift_diagnostic_v1`
+2. Run activation-controlled pilot:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention_controlled --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_controlled_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_controlled_pilot_v1/metrics.csv`
+3. Diagnose controlled routing split:
+   `python revision/experiments/diagnose_lob_mappo_gate_drift.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods gated_intervention_controlled --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_controlled_routing_diagnostic_v1`
+
+The repo-visible follow-up summary is
+`revision/notes/lob_mappo_gate_drift_diagnostic_v1_summary.md`.
+
+Current decision boundary: do not launch the full LOB/MAPPO main experiment
+from this pilot. Activation control works, but controlled gated routing did not
+beat matched random on spread/reward in the local LOB/MAPPO pilot.

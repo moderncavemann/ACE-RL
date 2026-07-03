@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 from typing import Dict, Literal, Sequence
 
@@ -9,7 +10,7 @@ import numpy as np
 
 from src.envs.local_lob_market_env import LocalLOBConfig, RiskState
 
-LOBGateMode = Literal["none", "always", "threshold", "random", "risk_aware"]
+LOBGateMode = Literal["none", "always", "threshold", "random", "risk_aware", "risk_aware_controlled"]
 
 
 @dataclass
@@ -27,6 +28,9 @@ class LOBGateConfig:
     w_flow: float = 0.10
     w_volume_suppression: float = 0.10
     w_recent_intervention: float = 0.10
+    activation_cap: float = 0.35
+    activation_window: int = 50
+    activation_cooldown: int = 0
     seed: int = 123
 
 
@@ -37,9 +41,13 @@ class LOBInterventionGate:
         self.mode = mode
         self.rng = np.random.default_rng(self.gate_config.seed)
         self.recent_intervention = 0.0
+        self.activation_history: deque[float] = deque(maxlen=max(1, int(self.gate_config.activation_window)))
+        self.cooldown_remaining = 0
 
     def reset(self) -> None:
         self.recent_intervention = 0.0
+        self.activation_history.clear()
+        self.cooldown_remaining = 0
 
     def decide(
         self,
@@ -53,6 +61,11 @@ class LOBInterventionGate:
         entropy = self._spread_entropy(agent_spreads)
         flow_concentration = self._flow_concentration(flow_shares)
         volume_suppression = float(np.clip(1.0 - recent_volume / max(self.gate_config.expected_volume, 1e-8), 0.0, 1.0))
+
+        raw_active = False
+        controlled_recent_rate = self._controlled_recent_rate()
+        control_budget_open = True
+        control_cooldown_open = self.cooldown_remaining <= 0
 
         if self.mode == "none":
             score, active = 0.0, False
@@ -72,18 +85,42 @@ class LOBInterventionGate:
                 + self.gate_config.w_volume_suppression * volume_suppression
                 - self.gate_config.w_recent_intervention * self.recent_intervention
             )
-            active = score > self.gate_config.risk_threshold
+            raw_active = score > self.gate_config.risk_threshold
+            if self.mode == "risk_aware_controlled":
+                active_quota = int(np.floor(
+                    np.clip(self.gate_config.activation_cap, 0.0, 1.0) * max(1, self.gate_config.activation_window)
+                ))
+                active_quota = max(1, active_quota) if self.gate_config.activation_cap > 0.0 else 0
+                control_budget_open = float(np.sum(self.activation_history)) < float(active_quota)
+                active = bool(raw_active and control_budget_open and control_cooldown_open)
+            else:
+                active = bool(raw_active)
 
         self.recent_intervention = 0.9 * self.recent_intervention + 0.1 * float(active)
+        if active and self.gate_config.activation_cooldown > 0:
+            self.cooldown_remaining = int(self.gate_config.activation_cooldown)
+        elif self.cooldown_remaining > 0:
+            self.cooldown_remaining -= 1
+        self.activation_history.append(float(active))
         return {
             "active": bool(active),
+            "raw_active": bool(raw_active if self.mode.startswith("risk_aware") else active),
             "score": float(score),
             "excess": float(excess),
             "spread_entropy": float(entropy),
             "flow_concentration": float(flow_concentration),
             "volume_suppression": float(volume_suppression),
             "avg_spread": float(avg_spread),
+            "controlled_recent_rate": float(controlled_recent_rate),
+            "control_budget_open": bool(control_budget_open),
+            "control_cooldown_open": bool(control_cooldown_open),
+            "activation_cap": float(self.gate_config.activation_cap),
         }
+
+    def _controlled_recent_rate(self) -> float:
+        if not self.activation_history:
+            return 0.0
+        return float(np.mean(self.activation_history))
 
     def _risk_adjusted_excess(self, risk_state: RiskState, avg_spread: float) -> float:
         if risk_state == "high":

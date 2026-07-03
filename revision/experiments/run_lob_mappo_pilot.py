@@ -43,6 +43,7 @@ METHODS: Dict[str, Tuple[LOBGateMode, float]] = {
     "always_on": ("always", 0.75),
     "threshold": ("threshold", 0.75),
     "gated_intervention": ("risk_aware", 0.75),
+    "gated_intervention_controlled": ("risk_aware_controlled", 0.75),
     "random_gate": ("random", 0.75),
 }
 
@@ -191,6 +192,10 @@ def evaluate_policy(
             row["gate_spread_entropy"] = float(decision["spread_entropy"])
             row["gate_flow_concentration"] = float(decision["flow_concentration"])
             row["gate_volume_suppression"] = float(decision["volume_suppression"])
+            row["gate_raw_active"] = bool(decision["raw_active"])
+            row["gate_controlled_recent_rate"] = float(decision["controlled_recent_rate"])
+            row["gate_control_budget_open"] = bool(decision["control_budget_open"])
+            row["gate_control_cooldown_open"] = bool(decision["control_cooldown_open"])
             records.append(row)
     return records
 
@@ -285,8 +290,15 @@ def metric_mean(aggregate: Dict[str, object], block: str, metric: str) -> float:
     return float(value or 0.0)
 
 
+def primary_gated_method(grouped_or_methods: Dict[str, object]) -> str:
+    if "gated_intervention_controlled" in grouped_or_methods:
+        return "gated_intervention_controlled"
+    return "gated_intervention"
+
+
 def pass_diagnostics(summary: Dict[str, object]) -> Dict[str, object]:
     methods = dict(summary["methods"])
+    gated_method = primary_gated_method(methods)
 
     def mean(method: str, block: str, metric: str) -> float:
         if method not in methods:
@@ -294,12 +306,12 @@ def pass_diagnostics(summary: Dict[str, object]) -> Dict[str, object]:
         return metric_mean(dict(dict(methods[method])["aggregate"]), block, metric)
 
     no_spread = mean("no_intervention", "eval_all", "avg_agent_spread_mean")
-    gated_active = mean("gated_intervention", "gate_metrics", "gate_activation_rate")
+    gated_active = mean(gated_method, "gate_metrics", "gate_activation_rate")
     random_active = mean("random_gate", "gate_metrics", "gate_activation_rate")
     always_active = mean("always_on", "gate_metrics", "gate_activation_rate")
-    gated_volume = mean("gated_intervention", "eval_all", "total_volume_mean")
+    gated_volume = mean(gated_method, "eval_all", "total_volume_mean")
     no_volume = mean("no_intervention", "eval_all", "total_volume_mean")
-    gated_reward = mean("gated_intervention", "eval_all", "mean_reward_mean")
+    gated_reward = mean(gated_method, "eval_all", "mean_reward_mean")
     no_reward = mean("no_intervention", "eval_all", "mean_reward_mean")
 
     return {
@@ -312,6 +324,7 @@ def pass_diagnostics(summary: Dict[str, object]) -> Dict[str, object]:
         "routing_changes_volume": bool(abs(gated_volume - no_volume) > 1e-6),
         "reward_not_obviously_collapsed": bool(gated_reward > no_reward - 5.0),
         "observed": {
+            "primary_gated_method": gated_method,
             "no_intervention_avg_agent_spread": no_spread,
             "gated_activation_rate": gated_active,
             "random_activation_rate": random_active,
@@ -391,10 +404,11 @@ def main() -> None:
         device=device,
     )
     grouped = run_grid(config, methods, args.episodes, args.eval_episodes, seeds, gate_config, mappo_config)
+    gated_method = primary_gated_method(grouped)
 
     gated_rates = [
         float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
-        for result in grouped.get("gated_intervention", [])
+        for result in grouped.get(gated_method, [])
     ]
     matched_rate = float(np.mean(gated_rates)) if args.random_rate == "auto" and gated_rates else float(args.random_rate)
     matched_rate = float(np.clip(matched_rate, 0.0, 1.0))
@@ -409,7 +423,14 @@ def main() -> None:
         mappo_config,
     )["random_gate"]
 
-    ordered_methods = ["no_intervention", "always_on", "threshold", "random_gate", "gated_intervention"]
+    ordered_methods = [
+        "no_intervention",
+        "always_on",
+        "threshold",
+        "random_gate",
+        "gated_intervention",
+        "gated_intervention_controlled",
+    ]
     methods_out: Dict[str, object] = {}
     for method in ordered_methods:
         if method not in grouped:
@@ -430,10 +451,11 @@ def main() -> None:
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,
             "mappo_config": asdict(mappo_config),
+            "primary_gated_method": gated_method,
             "stage": "local_lob_mappo_pilot_not_full_main",
         },
         "methods": methods_out,
-        "paired_random_minus_gated_spread": paired_delta(grouped["random_gate"], grouped.get("gated_intervention", []), "avg_agent_spread_mean"),
+        "paired_random_minus_gated_spread": paired_delta(grouped["random_gate"], grouped.get(gated_method, []), "avg_agent_spread_mean"),
     }
     summary["pilot_diagnostics"] = pass_diagnostics(summary)
 
