@@ -91,17 +91,31 @@ def train_policy(
     seed: int,
     gate_config: LOBGateConfig,
     mappo_base: MAPPOConfig,
+    routing_rho_override: float | None = None,
 ) -> Tuple[MAPPOTrainer, Dict[str, float]]:
     trainer = make_trainer(config, seed, mappo_base)
     env = LocalLOBMarketEnv(config)
-    gate_mode, routing_rho = METHODS[method]
+    gate_mode, default_routing_rho = METHODS[method]
+    routing_rho = default_routing_rho
+    if routing_rho_override is not None and gate_mode != "none":
+        routing_rho = float(routing_rho_override)
     gate = LOBInterventionGate(config, gate_config, gate_mode)
     stats: List[Dict[str, float]] = []
     for ep in range(episodes):
         stats.append(rollout_training_episode(env, trainer, gate, routing_rho, seed=seed + ep))
     return trainer, {
         key: float(np.mean([row[key] for row in stats])) if stats else 0.0
-        for key in ("loss", "policy_loss", "value_loss", "entropy", "return_mean")
+        for key in (
+            "loss",
+            "policy_loss",
+            "value_loss",
+            "entropy",
+            "return_mean",
+            "gate_activation_rate",
+            "gate_raw_activation_rate",
+            "gate_score_mean",
+            "routing_boost_mean",
+        )
     }
 
 
@@ -112,8 +126,12 @@ def collect_records(
     eval_episodes: int,
     seed: int,
     gate_config: LOBGateConfig,
+    routing_rho_override: float | None = None,
 ) -> List[Record]:
-    gate_mode, routing_rho = METHODS[method]
+    gate_mode, default_routing_rho = METHODS[method]
+    routing_rho = default_routing_rho
+    if routing_rho_override is not None and gate_mode != "none":
+        routing_rho = float(routing_rho_override)
     env = LocalLOBMarketEnv(config)
     actual_gate = LOBInterventionGate(config, gate_config, gate_mode)
     passive_gate = LOBInterventionGate(config, gate_config, "risk_aware")
@@ -152,7 +170,11 @@ def collect_records(
                 "routing_effective_multiplier": float(info["routing_effective_multiplier"]),
                 "routing_spread_cap_met": bool(info["routing_spread_cap_met"]),
                 "actual_gate_active": bool(actual["active"]),
+                "actual_gate_raw_active": bool(actual["raw_active"]),
                 "actual_gate_score": float(actual["score"]),
+                "actual_gate_controlled_recent_rate": float(actual["controlled_recent_rate"]),
+                "actual_gate_control_budget_open": bool(actual["control_budget_open"]),
+                "actual_gate_control_cooldown_open": bool(actual["control_cooldown_open"]),
                 "passive_gate_active": bool(passive["active"]),
                 "passive_gate_raw_active": bool(passive["raw_active"]),
                 "passive_gate_score": float(passive["score"]),
@@ -185,8 +207,13 @@ def summarize(records: List[Record]) -> Dict[str, object]:
         "mean_reward",
         "routing_effective_multiplier",
         "actual_gate_active",
+        "actual_gate_raw_active",
         "actual_gate_score",
+        "actual_gate_controlled_recent_rate",
+        "actual_gate_control_budget_open",
+        "actual_gate_control_cooldown_open",
         "passive_gate_active",
+        "passive_gate_raw_active",
         "passive_gate_score",
         "passive_gate_excess",
         "passive_gate_spread_entropy",
@@ -280,6 +307,9 @@ def main() -> None:
     parser.add_argument("--random-rate", default="auto")
     parser.add_argument("--pilot-summary-for-random-rate", default="revision/experiments/outputs/lob_mappo_pilot_conservative_v1/summary.json")
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
+    parser.add_argument("--routing-rho", type=float, default=None)
+    parser.add_argument("--routing-spread-cap-ticks", type=float, default=None)
+    parser.add_argument("--routing-withhold-rate", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -295,7 +325,16 @@ def main() -> None:
             raise SystemExit(f"Unknown method '{method}'")
 
     device = choose_device(args.device)
-    config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
+    config_kwargs = {
+        "n_agents": args.n_agents,
+        "episode_length": args.episode_length,
+        "seed": seeds[0] if seeds else 0,
+    }
+    if args.routing_spread_cap_ticks is not None:
+        config_kwargs["routing_spread_cap_ticks"] = float(args.routing_spread_cap_ticks)
+    if args.routing_withhold_rate is not None:
+        config_kwargs["routing_withhold_rate"] = float(args.routing_withhold_rate)
+    config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     if args.random_rate == "auto":
         matched_rate = load_auto_random_rate(args.pilot_summary_for_random_rate, gate_config.random_rate)
@@ -324,13 +363,20 @@ def main() -> None:
     for method in methods:
         training[method] = {}
         for seed in seeds:
+            method_gate_config = gate_config_by_method[method]
+            if method == "random_gate":
+                method_gate_config = LOBGateConfig(**{
+                    **vars(method_gate_config),
+                    "seed": int(gate_config.seed + 10_000 + 9973 * seed),
+                })
             trainer, stats = train_policy(
                 replace(config, seed=seed),
                 method,
                 args.episodes,
                 seed,
-                gate_config_by_method[method],
+                method_gate_config,
                 mappo_base,
+                routing_rho_override=args.routing_rho,
             )
             training[method][str(seed)] = stats
             records.extend(
@@ -340,7 +386,8 @@ def main() -> None:
                     method,
                     args.eval_episodes,
                     seed,
-                    gate_config_by_method[method],
+                    method_gate_config,
+                    routing_rho_override=args.routing_rho,
                 )
             )
 
@@ -357,6 +404,8 @@ def main() -> None:
             "methods": methods,
             "device": device,
             "matched_random_rate": float(np.clip(matched_rate, 0.0, 1.0)),
+            "routing_rho_override": args.routing_rho,
+            "config": asdict(config),
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,
             "mappo_config": asdict(mappo_base),

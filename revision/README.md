@@ -170,3 +170,22 @@ The repo-visible boost-only validation summary is
 Current boost-only validation decision: the 20/5 pilot passes, but the 50/10
 pilot does not preserve a timing advantage over matched random. Do not launch
 full LOB/MAPPO main experiments yet.
+
+Boost-only drift diagnostic:
+
+1. Compare 20/5 score drift:
+   `python revision/experiments/diagnose_lob_mappo_gate_drift.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,gated_intervention_controlled,random_gate --random-rate 0.106 --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_boost_only_drift_20_v1`
+2. Compare 50/10 score drift:
+   `python revision/experiments/diagnose_lob_mappo_gate_drift.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,gated_intervention_controlled,random_gate --random-rate 0.0624 --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_boost_only_drift_50_v1`
+3. Check oracle timing:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-4 --methods oracle_low_high_spread --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_oracle_timing_boost_only_50_trainstats_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_oracle_timing_boost_only_50_trainstats_v1/metrics.csv`
+4. Check no-routing ablation:
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-4 --methods gated_intervention_controlled --routing-rho 0.0 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_no_routing_controlled_gate_50_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_no_routing_controlled_gate_50_v1/metrics.csv`
+
+The repo-visible drift diagnostic summary is
+`revision/notes/lob_mappo_boost_only_drift_diagnostic_v1_summary.md`.
+
+Current drift diagnostic decision: routing is necessary, but low-rate matched
+random can exploit the boost-only routing channel in longer MAPPO training. Do
+not force more activations; next work should test whether a sharper conditional
+routing channel can make timing matter.

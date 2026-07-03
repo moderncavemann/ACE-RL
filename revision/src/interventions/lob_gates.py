@@ -10,7 +10,15 @@ import numpy as np
 
 from src.envs.local_lob_market_env import LocalLOBConfig, RiskState
 
-LOBGateMode = Literal["none", "always", "threshold", "random", "risk_aware", "risk_aware_controlled"]
+LOBGateMode = Literal[
+    "none",
+    "always",
+    "threshold",
+    "random",
+    "risk_aware",
+    "risk_aware_controlled",
+    "oracle_low_high_spread",
+]
 
 
 @dataclass
@@ -77,6 +85,9 @@ class LOBInterventionGate:
         elif self.mode == "random":
             score = self.gate_config.random_rate
             active = bool(self.rng.random() < self.gate_config.random_rate)
+        elif self.mode == "oracle_low_high_spread":
+            score = avg_spread - self.gate_config.threshold_spread
+            active = bool(risk_state == "low" and avg_spread > self.gate_config.threshold_spread)
         else:
             score = (
                 self.gate_config.w_excess * excess

@@ -44,6 +44,7 @@ METHODS: Dict[str, Tuple[LOBGateMode, float]] = {
     "threshold": ("threshold", 0.75),
     "gated_intervention": ("risk_aware", 0.75),
     "gated_intervention_controlled": ("risk_aware_controlled", 0.75),
+    "oracle_low_high_spread": ("oracle_low_high_spread", 0.75),
     "random_gate": ("random", 0.75),
 }
 
@@ -124,6 +125,10 @@ def rollout_training_episode(
     logp_rows: list[np.ndarray] = []
     value_rows: list[np.ndarray] = []
     reward_rows: list[np.ndarray] = []
+    gate_active_rows: list[float] = []
+    gate_raw_active_rows: list[float] = []
+    gate_score_rows: list[float] = []
+    routing_boost_rows: list[float] = []
 
     while not done:
         obs = agent_observations(env)
@@ -144,8 +149,12 @@ def rollout_training_episode(
         logp_rows.append(logp.astype(float))
         value_rows.append(values.astype(float))
         reward_rows.append(np.array([rewards[i] for i in range(env.config.n_agents)], dtype=float))
+        gate_active_rows.append(float(bool(decision["active"])))
+        gate_raw_active_rows.append(float(bool(decision["raw_active"])))
+        gate_score_rows.append(float(decision["score"]))
+        routing_boost_rows.append(float(boost))
 
-    return trainer.update_episode(
+    stats = trainer.update_episode(
         np.stack(obs_rows),
         np.stack(critic_rows),
         np.stack(action_rows),
@@ -153,6 +162,13 @@ def rollout_training_episode(
         np.stack(reward_rows),
         np.stack(value_rows),
     )
+    stats.update({
+        "gate_activation_rate": float(np.mean(gate_active_rows)) if gate_active_rows else 0.0,
+        "gate_raw_activation_rate": float(np.mean(gate_raw_active_rows)) if gate_raw_active_rows else 0.0,
+        "gate_score_mean": float(np.mean(gate_score_rows)) if gate_score_rows else 0.0,
+        "routing_boost_mean": float(np.mean(routing_boost_rows)) if routing_boost_rows else 0.0,
+    })
+    return stats
 
 
 def evaluate_policy(
@@ -246,7 +262,17 @@ def run_method_seed(
         "routing_rho": routing_rho,
         "training": {
             key: float(np.mean([row[key] for row in training_stats])) if training_stats else 0.0
-            for key in ("loss", "policy_loss", "value_loss", "entropy", "return_mean")
+            for key in (
+                "loss",
+                "policy_loss",
+                "value_loss",
+                "entropy",
+                "return_mean",
+                "gate_activation_rate",
+                "gate_raw_activation_rate",
+                "gate_score_mean",
+                "routing_boost_mean",
+            )
         },
         "eval_all": summarize_records(records),
         "eval_by_risk": summarize_by_risk(records),
@@ -301,8 +327,9 @@ def metric_mean(aggregate: Dict[str, object], block: str, metric: str) -> float:
 
 
 def primary_gated_method(grouped_or_methods: Dict[str, object]) -> str:
-    if "gated_intervention_controlled" in grouped_or_methods:
-        return "gated_intervention_controlled"
+    for method in ("gated_intervention_controlled", "gated_intervention", "oracle_low_high_spread"):
+        if method in grouped_or_methods:
+            return method
     return "gated_intervention"
 
 
@@ -462,6 +489,7 @@ def main() -> None:
         "random_gate",
         "gated_intervention",
         "gated_intervention_controlled",
+        "oracle_low_high_spread",
     ]
     methods_out: Dict[str, object] = {}
     for method in ordered_methods:
