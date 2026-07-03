@@ -89,6 +89,9 @@ def summarize_records(records: List[Dict[str, object]]) -> Dict[str, float]:
         "routing_flow_boost",
         "routing_effective_multiplier",
         "routing_spread_cap_met",
+        "routing_targeted_volume",
+        "routing_targeted_orders",
+        "routing_eligible_agents",
     ]
     out: Dict[str, float] = {"n_steps": float(len(records))}
     for field in fields:

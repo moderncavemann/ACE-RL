@@ -53,6 +53,13 @@ def parse_floats(raw: str) -> List[float]:
     return values
 
 
+def parse_strings(raw: str) -> List[str]:
+    values = [part.strip() for part in raw.split(",") if part.strip()]
+    if not values:
+        raise SystemExit(f"Expected at least one value, got '{raw}'")
+    return values
+
+
 def mean_se(values: Iterable[float]) -> Dict[str, float]:
     arr = np.array(list(values), dtype=float)
     if len(arr) == 0:
@@ -166,11 +173,17 @@ def routing_split(records: Sequence[Dict[str, object]]) -> Dict[str, float]:
         "active_best_spread": mean(active, "best_spread_ticks"),
         "active_volume": mean(active, "total_volume"),
         "active_routing_multiplier": mean(active, "routing_effective_multiplier"),
+        "active_targeted_volume": mean(active, "routing_targeted_volume"),
+        "active_targeted_orders": mean(active, "routing_targeted_orders"),
+        "active_eligible_agents": mean(active, "routing_eligible_agents"),
         "active_reward": mean(active, "mean_reward"),
         "active_cap_met_routing_multiplier": mean(active_cap, "routing_effective_multiplier"),
         "active_cap_not_met_routing_multiplier": mean(active_no_cap, "routing_effective_multiplier"),
         "inactive_avg_spread": mean(inactive, "avg_agent_spread"),
         "inactive_volume": mean(inactive, "total_volume"),
+        "inactive_targeted_volume": mean(inactive, "routing_targeted_volume"),
+        "inactive_targeted_orders": mean(inactive, "routing_targeted_orders"),
+        "inactive_eligible_agents": mean(inactive, "routing_eligible_agents"),
         "inactive_reward": mean(inactive, "mean_reward"),
     }
 
@@ -182,14 +195,18 @@ def run_cell(
     seeds: Sequence[int],
     episodes: int,
     eval_episodes: int,
+    routing_mode: str,
     routing_rho: float,
     spread_cap: float,
     withhold_rate: float,
+    relative_improvement: float,
 ) -> Dict[str, object]:
     config = replace(
         base_config,
+        routing_mode=routing_mode,  # type: ignore[arg-type]
         routing_spread_cap_ticks=float(spread_cap),
         routing_withhold_rate=float(withhold_rate),
+        routing_relative_improvement_ticks=float(relative_improvement),
     )
 
     gated_results: List[Dict[str, object]] = []
@@ -255,8 +272,10 @@ def run_cell(
     return {
         "params": {
             "routing_rho": float(routing_rho),
+            "routing_mode": routing_mode,
             "routing_spread_cap_ticks": float(spread_cap),
             "routing_withhold_rate": float(withhold_rate),
+            "routing_relative_improvement_ticks": float(relative_improvement),
             "matched_random_rate": gated_activation,
         },
         "methods": {
@@ -285,6 +304,9 @@ def run_cell(
             "active_cap_met_share_active": split["active_cap_met_share_active"],
             "active_cap_not_met_share_active": split["active_cap_not_met_share_active"],
             "active_routing_multiplier": split["active_routing_multiplier"],
+            "active_targeted_volume": split["active_targeted_volume"],
+            "active_targeted_orders": split["active_targeted_orders"],
+            "active_eligible_agents": split["active_eligible_agents"],
             "candidate": bool(activation_ok and spread_delta >= 0.0 and reward_delta >= -0.005),
         },
     }
@@ -305,6 +327,9 @@ def flatten_cell(index: int, cell: Dict[str, object]) -> Dict[str, object]:
         "active_share": split.get("active_share", 0.0),
         "active_cap_met_share_all": split.get("active_cap_met_share_all", 0.0),
         "active_cap_not_met_share_all": split.get("active_cap_not_met_share_all", 0.0),
+        "active_targeted_volume": split.get("active_targeted_volume", 0.0),
+        "active_targeted_orders": split.get("active_targeted_orders", 0.0),
+        "active_eligible_agents": split.get("active_eligible_agents", 0.0),
     }
 
 
@@ -324,9 +349,11 @@ def main() -> None:
     parser.add_argument("--episode-length", type=int, default=100)
     parser.add_argument("--n-agents", type=int, default=10)
     parser.add_argument("--seeds", default="0-2")
+    parser.add_argument("--routing-modes", default="book_multiplier")
     parser.add_argument("--routing-rhos", default="0.25,0.75")
     parser.add_argument("--routing-spread-caps", default="4,8,10")
     parser.add_argument("--routing-withhold-rates", default="0.0,0.5")
+    parser.add_argument("--routing-relative-improvements", default="1.0")
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
@@ -337,9 +364,14 @@ def main() -> None:
     args = parser.parse_args()
 
     seeds = parse_seeds(args.seeds)
+    routing_modes = parse_strings(args.routing_modes)
+    for mode in routing_modes:
+        if mode not in {"book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"}:
+            raise SystemExit(f"Unknown routing mode '{mode}'")
     routing_rhos = parse_floats(args.routing_rhos)
     spread_caps = parse_floats(args.routing_spread_caps)
     withhold_rates = parse_floats(args.routing_withhold_rates)
+    relative_improvements = parse_floats(args.routing_relative_improvements)
     device = choose_device(args.device)
     base_config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
     gate_config = load_lob_gate_config(args.gate_config)
@@ -355,27 +387,35 @@ def main() -> None:
     )
 
     cells: List[Dict[str, object]] = []
-    total = len(routing_rhos) * len(spread_caps) * len(withhold_rates)
-    for routing_rho in routing_rhos:
-        for spread_cap in spread_caps:
-            for withhold_rate in withhold_rates:
-                print(
-                    f"[{len(cells) + 1}/{total}] rho={routing_rho} cap={spread_cap} withhold={withhold_rate}",
-                    flush=True,
-                )
-                cells.append(
-                    run_cell(
-                        base_config,
-                        gate_config,
-                        mappo_config,
-                        seeds,
-                        args.episodes,
-                        args.eval_episodes,
-                        routing_rho,
-                        spread_cap,
-                        withhold_rate,
-                    )
-                )
+    total = len(routing_modes) * len(routing_rhos) * len(spread_caps) * len(withhold_rates) * len(relative_improvements)
+    for routing_mode in routing_modes:
+        for routing_rho in routing_rhos:
+            for spread_cap in spread_caps:
+                for withhold_rate in withhold_rates:
+                    for relative_improvement in relative_improvements:
+                        print(
+                            (
+                                f"[{len(cells) + 1}/{total}] mode={routing_mode} "
+                                f"rho={routing_rho} cap={spread_cap} withhold={withhold_rate} "
+                                f"rel={relative_improvement}"
+                            ),
+                            flush=True,
+                        )
+                        cells.append(
+                            run_cell(
+                                base_config,
+                                gate_config,
+                                mappo_config,
+                                seeds,
+                                args.episodes,
+                                args.eval_episodes,
+                                routing_mode,
+                                routing_rho,
+                                spread_cap,
+                                withhold_rate,
+                                relative_improvement,
+                            )
+                        )
 
     rows = [flatten_cell(index, cell) for index, cell in enumerate(cells)]
     rows_sorted = sorted(
@@ -396,9 +436,11 @@ def main() -> None:
             "episode_length": args.episode_length,
             "n_agents": args.n_agents,
             "seeds": seeds,
+            "routing_modes": routing_modes,
             "routing_rhos": routing_rhos,
             "routing_spread_caps": spread_caps,
             "routing_withhold_rates": withhold_rates,
+            "routing_relative_improvements": relative_improvements,
             "device": device,
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,

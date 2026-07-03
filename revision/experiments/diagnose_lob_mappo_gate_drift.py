@@ -169,6 +169,9 @@ def collect_records(
                 "mean_reward": float(info["mean_reward"]),
                 "routing_effective_multiplier": float(info["routing_effective_multiplier"]),
                 "routing_spread_cap_met": bool(info["routing_spread_cap_met"]),
+                "routing_targeted_volume": float(info["routing_targeted_volume"]),
+                "routing_targeted_orders": float(info["routing_targeted_orders"]),
+                "routing_eligible_agents": float(info["routing_eligible_agents"]),
                 "actual_gate_active": bool(actual["active"]),
                 "actual_gate_raw_active": bool(actual["raw_active"]),
                 "actual_gate_score": float(actual["score"]),
@@ -206,6 +209,9 @@ def summarize(records: List[Record]) -> Dict[str, object]:
         "total_volume",
         "mean_reward",
         "routing_effective_multiplier",
+        "routing_targeted_volume",
+        "routing_targeted_orders",
+        "routing_eligible_agents",
         "actual_gate_active",
         "actual_gate_raw_active",
         "actual_gate_score",
@@ -307,9 +313,15 @@ def main() -> None:
     parser.add_argument("--random-rate", default="auto")
     parser.add_argument("--pilot-summary-for-random-rate", default="revision/experiments/outputs/lob_mappo_pilot_conservative_v1/summary.json")
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
+    parser.add_argument(
+        "--routing-mode",
+        choices=["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"],
+        default=None,
+    )
     parser.add_argument("--routing-rho", type=float, default=None)
     parser.add_argument("--routing-spread-cap-ticks", type=float, default=None)
     parser.add_argument("--routing-withhold-rate", type=float, default=None)
+    parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -330,10 +342,14 @@ def main() -> None:
         "episode_length": args.episode_length,
         "seed": seeds[0] if seeds else 0,
     }
+    if args.routing_mode is not None:
+        config_kwargs["routing_mode"] = args.routing_mode
     if args.routing_spread_cap_ticks is not None:
         config_kwargs["routing_spread_cap_ticks"] = float(args.routing_spread_cap_ticks)
     if args.routing_withhold_rate is not None:
         config_kwargs["routing_withhold_rate"] = float(args.routing_withhold_rate)
+    if args.routing_relative_improvement_ticks is not None:
+        config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     if args.random_rate == "auto":

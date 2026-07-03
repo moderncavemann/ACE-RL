@@ -385,6 +385,9 @@ def write_metrics_csv(path: Path, summary: Dict[str, object]) -> None:
             ("eval_all", "mean_reward_mean"),
             ("eval_all", "mean_abs_inventory_mean"),
             ("eval_all", "routing_effective_multiplier_mean"),
+            ("eval_all", "routing_targeted_volume_mean"),
+            ("eval_all", "routing_targeted_orders_mean"),
+            ("eval_all", "routing_eligible_agents_mean"),
             ("gate_metrics", "gate_activation_rate"),
             ("gate_metrics", "tpr_low_high_spread"),
             ("gate_metrics", "fpr_high_normal_spread"),
@@ -412,9 +415,15 @@ def main() -> None:
     parser.add_argument("--methods", default="no_intervention,always_on,threshold,gated_intervention")
     parser.add_argument("--random-rate", default="auto")
     parser.add_argument("--gate-config", default=None)
+    parser.add_argument(
+        "--routing-mode",
+        choices=["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"],
+        default=None,
+    )
     parser.add_argument("--routing-rho", type=float, default=None)
     parser.add_argument("--routing-spread-cap-ticks", type=float, default=None)
     parser.add_argument("--routing-withhold-rate", type=float, default=None)
+    parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -436,10 +445,14 @@ def main() -> None:
         "episode_length": args.episode_length,
         "seed": seeds[0] if seeds else 0,
     }
+    if args.routing_mode is not None:
+        config_kwargs["routing_mode"] = args.routing_mode
     if args.routing_spread_cap_ticks is not None:
         config_kwargs["routing_spread_cap_ticks"] = float(args.routing_spread_cap_ticks)
     if args.routing_withhold_rate is not None:
         config_kwargs["routing_withhold_rate"] = float(args.routing_withhold_rate)
+    if args.routing_relative_improvement_ticks is not None:
+        config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     mappo_config = MAPPOConfig(

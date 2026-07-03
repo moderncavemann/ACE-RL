@@ -17,6 +17,7 @@ from typing import Dict, Iterable, Literal, Sequence, Tuple
 import numpy as np
 
 RiskState = Literal["low", "high"]
+RoutingMode = Literal["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"]
 
 
 @dataclass(frozen=True)
@@ -29,9 +30,11 @@ class LocalLOBConfig:
     max_inventory: int = 20
     inventory_penalty: float = 0.002
     base_flow_intensity: float = 2.0
+    routing_mode: RoutingMode = "book_multiplier"
     routing_flow_multiplier: float = 1.25
     routing_spread_cap_ticks: float = 4.0
     routing_withhold_rate: float = 0.50
+    routing_relative_improvement_ticks: float = 1.0
     seed_liquidity_levels: int = 5
     seed_liquidity_qty: int = 8
     p_low_to_high: float = 0.04
@@ -180,6 +183,9 @@ class LocalLOBMarketEnv:
         self.last_total_volume = 0.0
         self.last_routing_multiplier = 1.0
         self.last_routing_cap_met = False
+        self.last_routing_targeted_volume = 0.0
+        self.last_routing_targeted_orders = 0
+        self.last_routing_eligible_agents = 0
         self.last_wealth = np.zeros(config.n_agents, dtype=float)
 
     def reset(self, seed: int | None = None) -> tuple[Dict[int, Tuple[int, ...]], dict[str, object]]:
@@ -198,6 +204,9 @@ class LocalLOBMarketEnv:
         self.last_total_volume = 0.0
         self.last_routing_multiplier = 1.0
         self.last_routing_cap_met = False
+        self.last_routing_targeted_volume = 0.0
+        self.last_routing_targeted_orders = 0
+        self.last_routing_eligible_agents = 0
         self._seed_liquidity()
         self.last_wealth = self._wealth()
         return self._states(), self._info_stub()
@@ -260,6 +269,9 @@ class LocalLOBMarketEnv:
             "routing_flow_boost": float(routing_flow_boost),
             "routing_effective_multiplier": float(self.last_routing_multiplier),
             "routing_spread_cap_met": bool(self.last_routing_cap_met),
+            "routing_targeted_volume": float(self.last_routing_targeted_volume),
+            "routing_targeted_orders": float(self.last_routing_targeted_orders),
+            "routing_eligible_agents": float(self.last_routing_eligible_agents),
             "gate_active": bool(gate_active),
             "gate_score": float(gate_score),
             "mean_abs_inventory": float(np.mean(np.abs(self.inventories))),
@@ -303,6 +315,18 @@ class LocalLOBMarketEnv:
     def _route_external_flow(self, routing_flow_boost: float) -> list[dict[str, object]]:
         best_spread = self.book.spread_ticks()
         cap_met = 0.0 < best_spread <= self.config.routing_spread_cap_ticks
+        eligible_agents = self._routing_eligible_agents()
+        self.last_routing_targeted_volume = 0.0
+        self.last_routing_targeted_orders = 0
+        self.last_routing_eligible_agents = len(eligible_agents)
+        if self.config.routing_mode in {"eligible_priority", "relative_priority"}:
+            return self._route_external_flow_eligible_priority(routing_flow_boost, cap_met, eligible_agents)
+        if self.config.routing_mode == "relative_reallocate":
+            return self._route_external_flow_relative_reallocate(routing_flow_boost, cap_met, eligible_agents)
+
+        return self._route_external_flow_book_multiplier(routing_flow_boost, cap_met)
+
+    def _route_external_flow_book_multiplier(self, routing_flow_boost: float, cap_met: bool) -> list[dict[str, object]]:
         if routing_flow_boost > 0.0 and cap_met:
             multiplier = 1.0 + self.config.routing_flow_multiplier * routing_flow_boost
         elif routing_flow_boost > 0.0:
@@ -314,6 +338,70 @@ class LocalLOBMarketEnv:
         self.last_routing_cap_met = bool(cap_met)
         intensity = self.config.base_flow_intensity * multiplier
         n_orders = int(self.rng.poisson(intensity))
+        return self._sample_book_external_orders(n_orders)
+
+    def _route_external_flow_eligible_priority(
+        self,
+        routing_flow_boost: float,
+        cap_met: bool,
+        eligible_agents: list[int],
+    ) -> list[dict[str, object]]:
+        if routing_flow_boost > 0.0 and eligible_agents:
+            normal_multiplier = 1.0
+            targeted_multiplier = self.config.routing_flow_multiplier * routing_flow_boost
+            effective_multiplier = 1.0 + targeted_multiplier
+        elif routing_flow_boost > 0.0:
+            normal_multiplier = max(0.0, 1.0 - self.config.routing_withhold_rate * routing_flow_boost)
+            targeted_multiplier = 0.0
+            effective_multiplier = normal_multiplier
+        else:
+            normal_multiplier = 1.0
+            targeted_multiplier = 0.0
+            effective_multiplier = 1.0
+
+        self.last_routing_multiplier = effective_multiplier
+        self.last_routing_cap_met = bool(cap_met)
+        normal_orders = int(self.rng.poisson(self.config.base_flow_intensity * normal_multiplier))
+        targeted_orders = int(self.rng.poisson(self.config.base_flow_intensity * targeted_multiplier))
+        fills = self._sample_book_external_orders(normal_orders)
+        targeted_fills = self._sample_targeted_external_fills(targeted_orders, eligible_agents)
+        self.last_routing_targeted_volume = float(sum(float(fill["quantity"]) for fill in targeted_fills))
+        self.last_routing_targeted_orders = len(targeted_fills)
+        fills.extend(targeted_fills)
+        return fills
+
+    def _route_external_flow_relative_reallocate(
+        self,
+        routing_flow_boost: float,
+        cap_met: bool,
+        eligible_agents: list[int],
+    ) -> list[dict[str, object]]:
+        if routing_flow_boost > 0.0 and eligible_agents:
+            targeted_share = float(np.clip(routing_flow_boost, 0.0, 1.0))
+            normal_multiplier = 1.0 - targeted_share
+            targeted_multiplier = targeted_share
+            effective_multiplier = 1.0
+        elif routing_flow_boost > 0.0:
+            normal_multiplier = max(0.0, 1.0 - self.config.routing_withhold_rate * routing_flow_boost)
+            targeted_multiplier = 0.0
+            effective_multiplier = normal_multiplier
+        else:
+            normal_multiplier = 1.0
+            targeted_multiplier = 0.0
+            effective_multiplier = 1.0
+
+        self.last_routing_multiplier = effective_multiplier
+        self.last_routing_cap_met = bool(cap_met)
+        normal_orders = int(self.rng.poisson(self.config.base_flow_intensity * normal_multiplier))
+        targeted_orders = int(self.rng.poisson(self.config.base_flow_intensity * targeted_multiplier))
+        fills = self._sample_book_external_orders(normal_orders)
+        targeted_fills = self._sample_targeted_external_fills(targeted_orders, eligible_agents)
+        self.last_routing_targeted_volume = float(sum(float(fill["quantity"]) for fill in targeted_fills))
+        self.last_routing_targeted_orders = len(targeted_fills)
+        fills.extend(targeted_fills)
+        return fills
+
+    def _sample_book_external_orders(self, n_orders: int) -> list[dict[str, object]]:
         fills: list[dict[str, object]] = []
         mid = self.book.mid_price(self.fundamental)
         for _ in range(n_orders):
@@ -326,6 +414,47 @@ class LocalLOBMarketEnv:
             _, order_fills = self.book.submit_order(-2, side, price, qty)
             fills.extend(order_fills)
         return fills
+
+    def _sample_targeted_external_fills(self, n_orders: int, eligible_agents: Sequence[int]) -> list[dict[str, object]]:
+        if n_orders <= 0 or not eligible_agents:
+            return []
+        fills: list[dict[str, object]] = []
+        mid = self.book.mid_price(self.fundamental)
+        for _ in range(n_orders):
+            agent_id = int(self.rng.choice(eligible_agents))
+            half = float(self.last_agent_spreads[agent_id]) * self.config.tick_size
+            qty = int(self.rng.integers(1, 4))
+            if self.rng.random() < 0.5:
+                fills.append({
+                    "price": round((mid + half) / self.config.tick_size) * self.config.tick_size,
+                    "quantity": qty,
+                    "aggressor_id": -2,
+                    "aggressor_side": "bid",
+                    "passive_id": agent_id,
+                    "passive_side": "ask",
+                })
+            else:
+                fills.append({
+                    "price": round((mid - half) / self.config.tick_size) * self.config.tick_size,
+                    "quantity": qty,
+                    "aggressor_id": -2,
+                    "aggressor_side": "ask",
+                    "passive_id": agent_id,
+                    "passive_side": "bid",
+                })
+        return fills
+
+    def _routing_eligible_agents(self) -> list[int]:
+        half_spreads = np.asarray(self.last_agent_spreads, dtype=float)
+        if self.config.routing_mode in {"relative_priority", "relative_reallocate"}:
+            threshold = float(np.mean(half_spreads) - self.config.routing_relative_improvement_ticks)
+            return [int(i) for i, spread in enumerate(half_spreads) if spread < threshold]
+
+        cap = float(self.config.routing_spread_cap_ticks)
+        if cap <= 0.0:
+            return []
+        full_spreads = 2.0 * half_spreads
+        return [int(i) for i, spread in enumerate(full_spreads) if spread <= cap]
 
     def _process_fills(self, fills: Sequence[dict[str, object]]) -> None:
         for fill in fills:
