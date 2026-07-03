@@ -139,3 +139,24 @@ The repo-visible follow-up summary is
 Current decision boundary: do not launch the full LOB/MAPPO main experiment
 from this pilot. Activation control works, but controlled gated routing did not
 beat matched random on spread/reward in the local LOB/MAPPO pilot.
+
+Routing parameter grid:
+
+1. Screen routing parameters:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 10 --eval-episodes 3 --episode-length 100 --n-agents 10 --seeds 0-2 --routing-rhos 0.25,0.75 --routing-spread-caps 4,8,10 --routing-withhold-rates 0.0,0.5 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_routing_grid_v1`
+2. Candidate check, broad-cap low-rho:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --routing-rhos 0.25 --routing-spread-caps 10 --routing-withhold-rates 0.5 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_routing_grid_candidate_rho025_cap10_withhold05_v1`
+3. Candidate check, boost-only strict-cap:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --routing-rhos 0.75 --routing-spread-caps 4 --routing-withhold-rates 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_routing_grid_candidate_rho075_cap4_withhold00_v1`
+
+The repo-visible routing-grid summary is
+`revision/notes/lob_mappo_routing_grid_v1_summary.md`.
+
+Current routing-grid decision: `routing_rho=0.75`,
+`routing_spread_cap_ticks=4`, and `routing_withhold_rate=0.0` is the current
+MAPPO-local-LOB pilot candidate. It should be rerun with normal baselines before
+any full main experiment.
+
+Candidate normal-baseline pilot command:
+
+`python revision/experiments/run_lob_mappo_pilot.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --methods no_intervention,always_on,threshold,gated_intervention_controlled --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_candidate_boost_only_pilot_v1/metrics.csv`

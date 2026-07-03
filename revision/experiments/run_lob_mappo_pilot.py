@@ -262,10 +262,14 @@ def run_grid(
     seeds: List[int],
     gate_config: LOBGateConfig,
     mappo_config: MAPPOConfig,
+    routing_rho_override: float | None = None,
 ) -> Dict[str, List[Dict[str, object]]]:
     grouped: Dict[str, List[Dict[str, object]]] = {method: [] for method in methods}
     for method in methods:
-        gate_mode, routing_rho = METHODS[method]
+        gate_mode, default_routing_rho = METHODS[method]
+        routing_rho = default_routing_rho
+        if routing_rho_override is not None and gate_mode != "none":
+            routing_rho = float(routing_rho_override)
         for seed in seeds:
             grouped[method].append(
                 run_method_seed(
@@ -375,6 +379,9 @@ def main() -> None:
     parser.add_argument("--methods", default="no_intervention,always_on,threshold,gated_intervention")
     parser.add_argument("--random-rate", default="auto")
     parser.add_argument("--gate-config", default=None)
+    parser.add_argument("--routing-rho", type=float, default=None)
+    parser.add_argument("--routing-spread-cap-ticks", type=float, default=None)
+    parser.add_argument("--routing-withhold-rate", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -391,7 +398,16 @@ def main() -> None:
             raise SystemExit(f"Unknown or invalid non-random method '{method}'")
 
     device = choose_device(args.device)
-    config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
+    config_kwargs = {
+        "n_agents": args.n_agents,
+        "episode_length": args.episode_length,
+        "seed": seeds[0] if seeds else 0,
+    }
+    if args.routing_spread_cap_ticks is not None:
+        config_kwargs["routing_spread_cap_ticks"] = float(args.routing_spread_cap_ticks)
+    if args.routing_withhold_rate is not None:
+        config_kwargs["routing_withhold_rate"] = float(args.routing_withhold_rate)
+    config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     mappo_config = MAPPOConfig(
         obs_dim=1,
@@ -403,7 +419,16 @@ def main() -> None:
         minibatch_size=args.minibatch_size,
         device=device,
     )
-    grouped = run_grid(config, methods, args.episodes, args.eval_episodes, seeds, gate_config, mappo_config)
+    grouped = run_grid(
+        config,
+        methods,
+        args.episodes,
+        args.eval_episodes,
+        seeds,
+        gate_config,
+        mappo_config,
+        routing_rho_override=args.routing_rho,
+    )
     gated_method = primary_gated_method(grouped)
 
     gated_rates = [
@@ -421,6 +446,7 @@ def main() -> None:
         seeds,
         random_gate_config,
         mappo_config,
+        routing_rho_override=args.routing_rho,
     )["random_gate"]
 
     ordered_methods = [
@@ -447,6 +473,7 @@ def main() -> None:
             "episode_length": args.episode_length,
             "seeds": seeds,
             "matched_random_rate": matched_rate,
+            "routing_rho_override": args.routing_rho,
             "config": asdict(config),
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,
