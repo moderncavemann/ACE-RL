@@ -322,6 +322,7 @@ def main() -> None:
     parser.add_argument("--routing-spread-cap-ticks", type=float, default=None)
     parser.add_argument("--routing-withhold-rate", type=float, default=None)
     parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
+    parser.add_argument("--routing-target-kappa", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -350,6 +351,8 @@ def main() -> None:
         config_kwargs["routing_withhold_rate"] = float(args.routing_withhold_rate)
     if args.routing_relative_improvement_ticks is not None:
         config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
+    if args.routing_target_kappa is not None:
+        config_kwargs["routing_target_kappa"] = float(args.routing_target_kappa)
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     if args.random_rate == "auto":

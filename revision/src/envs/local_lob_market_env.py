@@ -35,6 +35,7 @@ class LocalLOBConfig:
     routing_spread_cap_ticks: float = 4.0
     routing_withhold_rate: float = 0.50
     routing_relative_improvement_ticks: float = 1.0
+    routing_target_kappa: float = 0.0
     seed_liquidity_levels: int = 5
     seed_liquidity_qty: int = 8
     p_low_to_high: float = 0.04
@@ -421,7 +422,7 @@ class LocalLOBMarketEnv:
         fills: list[dict[str, object]] = []
         mid = self.book.mid_price(self.fundamental)
         for _ in range(n_orders):
-            agent_id = int(self.rng.choice(eligible_agents))
+            agent_id = int(self.rng.choice(eligible_agents, p=self._target_agent_probabilities(eligible_agents)))
             half = float(self.last_agent_spreads[agent_id]) * self.config.tick_size
             qty = int(self.rng.integers(1, 4))
             if self.rng.random() < 0.5:
@@ -443,6 +444,19 @@ class LocalLOBMarketEnv:
                     "passive_side": "bid",
                 })
         return fills
+
+    def _target_agent_probabilities(self, eligible_agents: Sequence[int]) -> np.ndarray | None:
+        kappa = float(self.config.routing_target_kappa)
+        if kappa <= 0.0 or len(eligible_agents) <= 1:
+            return None
+        spreads = np.array([self.last_agent_spreads[int(agent_id)] for agent_id in eligible_agents], dtype=float)
+        logits = -kappa * spreads
+        logits -= float(np.max(logits))
+        weights = np.exp(logits)
+        total = float(np.sum(weights))
+        if total <= 0.0:
+            return None
+        return weights / total
 
     def _routing_eligible_agents(self) -> list[int]:
         half_spreads = np.asarray(self.last_agent_spreads, dtype=float)

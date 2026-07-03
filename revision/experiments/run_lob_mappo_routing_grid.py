@@ -200,6 +200,7 @@ def run_cell(
     spread_cap: float,
     withhold_rate: float,
     relative_improvement: float,
+    target_kappa: float,
 ) -> Dict[str, object]:
     config = replace(
         base_config,
@@ -207,6 +208,7 @@ def run_cell(
         routing_spread_cap_ticks=float(spread_cap),
         routing_withhold_rate=float(withhold_rate),
         routing_relative_improvement_ticks=float(relative_improvement),
+        routing_target_kappa=float(target_kappa),
     )
 
     gated_results: List[Dict[str, object]] = []
@@ -276,6 +278,7 @@ def run_cell(
             "routing_spread_cap_ticks": float(spread_cap),
             "routing_withhold_rate": float(withhold_rate),
             "routing_relative_improvement_ticks": float(relative_improvement),
+            "routing_target_kappa": float(target_kappa),
             "matched_random_rate": gated_activation,
         },
         "methods": {
@@ -354,6 +357,7 @@ def main() -> None:
     parser.add_argument("--routing-spread-caps", default="4,8,10")
     parser.add_argument("--routing-withhold-rates", default="0.0,0.5")
     parser.add_argument("--routing-relative-improvements", default="1.0")
+    parser.add_argument("--routing-target-kappas", default="0.0")
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
@@ -372,6 +376,7 @@ def main() -> None:
     spread_caps = parse_floats(args.routing_spread_caps)
     withhold_rates = parse_floats(args.routing_withhold_rates)
     relative_improvements = parse_floats(args.routing_relative_improvements)
+    target_kappas = parse_floats(args.routing_target_kappas)
     device = choose_device(args.device)
     base_config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
     gate_config = load_lob_gate_config(args.gate_config)
@@ -387,35 +392,44 @@ def main() -> None:
     )
 
     cells: List[Dict[str, object]] = []
-    total = len(routing_modes) * len(routing_rhos) * len(spread_caps) * len(withhold_rates) * len(relative_improvements)
+    total = (
+        len(routing_modes)
+        * len(routing_rhos)
+        * len(spread_caps)
+        * len(withhold_rates)
+        * len(relative_improvements)
+        * len(target_kappas)
+    )
     for routing_mode in routing_modes:
         for routing_rho in routing_rhos:
             for spread_cap in spread_caps:
                 for withhold_rate in withhold_rates:
                     for relative_improvement in relative_improvements:
-                        print(
-                            (
-                                f"[{len(cells) + 1}/{total}] mode={routing_mode} "
-                                f"rho={routing_rho} cap={spread_cap} withhold={withhold_rate} "
-                                f"rel={relative_improvement}"
-                            ),
-                            flush=True,
-                        )
-                        cells.append(
-                            run_cell(
-                                base_config,
-                                gate_config,
-                                mappo_config,
-                                seeds,
-                                args.episodes,
-                                args.eval_episodes,
-                                routing_mode,
-                                routing_rho,
-                                spread_cap,
-                                withhold_rate,
-                                relative_improvement,
+                        for target_kappa in target_kappas:
+                            print(
+                                (
+                                    f"[{len(cells) + 1}/{total}] mode={routing_mode} "
+                                    f"rho={routing_rho} cap={spread_cap} withhold={withhold_rate} "
+                                    f"rel={relative_improvement} kappa={target_kappa}"
+                                ),
+                                flush=True,
                             )
-                        )
+                            cells.append(
+                                run_cell(
+                                    base_config,
+                                    gate_config,
+                                    mappo_config,
+                                    seeds,
+                                    args.episodes,
+                                    args.eval_episodes,
+                                    routing_mode,
+                                    routing_rho,
+                                    spread_cap,
+                                    withhold_rate,
+                                    relative_improvement,
+                                    target_kappa,
+                                )
+                            )
 
     rows = [flatten_cell(index, cell) for index, cell in enumerate(cells)]
     rows_sorted = sorted(
@@ -441,6 +455,7 @@ def main() -> None:
             "routing_spread_caps": spread_caps,
             "routing_withhold_rates": withhold_rates,
             "routing_relative_improvements": relative_improvements,
+            "routing_target_kappas": target_kappas,
             "device": device,
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,

@@ -213,3 +213,22 @@ does not pass the 10-seed 50/10 pilot. Do not launch full LOB/MAPPO main
 experiments yet. The next step is assay stabilization: diagnose why
 no-intervention spread elevation is absent in many MAPPO seeds before running
 more routing grids.
+
+Assay stabilization follow-up:
+
+1. Base no-intervention assays:
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-19 --scenarios base --checkpoint-episodes 10,20,50 --checkpoint-eval-episodes 2 --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_no_intervention_assay_base20_v1`
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 20 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-19 --scenarios base --checkpoint-episodes 10,20 --checkpoint-eval-episodes 2 --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_no_intervention_assay_base20ep_20seeds_v1`
+2. Stabilization grid:
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 50 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-9 --scenarios low_entropy,entropy_001,lr_1e3,inventory_low,inventory_high,flow_low,flow_high,risk_persistent --checkpoint-episodes 20,50 --checkpoint-eval-episodes 1 --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_no_intervention_assay_stabilization_grid_v1`
+3. Inventory-high calibration and comparisons:
+   `python revision/experiments/calibrate_lob_mappo_gate.py --episodes 50 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --target-activation 0.05,0.35 --max-fpr 0.25 --high-spread-tau 4.0 --inventory-penalty 0.006 --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1`
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-9 --methods no_intervention,gated_intervention_controlled --routing-mode relative_reallocate --routing-rho 0.5 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --routing-relative-improvement-ticks 0.0 --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_inventory_high_reallocate_rho05_50_10seeds_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_inventory_high_reallocate_rho05_50_10seeds_v1/metrics.csv`
+   `python revision/experiments/run_lob_mappo_pilot.py --episodes 50 --eval-episodes 10 --episode-length 100 --n-agents 10 --seeds 0-9 --methods no_intervention,gated_intervention_controlled --routing-mode relative_reallocate --routing-rho 0.75 --routing-spread-cap-ticks 4 --routing-withhold-rate 0.0 --routing-relative-improvement-ticks 0.0 --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output revision/experiments/outputs/lob_mappo_inventory_high_reallocate_rho075_50_10seeds_v1/summary.json --metrics-csv revision/experiments/outputs/lob_mappo_inventory_high_reallocate_rho075_50_10seeds_v1/metrics.csv`
+
+The repo-visible assay-stabilization summary is
+`revision/notes/lob_mappo_assay_stabilization_v1_summary.md`.
+
+Current assay-stabilization decision: observation can be stabilized with
+`inventory_penalty=0.006`, but risk-aware gated reallocation still does not beat
+matched random on enough seeds. Full LOB/MAPPO main experiments remain no-go.

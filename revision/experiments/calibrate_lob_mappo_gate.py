@@ -117,6 +117,12 @@ def main() -> None:
     parser.add_argument("--max-fpr", type=float, default=0.25)
     parser.add_argument("--grid-size", type=int, default=1001)
     parser.add_argument("--high-spread-tau", type=float, default=4.0)
+    parser.add_argument("--inventory-penalty", type=float, default=None)
+    parser.add_argument("--base-flow-intensity", type=float, default=None)
+    parser.add_argument("--p-low-to-high", type=float, default=None)
+    parser.add_argument("--p-high-to-low", type=float, default=None)
+    parser.add_argument("--low-sigma", type=float, default=None)
+    parser.add_argument("--high-sigma", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -127,7 +133,24 @@ def main() -> None:
 
     seeds = parse_seeds(args.seeds)
     device = choose_device(args.device)
-    config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
+    config_kwargs = {
+        "n_agents": args.n_agents,
+        "episode_length": args.episode_length,
+        "seed": seeds[0] if seeds else 0,
+    }
+    if args.inventory_penalty is not None:
+        config_kwargs["inventory_penalty"] = float(args.inventory_penalty)
+    if args.base_flow_intensity is not None:
+        config_kwargs["base_flow_intensity"] = float(args.base_flow_intensity)
+    if args.p_low_to_high is not None:
+        config_kwargs["p_low_to_high"] = float(args.p_low_to_high)
+    if args.p_high_to_low is not None:
+        config_kwargs["p_high_to_low"] = float(args.p_high_to_low)
+    if args.low_sigma is not None:
+        config_kwargs["low_sigma"] = float(args.low_sigma)
+    if args.high_sigma is not None:
+        config_kwargs["high_sigma"] = float(args.high_sigma)
+    config = LocalLOBConfig(**config_kwargs)
     base_gate_config = LOBGateConfig()
     mappo_base = MAPPOConfig(
         obs_dim=1,
@@ -173,6 +196,7 @@ def main() -> None:
             "target_activation": args.target_activation,
             "max_fpr": args.max_fpr,
             "high_spread_tau": args.high_spread_tau,
+            "config": asdict(config),
             "device": device,
             "mappo_config": asdict(mappo_base),
             "score_summary": summarize(float(row["gate_score"]) for row in records),
