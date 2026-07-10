@@ -232,3 +232,22 @@ The repo-visible assay-stabilization summary is
 Current assay-stabilization decision: observation can be stabilized with
 `inventory_penalty=0.006`, but risk-aware gated reallocation still does not beat
 matched random on enough seeds. Full LOB/MAPPO main experiments remain no-go.
+
+Routing-channel repair follow-up:
+
+1. Oracle-first balanced/continuous reallocation screen:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --routing-modes continuous_reallocate,balanced_reallocate --routing-rhos 0.25,0.5,0.75 --routing-spread-caps 4 --routing-withhold-rates 0.0 --routing-relative-improvements 0.0 --routing-target-kappas 1.0,4.0 --timing-method oracle_low_high_spread --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_repair_oracle_screen_v1`
+2. Threshold-timing diagnostic:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --routing-modes balanced_reallocate --routing-rhos 0.5,0.75 --routing-spread-caps 4 --routing-withhold-rates 0.0 --routing-relative-improvements 0.0 --routing-target-kappas 1.0,4.0 --timing-method threshold --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_repair_threshold_screen_v1`
+3. Gated candidate screen and 10-seed expansion:
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --routing-modes balanced_reallocate --routing-rhos 0.5,0.75 --routing-spread-caps 4 --routing-withhold-rates 0.0 --routing-relative-improvements 0.0 --routing-target-kappas 1.0,4.0 --timing-method gated_intervention_controlled --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_repair_gated_screen_v1`
+   `python revision/experiments/run_lob_mappo_routing_grid.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-9 --routing-modes balanced_reallocate --routing-rhos 0.75 --routing-spread-caps 4 --routing-withhold-rates 0.0 --routing-relative-improvements 0.0 --routing-target-kappas 4.0 --timing-method gated_intervention_controlled --inventory-penalty 0.006 --gate-config revision/experiments/outputs/lob_mappo_gate_calibration_inventory_high_v1/lob_mappo_gate_config.json --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_repair_gated_candidate_10seeds_v1`
+
+The repo-visible routing-channel repair summary is
+`revision/notes/lob_mappo_routing_channel_repair_v1_summary.md`.
+
+Current routing-channel repair decision: `balanced_reallocate` improves
+diagnostic visibility and threshold-style high-spread timing can beat matched
+random in a 5-seed screen, but the risk-aware gated candidate falls to `4/10`
+positive seeds in the 10-seed expansion. Full LOB/MAPPO main experiments remain
+no-go; the next issue is label/assay alignment, not another broad routing grid.

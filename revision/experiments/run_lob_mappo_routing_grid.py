@@ -42,8 +42,12 @@ from src.envs.local_lob_market_env import LocalLOBConfig, LocalLOBMarketEnv  # n
 from src.interventions.lob_gates import LOBGateConfig, LOBGateMode, LOBInterventionGate  # noqa: E402
 
 
-GATED_METHOD = "gated_intervention_controlled"
 RANDOM_METHOD = "random_gate"
+TIMING_METHODS: Dict[str, LOBGateMode] = {
+    "gated_intervention_controlled": "risk_aware_controlled",
+    "oracle_low_high_spread": "oracle_low_high_spread",
+    "threshold": "threshold",
+}
 
 
 def parse_floats(raw: str) -> List[float]:
@@ -201,6 +205,8 @@ def run_cell(
     withhold_rate: float,
     relative_improvement: float,
     target_kappa: float,
+    timing_method: str,
+    timing_gate_mode: LOBGateMode,
 ) -> Dict[str, object]:
     config = replace(
         base_config,
@@ -211,13 +217,13 @@ def run_cell(
         routing_target_kappa=float(target_kappa),
     )
 
-    gated_results: List[Dict[str, object]] = []
-    gated_records: List[Dict[str, object]] = []
+    timed_results: List[Dict[str, object]] = []
+    timed_records: List[Dict[str, object]] = []
     for seed in seeds:
         result, records = run_method_seed(
             replace(config, seed=seed),
-            GATED_METHOD,
-            "risk_aware_controlled",
+            timing_method,
+            timing_gate_mode,
             routing_rho,
             episodes,
             eval_episodes,
@@ -225,16 +231,16 @@ def run_cell(
             base_gate_config,
             mappo_config,
         )
-        gated_results.append(result)
-        gated_records.extend(records)
+        timed_results.append(result)
+        timed_records.extend(records)
 
-    gated_activation = float(np.mean([
+    timed_activation = float(np.mean([
         float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
-        for result in gated_results
+        for result in timed_results
     ]))
     random_gate_config = LOBGateConfig(**{
         **vars(base_gate_config),
-        "random_rate": float(np.clip(gated_activation, 0.0, 1.0)),
+        "random_rate": float(np.clip(timed_activation, 0.0, 1.0)),
     })
     random_results: List[Dict[str, object]] = []
     random_records: List[Dict[str, object]] = []
@@ -257,19 +263,19 @@ def run_cell(
         random_results.append(result)
         random_records.extend(records)
 
-    gated_aggregate = aggregate_seed_results(gated_results)
+    timed_aggregate = aggregate_seed_results(timed_results)
     random_aggregate = aggregate_seed_results(random_results)
-    paired = paired_delta(random_results, gated_results, "avg_agent_spread_mean")
-    gated_spread = metric_mean(gated_aggregate, "eval_all", "avg_agent_spread_mean")
+    paired = paired_delta(random_results, timed_results, "avg_agent_spread_mean")
+    timed_spread = metric_mean(timed_aggregate, "eval_all", "avg_agent_spread_mean")
     random_spread = metric_mean(random_aggregate, "eval_all", "avg_agent_spread_mean")
-    gated_reward = metric_mean(gated_aggregate, "eval_all", "mean_reward_mean")
+    timed_reward = metric_mean(timed_aggregate, "eval_all", "mean_reward_mean")
     random_reward = metric_mean(random_aggregate, "eval_all", "mean_reward_mean")
-    gated_volume = metric_mean(gated_aggregate, "eval_all", "total_volume_mean")
+    timed_volume = metric_mean(timed_aggregate, "eval_all", "total_volume_mean")
     random_volume = metric_mean(random_aggregate, "eval_all", "total_volume_mean")
-    split = routing_split(gated_records)
-    activation_ok = 0.05 <= gated_activation <= 0.40
+    split = routing_split(timed_records)
+    activation_ok = 0.05 <= timed_activation <= 0.40
     spread_delta = float(paired.get("mean", 0.0))
-    reward_delta = gated_reward - random_reward
+    reward_delta = timed_reward - random_reward
 
     return {
         "params": {
@@ -279,12 +285,13 @@ def run_cell(
             "routing_withhold_rate": float(withhold_rate),
             "routing_relative_improvement_ticks": float(relative_improvement),
             "routing_target_kappa": float(target_kappa),
-            "matched_random_rate": gated_activation,
+            "timing_method": timing_method,
+            "matched_random_rate": timed_activation,
         },
         "methods": {
-            GATED_METHOD: {
-                "seed_results": gated_results,
-                "aggregate": gated_aggregate,
+            timing_method: {
+                "seed_results": timed_results,
+                "aggregate": timed_aggregate,
                 "routing_split": split,
             },
             RANDOM_METHOD: {
@@ -295,14 +302,14 @@ def run_cell(
         "paired_random_minus_gated_spread": paired,
         "screen": {
             "activation_ok": bool(activation_ok),
-            "gated_activation_rate": gated_activation,
-            "gated_spread": gated_spread,
+            "timed_activation_rate": timed_activation,
+            "timed_spread": timed_spread,
             "random_spread": random_spread,
             "spread_delta_random_minus_gated": spread_delta,
-            "gated_reward": gated_reward,
+            "timed_reward": timed_reward,
             "random_reward": random_reward,
             "reward_delta_gated_minus_random": reward_delta,
-            "gated_volume": gated_volume,
+            "timed_volume": timed_volume,
             "random_volume": random_volume,
             "active_cap_met_share_active": split["active_cap_met_share_active"],
             "active_cap_not_met_share_active": split["active_cap_not_met_share_active"],
@@ -315,11 +322,20 @@ def run_cell(
     }
 
 
+def timed_method_from_cell(cell: Dict[str, object]) -> str:
+    methods = dict(cell["methods"])
+    for method in TIMING_METHODS:
+        if method in methods:
+            return method
+    raise KeyError("No timing method found in cell")
+
+
 def flatten_cell(index: int, cell: Dict[str, object]) -> Dict[str, object]:
     params = dict(cell["params"])
     screen = dict(cell["screen"])
     paired = dict(cell["paired_random_minus_gated_spread"])
-    split = dict(dict(dict(cell["methods"])[GATED_METHOD])["routing_split"])
+    timed_method = timed_method_from_cell(cell)
+    split = dict(dict(dict(cell["methods"])[timed_method])["routing_split"])
     return {
         "cell": index,
         **params,
@@ -358,7 +374,14 @@ def main() -> None:
     parser.add_argument("--routing-withhold-rates", default="0.0,0.5")
     parser.add_argument("--routing-relative-improvements", default="1.0")
     parser.add_argument("--routing-target-kappas", default="0.0")
+    parser.add_argument("--timing-method", choices=sorted(TIMING_METHODS), default="gated_intervention_controlled")
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
+    parser.add_argument("--inventory-penalty", type=float, default=None)
+    parser.add_argument("--base-flow-intensity", type=float, default=None)
+    parser.add_argument("--p-low-to-high", type=float, default=None)
+    parser.add_argument("--p-high-to-low", type=float, default=None)
+    parser.add_argument("--low-sigma", type=float, default=None)
+    parser.add_argument("--high-sigma", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -370,7 +393,14 @@ def main() -> None:
     seeds = parse_seeds(args.seeds)
     routing_modes = parse_strings(args.routing_modes)
     for mode in routing_modes:
-        if mode not in {"book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"}:
+        if mode not in {
+            "book_multiplier",
+            "eligible_priority",
+            "relative_priority",
+            "relative_reallocate",
+            "continuous_reallocate",
+            "balanced_reallocate",
+        }:
             raise SystemExit(f"Unknown routing mode '{mode}'")
     routing_rhos = parse_floats(args.routing_rhos)
     spread_caps = parse_floats(args.routing_spread_caps)
@@ -378,8 +408,26 @@ def main() -> None:
     relative_improvements = parse_floats(args.routing_relative_improvements)
     target_kappas = parse_floats(args.routing_target_kappas)
     device = choose_device(args.device)
-    base_config = LocalLOBConfig(n_agents=args.n_agents, episode_length=args.episode_length, seed=seeds[0] if seeds else 0)
+    config_kwargs = {
+        "n_agents": args.n_agents,
+        "episode_length": args.episode_length,
+        "seed": seeds[0] if seeds else 0,
+    }
+    if args.inventory_penalty is not None:
+        config_kwargs["inventory_penalty"] = float(args.inventory_penalty)
+    if args.base_flow_intensity is not None:
+        config_kwargs["base_flow_intensity"] = float(args.base_flow_intensity)
+    if args.p_low_to_high is not None:
+        config_kwargs["p_low_to_high"] = float(args.p_low_to_high)
+    if args.p_high_to_low is not None:
+        config_kwargs["p_high_to_low"] = float(args.p_high_to_low)
+    if args.low_sigma is not None:
+        config_kwargs["low_sigma"] = float(args.low_sigma)
+    if args.high_sigma is not None:
+        config_kwargs["high_sigma"] = float(args.high_sigma)
+    base_config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
+    timing_gate_mode = TIMING_METHODS[args.timing_method]
     mappo_config = MAPPOConfig(
         obs_dim=1,
         critic_obs_dim=1,
@@ -428,6 +476,8 @@ def main() -> None:
                                     withhold_rate,
                                     relative_improvement,
                                     target_kappa,
+                                    args.timing_method,
+                                    timing_gate_mode,
                                 )
                             )
 
@@ -456,7 +506,9 @@ def main() -> None:
             "routing_withhold_rates": withhold_rates,
             "routing_relative_improvements": relative_improvements,
             "routing_target_kappas": target_kappas,
+            "timing_method": args.timing_method,
             "device": device,
+            "config": asdict(base_config),
             "gate_config": asdict(gate_config),
             "gate_config_path": args.gate_config,
             "mappo_config": asdict(mappo_config),

@@ -417,7 +417,14 @@ def main() -> None:
     parser.add_argument("--gate-config", default=None)
     parser.add_argument(
         "--routing-mode",
-        choices=["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"],
+        choices=[
+            "book_multiplier",
+            "eligible_priority",
+            "relative_priority",
+            "relative_reallocate",
+            "continuous_reallocate",
+            "balanced_reallocate",
+        ],
         default=None,
     )
     parser.add_argument("--routing-rho", type=float, default=None)
