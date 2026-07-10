@@ -270,3 +270,18 @@ the no-intervention acceptance gate. Full LOB/MAPPO main experiments remain
 no-go. The next redesign should target the learner/assay structure, especially
 shared-actor symmetry and state-contingent risk pricing, rather than more
 routing or threshold screens.
+
+Structural redesign v2:
+
+1. Fixed-policy economic acceptance:
+   `python revision/experiments/validate_lob_assay_economics.py --seeds 0-99 --inventory-penalty 0.0001 --base-flow-intensity 2 --low-sigma 0.005 --high-sigma 0.08 --informed-flow-prob 0.7 --spread-elasticity 0.14 --seed-liquidity-qty 0 --agent-quote-quantity 1 --routing-mode platform_reallocate --routing-routable-fraction 0.9 --no-routing-platform-balanced --routing-eligibility-mode absolute_cap --routing-target-kappa 4.0 --routing-rho 1.0 --output-dir revision/experiments/outputs/lob_assay_econ_absolute_cap_f09_no_spill_100seed_v2`
+2. Frozen seller-response and timing diagnostic:
+   `python revision/experiments/run_lob_mappo_frozen_policy_timing_pilot.py --episodes 100 --eval-episodes 5 --episode-length 100 --seeds 0-4 --warm-start-updates 20 --response-train-rate 0.5 --response-train-low-risk-only --risk-stratified-yoke --schedule-from-response-policy --routing-routable-fraction 0.9 --no-routing-platform-balanced --routing-eligibility-mode absolute_cap --routing-target-kappa 4.0 --routing-rho 1.0 --device mps --output-dir revision/experiments/outputs/lob_mappo_frozen_policy_response_schedule_absolute_cap_f09_no_spill_100_5seed_screen_v1`
+3. Actual online oracle versus risk-stratified dose-yoked training:
+   `python revision/experiments/run_lob_mappo_yoked_timing_pilot.py --episodes 100 --eval-episodes 5 --episode-length 100 --seeds 0-4 --timing-mode oracle_controlled --training-schedule-source timed_online --device mps --output-dir revision/experiments/outputs/lob_mappo_yoked_timed_online_absolute_cap_f09_no_spill_100_5seed_screen_v1`
+
+The economic assay passes and the same-state seller response diagnostic passes,
+but timing does not beat the equal-dose low-risk shuffled comparator: the final
+gate-off `yoked - timed` spread difference is `-0.3166 +/- 0.2927` with only
+`2/5` positive seeds. Do not launch a learned-gate or full-main sweep. See
+`revision/notes/lob_mappo_structural_redesign_v2_summary.md`.

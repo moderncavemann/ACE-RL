@@ -26,7 +26,9 @@ from run_lob_mappo_pilot import (  # noqa: E402
     agent_observations,
     choose_device,
     critic_observations,
+    evaluation_episode_seed,
     rollout_training_episode,
+    warm_start_risk_policy,
 )
 from run_lob_marl_pilot import mean_se, parse_seeds  # noqa: E402
 from src.agents.mappo import MAPPOConfig, MAPPOTrainer  # noqa: E402
@@ -131,7 +133,7 @@ def evaluate_policy(
     env = LocalLOBMarketEnv(config)
     records: List[Record] = []
     for ep in range(eval_episodes):
-        env.reset(seed=seed + 20_000 + ep)
+        env.reset(seed=evaluation_episode_seed(seed, ep))
         done = False
         while not done:
             obs = agent_observations(env, include_agent_id=include_agent_id)
@@ -181,6 +183,7 @@ def make_trainer(
             "obs_dim": int(obs.shape[1]),
             "critic_obs_dim": int(critic_obs.shape[1]),
             "n_actions": config.n_actions,
+            "n_agents": config.n_agents,
             "seed": seed,
         }
     ))
@@ -195,13 +198,46 @@ def run_seed(
     checkpoint_episodes: Sequence[int],
     checkpoint_eval_episodes: int,
     include_agent_id: bool = False,
+    warm_start_steps: int = 0,
+    warm_start_updates: int = 0,
+    warm_start_low_half_spread: int = 3,
+    warm_start_high_half_spread: int = 5,
 ) -> Dict[str, object]:
     env = LocalLOBMarketEnv(config)
     trainer = make_trainer(config, seed, mappo_base, include_agent_id=include_agent_id)
+    warm_start = warm_start_risk_policy(
+        env,
+        trainer,
+        warm_start_low_half_spread,
+        warm_start_high_half_spread,
+        warm_start_steps,
+        warm_start_updates,
+        seed=seed + 500_000,
+        include_agent_id=include_agent_id,
+    )
     gate = LOBInterventionGate(config, LOBGateConfig(), "none")
     training_rows: List[Dict[str, float]] = []
     learning_curve: List[Dict[str, float]] = []
-    checkpoints = set(int(x) for x in checkpoint_episodes if int(x) > 0)
+    checkpoints = set(int(x) for x in checkpoint_episodes if int(x) >= 0)
+
+    if 0 in checkpoints:
+        eval_records = evaluate_policy(
+            config,
+            trainer,
+            seed + 100_000,
+            checkpoint_eval_episodes,
+            include_agent_id=include_agent_id,
+        )
+        eval_summary = summarize_records(eval_records)
+        learning_curve.append({
+            "seed": float(seed),
+            "episode": 0.0,
+            "avg_agent_spread": float(eval_summary.get("avg_agent_spread_mean", 0.0)),
+            "best_spread_ticks": float(eval_summary.get("best_spread_ticks_mean", 0.0)),
+            "mean_reward": float(eval_summary.get("mean_reward_mean", 0.0)),
+            "action_alignment": float(eval_summary.get("action_alignment_mean", 0.0)),
+            "action_entropy": float(eval_summary.get("action_entropy_mean", 0.0)),
+        })
 
     for ep in range(1, episodes + 1):
         stats = rollout_training_episode(
@@ -250,6 +286,7 @@ def run_seed(
             key: float(np.mean([row[key] for row in training_rows])) if training_rows else 0.0
             for key in ("loss", "policy_loss", "value_loss", "entropy", "return_mean")
         },
+        "warm_start": warm_start,
         "final_eval": final_summary,
         "final_eval_by_risk": by_risk,
         "learning_curve": learning_curve,
@@ -364,10 +401,22 @@ def main() -> None:
     parser.add_argument("--mark-to-fundamental", action="store_true")
     parser.add_argument("--informed-flow-prob", type=float, default=None)
     parser.add_argument("--spread-elasticity", type=float, default=None)
-    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark", "resting_quote"], default=None)
     parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--routing-mode", choices=["book_multiplier", "platform_reallocate"], default=None)
+    parser.add_argument("--routing-routable-fraction", type=float, default=None)
+    parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
+    parser.add_argument("--routing-target-kappa", type=float, default=None)
     parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--quote-priority-mode", choices=["fixed", "rotating"], default=None)
+    parser.add_argument("--agent-quote-quantity", type=int, default=None)
+    parser.add_argument("--common-random-numbers", action="store_true")
     parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--policy-mode", choices=["shared", "multihead", "independent"], default="shared")
+    parser.add_argument("--warm-start-steps", type=int, default=0)
+    parser.add_argument("--warm-start-updates", type=int, default=0)
+    parser.add_argument("--warm-start-low-half-spread", type=int, default=3)
+    parser.add_argument("--warm-start-high-half-spread", type=int, default=5)
     parser.add_argument("--output-dir", default="revision/experiments/outputs/lob_mappo_no_intervention_assay_v1")
     args = parser.parse_args()
 
@@ -413,13 +462,29 @@ def main() -> None:
         config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
     if args.targeted_competitive_half_spread_ticks is not None:
         config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.routing_mode is not None:
+        config_kwargs["routing_mode"] = args.routing_mode
+    if args.routing_routable_fraction is not None:
+        config_kwargs["routing_routable_fraction"] = float(args.routing_routable_fraction)
+    if args.routing_relative_improvement_ticks is not None:
+        config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
+    if args.routing_target_kappa is not None:
+        config_kwargs["routing_target_kappa"] = float(args.routing_target_kappa)
     if args.enforce_max_inventory:
         config_kwargs["enforce_max_inventory"] = True
+    if args.quote_priority_mode is not None:
+        config_kwargs["quote_priority_mode"] = args.quote_priority_mode
+    if args.agent_quote_quantity is not None:
+        config_kwargs["agent_quote_quantity"] = int(args.agent_quote_quantity)
+    if args.common_random_numbers:
+        config_kwargs["common_random_numbers"] = True
     base_config = LocalLOBConfig(**config_kwargs)
     base_mappo = MAPPOConfig(
         obs_dim=1,
         critic_obs_dim=1,
         n_actions=base_config.n_actions,
+        n_agents=base_config.n_agents,
+        policy_mode=args.policy_mode,
         hidden_dim=args.hidden_dim,
         learning_rate=args.learning_rate,
         entropy_coef=args.entropy_coef,
@@ -447,6 +512,10 @@ def main() -> None:
                     checkpoints,
                     args.checkpoint_eval_episodes,
                     include_agent_id=args.agent_id_feature,
+                    warm_start_steps=args.warm_start_steps,
+                    warm_start_updates=args.warm_start_updates,
+                    warm_start_low_half_spread=args.warm_start_low_half_spread,
+                    warm_start_high_half_spread=args.warm_start_high_half_spread,
                 )
             )
         aggregate = aggregate_seed_results(
@@ -497,6 +566,10 @@ def main() -> None:
             "config": asdict(base_config),
             "mappo_config": asdict(base_mappo),
             "agent_id_feature": args.agent_id_feature,
+            "warm_start_steps": args.warm_start_steps,
+            "warm_start_updates": args.warm_start_updates,
+            "warm_start_low_half_spread": args.warm_start_low_half_spread,
+            "warm_start_high_half_spread": args.warm_start_high_half_spread,
         },
         "ranked_scenarios": ranked,
         "scenarios": scenarios_out,

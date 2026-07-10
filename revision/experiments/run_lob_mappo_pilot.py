@@ -45,6 +45,7 @@ METHODS: Dict[str, Tuple[LOBGateMode, float]] = {
     "gated_intervention": ("risk_aware", 0.75),
     "gated_intervention_controlled": ("risk_aware_controlled", 0.75),
     "oracle_low_high_spread": ("oracle_low_high_spread", 0.75),
+    "oracle_low_high_spread_controlled": ("oracle_low_high_spread_controlled", 0.75),
     "random_gate": ("random", 0.75),
 }
 
@@ -59,6 +60,11 @@ def choose_device(raw: str) -> str:
     return "cpu"
 
 
+def evaluation_episode_seed(training_seed: int, episode: int, namespace: int = 20_000) -> int:
+    """Map a training seed and eval episode to a non-overlapping RNG seed."""
+    return int(namespace + 1_000_003 * int(training_seed) + int(episode))
+
+
 def flow_concentration(flow_shares: np.ndarray) -> float:
     total = float(np.sum(flow_shares))
     if total <= 0.0:
@@ -67,7 +73,12 @@ def flow_concentration(flow_shares: np.ndarray) -> float:
     return float(np.sum(shares ** 2))
 
 
-def agent_observations(env: LocalLOBMarketEnv, include_agent_id: bool = False) -> np.ndarray:
+def agent_observations(
+    env: LocalLOBMarketEnv,
+    include_agent_id: bool = False,
+    include_gate_signal: bool = False,
+    gate_signal: float = 0.0,
+) -> np.ndarray:
     cfg = env.config
     max_spread = float(max(cfg.half_spread_levels))
     risk = 1.0 if env.risk_state == "high" else 0.0
@@ -91,6 +102,8 @@ def agent_observations(env: LocalLOBMarketEnv, include_agent_id: bool = False) -
         ]
         if include_agent_id:
             row.append(float(agent_id) / max(cfg.n_agents - 1, 1))
+        if include_gate_signal:
+            row.append(float(gate_signal))
         obs.append(row)
     return np.array(obs, dtype=np.float32)
 
@@ -110,6 +123,56 @@ def critic_observations(env: LocalLOBMarketEnv, obs: np.ndarray) -> np.ndarray:
     ], dtype=np.float32)
     tiled = np.repeat(global_features[None, :], cfg.n_agents, axis=0)
     return np.concatenate([obs, tiled], axis=1).astype(np.float32)
+
+
+def warm_start_risk_policy(
+    env: LocalLOBMarketEnv,
+    trainer: MAPPOTrainer,
+    low_half_spread: int,
+    high_half_spread: int,
+    steps: int,
+    updates: int,
+    seed: int,
+    include_agent_id: bool = False,
+    include_gate_signal: bool = False,
+) -> Dict[str, float]:
+    if steps <= 0 or updates <= 0:
+        return {"loss": 0.0, "accuracy": 0.0, "epochs": 0.0}
+    try:
+        low_action = env.config.half_spread_levels.index(int(low_half_spread))
+        high_action = env.config.half_spread_levels.index(int(high_half_spread))
+    except ValueError as exc:
+        raise ValueError("warm-start spreads must be valid half_spread_levels") from exc
+
+    env.reset(seed=seed)
+    obs_rows: list[np.ndarray] = []
+    action_rows: list[np.ndarray] = []
+    for step in range(steps):
+        risk_high = (step // 10) % 2 == 1
+        env.risk_state = "high" if risk_high else "low"
+        obs = agent_observations(
+            env,
+            include_agent_id=include_agent_id,
+            include_gate_signal=include_gate_signal,
+            gate_signal=0.0,
+        )
+        action = high_action if risk_high else low_action
+        actions = np.full(env.config.n_agents, action, dtype=np.int64)
+        obs_rows.append(obs)
+        action_rows.append(actions)
+        _, _, done, _, _ = env.step(actions)
+        if done and step + 1 < steps:
+            env.reset(seed=seed + step + 1)
+
+    stacked_obs = np.stack(obs_rows)
+    stacked_actions = np.stack(action_rows)
+    agent_ids = np.tile(np.arange(env.config.n_agents, dtype=np.int64), steps)
+    return trainer.pretrain_actor(
+        stacked_obs.reshape((-1, stacked_obs.shape[-1])),
+        stacked_actions.reshape(-1),
+        agent_ids,
+        epochs=updates,
+    )
 
 
 def rollout_training_episode(
@@ -185,14 +248,20 @@ def evaluate_policy(
     eval_episodes: int,
     include_agent_id: bool = False,
     gate_off: bool = False,
+    include_gate_signal: bool = False,
 ) -> List[Dict[str, object]]:
     records: List[Dict[str, object]] = []
     for ep in range(eval_episodes):
-        env.reset(seed=seed + 20_000 + ep)
+        env.reset(seed=evaluation_episode_seed(seed, ep))
         gate.reset()
         done = False
         while not done:
-            obs = agent_observations(env, include_agent_id=include_agent_id)
+            obs = agent_observations(
+                env,
+                include_agent_id=include_agent_id,
+                include_gate_signal=include_gate_signal,
+                gate_signal=0.0,
+            )
             critic_obs = critic_observations(env, obs)
             actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
             spreads = [env.config.half_spread_levels[int(actions[i])] for i in range(env.config.n_agents)]
@@ -247,6 +316,7 @@ def run_method_seed(
             "obs_dim": int(obs.shape[1]),
             "critic_obs_dim": int(critic_obs.shape[1]),
             "n_actions": config.n_actions,
+            "n_agents": config.n_agents,
             "seed": seed,
         }
     )
@@ -352,7 +422,12 @@ def metric_mean(aggregate: Dict[str, object], block: str, metric: str) -> float:
 
 
 def primary_gated_method(grouped_or_methods: Dict[str, object]) -> str:
-    for method in ("gated_intervention_controlled", "gated_intervention", "oracle_low_high_spread"):
+    for method in (
+        "gated_intervention_controlled",
+        "gated_intervention",
+        "oracle_low_high_spread_controlled",
+        "oracle_low_high_spread",
+    ):
         if method in grouped_or_methods:
             return method
     return "gated_intervention"
@@ -450,6 +525,8 @@ def main() -> None:
             "eligible_priority",
             "relative_priority",
             "relative_reallocate",
+            "conditional_reallocate",
+            "platform_reallocate",
             "continuous_reallocate",
             "balanced_reallocate",
         ],
@@ -460,6 +537,18 @@ def main() -> None:
     parser.add_argument("--routing-withhold-rate", type=float, default=None)
     parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
     parser.add_argument("--routing-target-kappa", type=float, default=None)
+    parser.add_argument("--routing-routable-fraction", type=float, default=None)
+    parser.add_argument(
+        "--routing-eligibility-mode",
+        choices=["relative", "absolute_cap", "soft_rank"],
+        default=None,
+    )
+    parser.add_argument("--routing-target-half-spread-cap", type=float, default=None)
+    parser.add_argument(
+        "--routing-platform-balanced",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
     parser.add_argument("--inventory-penalty", type=float, default=None)
     parser.add_argument("--base-flow-intensity", type=float, default=None)
     parser.add_argument("--p-low-to-high", type=float, default=None)
@@ -472,10 +561,14 @@ def main() -> None:
     parser.add_argument("--mark-to-fundamental", action="store_true")
     parser.add_argument("--informed-flow-prob", type=float, default=None)
     parser.add_argument("--spread-elasticity", type=float, default=None)
-    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark", "resting_quote"], default=None)
     parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
     parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--quote-priority-mode", choices=["fixed", "rotating"], default=None)
+    parser.add_argument("--agent-quote-quantity", type=int, default=None)
+    parser.add_argument("--common-random-numbers", action="store_true")
     parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--policy-mode", choices=["shared", "multihead", "independent"], default="shared")
     parser.add_argument("--eval-gate-off", action="store_true")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
@@ -508,6 +601,16 @@ def main() -> None:
         config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
     if args.routing_target_kappa is not None:
         config_kwargs["routing_target_kappa"] = float(args.routing_target_kappa)
+    if args.routing_routable_fraction is not None:
+        config_kwargs["routing_routable_fraction"] = float(args.routing_routable_fraction)
+    if args.routing_eligibility_mode is not None:
+        config_kwargs["routing_eligibility_mode"] = args.routing_eligibility_mode
+    if args.routing_target_half_spread_cap is not None:
+        config_kwargs["routing_target_half_spread_cap"] = float(
+            args.routing_target_half_spread_cap
+        )
+    if args.routing_platform_balanced is not None:
+        config_kwargs["routing_platform_balanced"] = bool(args.routing_platform_balanced)
     if args.inventory_penalty is not None:
         config_kwargs["inventory_penalty"] = float(args.inventory_penalty)
     if args.base_flow_intensity is not None:
@@ -539,12 +642,20 @@ def main() -> None:
         config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
     if args.enforce_max_inventory:
         config_kwargs["enforce_max_inventory"] = True
+    if args.quote_priority_mode is not None:
+        config_kwargs["quote_priority_mode"] = args.quote_priority_mode
+    if args.agent_quote_quantity is not None:
+        config_kwargs["agent_quote_quantity"] = int(args.agent_quote_quantity)
+    if args.common_random_numbers:
+        config_kwargs["common_random_numbers"] = True
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     mappo_config = MAPPOConfig(
         obs_dim=1,
         critic_obs_dim=1,
         n_actions=config.n_actions,
+        n_agents=config.n_agents,
+        policy_mode=args.policy_mode,
         hidden_dim=args.hidden_dim,
         learning_rate=args.learning_rate,
         update_epochs=args.update_epochs,
@@ -594,6 +705,7 @@ def main() -> None:
         "gated_intervention",
         "gated_intervention_controlled",
         "oracle_low_high_spread",
+        "oracle_low_high_spread_controlled",
     ]
     methods_out: Dict[str, object] = {}
     for method in ordered_methods:

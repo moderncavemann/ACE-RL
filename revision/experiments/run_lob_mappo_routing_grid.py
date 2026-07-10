@@ -46,6 +46,7 @@ RANDOM_METHOD = "random_gate"
 TIMING_METHODS: Dict[str, LOBGateMode] = {
     "gated_intervention_controlled": "risk_aware_controlled",
     "oracle_low_high_spread": "oracle_low_high_spread",
+    "oracle_low_high_spread_controlled": "oracle_low_high_spread_controlled",
     "threshold": "threshold",
 }
 
@@ -108,6 +109,7 @@ def make_trainer(
             "obs_dim": int(obs.shape[1]),
             "critic_obs_dim": int(critic_obs.shape[1]),
             "n_actions": config.n_actions,
+            "n_agents": config.n_agents,
             "seed": seed,
         }
     )
@@ -425,10 +427,15 @@ def main() -> None:
     parser.add_argument("--mark-to-fundamental", action="store_true")
     parser.add_argument("--informed-flow-prob", type=float, default=None)
     parser.add_argument("--spread-elasticity", type=float, default=None)
-    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark", "resting_quote"], default=None)
     parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--routing-routable-fraction", type=float, default=None)
     parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--quote-priority-mode", choices=["fixed", "rotating"], default=None)
+    parser.add_argument("--agent-quote-quantity", type=int, default=None)
+    parser.add_argument("--common-random-numbers", action="store_true")
     parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--policy-mode", choices=["shared", "multihead", "independent"], default="shared")
     parser.add_argument("--eval-gate-off", action="store_true")
     parser.add_argument("--match-random-rate-source", choices=["eval", "train"], default="eval")
     parser.add_argument("--device", default="auto")
@@ -447,6 +454,8 @@ def main() -> None:
             "eligible_priority",
             "relative_priority",
             "relative_reallocate",
+            "conditional_reallocate",
+            "platform_reallocate",
             "continuous_reallocate",
             "balanced_reallocate",
         }:
@@ -491,8 +500,16 @@ def main() -> None:
         config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
     if args.targeted_competitive_half_spread_ticks is not None:
         config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.routing_routable_fraction is not None:
+        config_kwargs["routing_routable_fraction"] = float(args.routing_routable_fraction)
     if args.enforce_max_inventory:
         config_kwargs["enforce_max_inventory"] = True
+    if args.quote_priority_mode is not None:
+        config_kwargs["quote_priority_mode"] = args.quote_priority_mode
+    if args.agent_quote_quantity is not None:
+        config_kwargs["agent_quote_quantity"] = int(args.agent_quote_quantity)
+    if args.common_random_numbers:
+        config_kwargs["common_random_numbers"] = True
     base_config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     timing_gate_mode = TIMING_METHODS[args.timing_method]
@@ -500,6 +517,8 @@ def main() -> None:
         obs_dim=1,
         critic_obs_dim=1,
         n_actions=base_config.n_actions,
+        n_agents=base_config.n_agents,
+        policy_mode=args.policy_mode,
         hidden_dim=args.hidden_dim,
         learning_rate=args.learning_rate,
         update_epochs=args.update_epochs,

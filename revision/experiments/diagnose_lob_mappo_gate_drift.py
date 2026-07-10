@@ -28,6 +28,7 @@ from run_lob_mappo_pilot import (  # noqa: E402
     agent_observations,
     choose_device,
     critic_observations,
+    evaluation_episode_seed,
     rollout_training_episode,
 )
 from run_lob_marl_pilot import load_lob_gate_config, parse_seeds  # noqa: E402
@@ -78,6 +79,7 @@ def make_trainer(config: LocalLOBConfig, seed: int, mappo_base: MAPPOConfig) -> 
             "obs_dim": int(obs.shape[1]),
             "critic_obs_dim": int(critic_obs.shape[1]),
             "n_actions": config.n_actions,
+            "n_agents": config.n_agents,
             "seed": seed,
         }
     )
@@ -139,7 +141,7 @@ def collect_records(
     max_spread = float(max(config.half_spread_levels))
 
     for ep in range(eval_episodes):
-        env.reset(seed=seed + 20_000 + ep)
+        env.reset(seed=evaluation_episode_seed(seed, ep))
         actual_gate.reset()
         passive_gate.reset()
         done = False
@@ -315,7 +317,7 @@ def main() -> None:
     parser.add_argument("--gate-config", default="revision/experiments/outputs/lob_mappo_gate_calibration_conservative_v1/lob_mappo_gate_config.json")
     parser.add_argument(
         "--routing-mode",
-        choices=["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate"],
+        choices=["book_multiplier", "eligible_priority", "relative_priority", "relative_reallocate", "conditional_reallocate", "platform_reallocate"],
         default=None,
     )
     parser.add_argument("--routing-rho", type=float, default=None)
@@ -323,6 +325,11 @@ def main() -> None:
     parser.add_argument("--routing-withhold-rate", type=float, default=None)
     parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
     parser.add_argument("--routing-target-kappa", type=float, default=None)
+    parser.add_argument("--routing-routable-fraction", type=float, default=None)
+    parser.add_argument("--quote-priority-mode", choices=["fixed", "rotating"], default=None)
+    parser.add_argument("--agent-quote-quantity", type=int, default=None)
+    parser.add_argument("--common-random-numbers", action="store_true")
+    parser.add_argument("--policy-mode", choices=["shared", "multihead", "independent"], default="shared")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -353,6 +360,14 @@ def main() -> None:
         config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
     if args.routing_target_kappa is not None:
         config_kwargs["routing_target_kappa"] = float(args.routing_target_kappa)
+    if args.routing_routable_fraction is not None:
+        config_kwargs["routing_routable_fraction"] = float(args.routing_routable_fraction)
+    if args.quote_priority_mode is not None:
+        config_kwargs["quote_priority_mode"] = args.quote_priority_mode
+    if args.agent_quote_quantity is not None:
+        config_kwargs["agent_quote_quantity"] = int(args.agent_quote_quantity)
+    if args.common_random_numbers:
+        config_kwargs["common_random_numbers"] = True
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     if args.random_rate == "auto":
@@ -370,6 +385,8 @@ def main() -> None:
         obs_dim=1,
         critic_obs_dim=1,
         n_actions=config.n_actions,
+        n_agents=config.n_agents,
+        policy_mode=args.policy_mode,
         hidden_dim=args.hidden_dim,
         learning_rate=args.learning_rate,
         update_epochs=args.update_epochs,

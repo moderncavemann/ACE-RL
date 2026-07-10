@@ -55,6 +55,11 @@ The current toy-scale validation notes are under `revision/notes/`.
 - `revision/notes/lob_mappo_pilot_v1_summary.md` records the first local
   LOB/MAPPO-style pilot. The pipeline runs, but full main experiments are
   blocked by MAPPO gate activation drift.
+- `revision/notes/lob_mappo_structural_redesign_v2_summary.md` records the
+  risk-coupled, no-spill platform-routing redesign and the final timing
+  decision. Economic acceptance and seller response pass; MAPPO timing versus
+  a risk-stratified equal-dose shuffled schedule fails, so full main remains
+  no-go.
 
 Gate-v2 feature diagnostic and calibration:
 

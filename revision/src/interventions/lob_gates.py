@@ -18,6 +18,7 @@ LOBGateMode = Literal[
     "risk_aware",
     "risk_aware_controlled",
     "oracle_low_high_spread",
+    "oracle_low_high_spread_controlled",
 ]
 
 
@@ -85,9 +86,18 @@ class LOBInterventionGate:
         elif self.mode == "random":
             score = self.gate_config.random_rate
             active = bool(self.rng.random() < self.gate_config.random_rate)
-        elif self.mode == "oracle_low_high_spread":
+        elif self.mode in {"oracle_low_high_spread", "oracle_low_high_spread_controlled"}:
             score = avg_spread - self.gate_config.threshold_spread
-            active = bool(risk_state == "low" and avg_spread > self.gate_config.threshold_spread)
+            raw_active = bool(risk_state == "low" and avg_spread > self.gate_config.threshold_spread)
+            if self.mode == "oracle_low_high_spread_controlled":
+                active_quota = int(np.floor(
+                    np.clip(self.gate_config.activation_cap, 0.0, 1.0) * max(1, self.gate_config.activation_window)
+                ))
+                active_quota = max(1, active_quota) if self.gate_config.activation_cap > 0.0 else 0
+                control_budget_open = float(np.sum(self.activation_history)) < float(active_quota)
+                active = bool(raw_active and control_budget_open and control_cooldown_open)
+            else:
+                active = raw_active
         else:
             score = (
                 self.gate_config.w_excess * excess
@@ -115,7 +125,11 @@ class LOBInterventionGate:
         self.activation_history.append(float(active))
         return {
             "active": bool(active),
-            "raw_active": bool(raw_active if self.mode.startswith("risk_aware") else active),
+            "raw_active": bool(
+                raw_active
+                if self.mode.startswith("risk_aware") or self.mode.endswith("_controlled")
+                else active
+            ),
             "score": float(score),
             "excess": float(excess),
             "spread_entropy": float(entropy),

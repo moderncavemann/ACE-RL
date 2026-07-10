@@ -28,6 +28,7 @@ from run_lob_mappo_pilot import (  # noqa: E402
     agent_observations,
     choose_device,
     critic_observations,
+    evaluation_episode_seed,
     rollout_training_episode,
 )
 from src.agents.mappo import MAPPOConfig, MAPPOTrainer  # noqa: E402
@@ -55,6 +56,7 @@ def train_no_intervention_mappo(
             "obs_dim": int(obs.shape[1]),
             "critic_obs_dim": int(critic_obs.shape[1]),
             "n_actions": config.n_actions,
+            "n_agents": config.n_agents,
             "seed": seed,
         }
     )
@@ -84,7 +86,7 @@ def collect_passive_records(
     gate = LOBInterventionGate(config, gate_config, "risk_aware")
     records: List[Record] = []
     for ep in range(episodes):
-        env.reset(seed=seed + 20_000 + ep)
+        env.reset(seed=evaluation_episode_seed(seed, ep))
         gate.reset()
         done = False
         while not done:
@@ -138,10 +140,18 @@ def main() -> None:
     parser.add_argument("--mark-to-fundamental", action="store_true")
     parser.add_argument("--informed-flow-prob", type=float, default=None)
     parser.add_argument("--spread-elasticity", type=float, default=None)
-    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark", "resting_quote"], default=None)
     parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--routing-mode", choices=["book_multiplier", "platform_reallocate"], default=None)
+    parser.add_argument("--routing-routable-fraction", type=float, default=None)
+    parser.add_argument("--routing-relative-improvement-ticks", type=float, default=None)
+    parser.add_argument("--routing-target-kappa", type=float, default=None)
     parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--quote-priority-mode", choices=["fixed", "rotating"], default=None)
+    parser.add_argument("--agent-quote-quantity", type=int, default=None)
+    parser.add_argument("--common-random-numbers", action="store_true")
     parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--policy-mode", choices=["shared", "multihead", "independent"], default="shared")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -186,14 +196,30 @@ def main() -> None:
         config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
     if args.targeted_competitive_half_spread_ticks is not None:
         config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.routing_mode is not None:
+        config_kwargs["routing_mode"] = args.routing_mode
+    if args.routing_routable_fraction is not None:
+        config_kwargs["routing_routable_fraction"] = float(args.routing_routable_fraction)
+    if args.routing_relative_improvement_ticks is not None:
+        config_kwargs["routing_relative_improvement_ticks"] = float(args.routing_relative_improvement_ticks)
+    if args.routing_target_kappa is not None:
+        config_kwargs["routing_target_kappa"] = float(args.routing_target_kappa)
     if args.enforce_max_inventory:
         config_kwargs["enforce_max_inventory"] = True
+    if args.quote_priority_mode is not None:
+        config_kwargs["quote_priority_mode"] = args.quote_priority_mode
+    if args.agent_quote_quantity is not None:
+        config_kwargs["agent_quote_quantity"] = int(args.agent_quote_quantity)
+    if args.common_random_numbers:
+        config_kwargs["common_random_numbers"] = True
     config = LocalLOBConfig(**config_kwargs)
     base_gate_config = LOBGateConfig()
     mappo_base = MAPPOConfig(
         obs_dim=1,
         critic_obs_dim=1,
         n_actions=config.n_actions,
+        n_agents=config.n_agents,
+        policy_mode=args.policy_mode,
         hidden_dim=args.hidden_dim,
         learning_rate=args.learning_rate,
         update_epochs=args.update_epochs,
