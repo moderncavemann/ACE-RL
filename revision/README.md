@@ -251,3 +251,22 @@ diagnostic visibility and threshold-style high-spread timing can beat matched
 random in a 5-seed screen, but the risk-aware gated candidate falls to `4/10`
 positive seeds in the 10-seed expansion. Full LOB/MAPPO main experiments remain
 no-go; the next issue is label/assay alignment, not another broad routing grid.
+
+Redesigned LOB/MAPPO assay follow-up:
+
+1. Risk-coupled no-intervention screen:
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 20 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --scenarios base --risk-coupled-economics --informed-flow-prob 0.3 --spread-elasticity 0.1 --targeted-fill-pricing competitive_benchmark --targeted-competitive-half-spread-ticks 2 --enforce-max-inventory --agent-id-feature --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_redesigned_assay_screen_v1`
+2. Candidate A 50-episode acceptance check:
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 50 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --scenarios base --risk-coupled-economics --inventory-penalty 0.0005 --informed-flow-prob 0.5 --spread-elasticity 0.05 --targeted-fill-pricing competitive_benchmark --targeted-competitive-half-spread-ticks 2 --enforce-max-inventory --agent-id-feature --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_redesigned_assay_candidate_a_50_v1`
+3. Strong-risk-differential acceptance check:
+   `python revision/experiments/diagnose_lob_mappo_assay.py --episodes 50 --eval-episodes 5 --episode-length 100 --n-agents 10 --seeds 0-4 --scenarios base --risk-coupled-economics --inventory-penalty 0.0005 --low-sigma 0.005 --high-sigma 0.08 --informed-flow-prob 0.7 --spread-elasticity 0.05 --seed-liquidity-qty 0 --targeted-fill-pricing competitive_benchmark --targeted-competitive-half-spread-ticks 2 --enforce-max-inventory --agent-id-feature --device auto --hidden-dim 64 --update-epochs 4 --minibatch-size 512 --output-dir revision/experiments/outputs/lob_mappo_redesigned_assay_candidate_e_50_v1`
+
+The repo-visible redesigned-assay summary is
+`revision/notes/lob_mappo_redesigned_assay_v1_summary.md`.
+
+Current redesigned-assay decision: risk-coupled economics and competitive
+targeted-fill pricing fix key conceptual bugs, but no screened candidate passes
+the no-intervention acceptance gate. Full LOB/MAPPO main experiments remain
+no-go. The next redesign should target the learner/assay structure, especially
+shared-actor symmetry and state-contingent risk pricing, rather than more
+routing or threshold screens.

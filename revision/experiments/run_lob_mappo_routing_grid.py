@@ -92,10 +92,15 @@ def aggregate_seed_results(results: Sequence[Dict[str, object]]) -> Dict[str, ob
     return out
 
 
-def make_trainer(config: LocalLOBConfig, seed: int, mappo_base: MAPPOConfig) -> MAPPOTrainer:
+def make_trainer(
+    config: LocalLOBConfig,
+    seed: int,
+    mappo_base: MAPPOConfig,
+    include_agent_id: bool = False,
+) -> MAPPOTrainer:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
-    obs = agent_observations(env)
+    obs = agent_observations(env, include_agent_id=include_agent_id)
     critic_obs = critic_observations(env, obs)
     mappo_config = MAPPOConfig(
         **{
@@ -119,9 +124,11 @@ def run_method_seed(
     seed: int,
     gate_config: LOBGateConfig,
     mappo_base: MAPPOConfig,
+    include_agent_id: bool = False,
+    eval_gate_off: bool = False,
 ) -> Tuple[Dict[str, object], List[Dict[str, object]]]:
     env = LocalLOBMarketEnv(config)
-    trainer = make_trainer(config, seed, mappo_base)
+    trainer = make_trainer(config, seed, mappo_base, include_agent_id=include_agent_id)
     gate = LOBInterventionGate(config, gate_config, gate_mode)
     training_stats = []
     for ep in range(episodes):
@@ -132,10 +139,21 @@ def run_method_seed(
                 gate,
                 routing_rho,
                 seed=seed + ep,
+                include_agent_id=include_agent_id,
             )
         )
 
-    records = evaluate_policy(env, trainer, gate, routing_rho, method, seed, eval_episodes)
+    records = evaluate_policy(
+        env,
+        trainer,
+        gate,
+        routing_rho,
+        method,
+        seed,
+        eval_episodes,
+        include_agent_id=include_agent_id,
+        gate_off=eval_gate_off,
+    )
     result = {
         "method": method,
         "gate_mode": gate_mode,
@@ -143,7 +161,17 @@ def run_method_seed(
         "routing_rho": routing_rho,
         "training": {
             key: float(np.mean([row[key] for row in training_stats])) if training_stats else 0.0
-            for key in ("loss", "policy_loss", "value_loss", "entropy", "return_mean")
+            for key in (
+                "loss",
+                "policy_loss",
+                "value_loss",
+                "entropy",
+                "return_mean",
+                "gate_activation_rate",
+                "gate_raw_activation_rate",
+                "gate_score_mean",
+                "routing_boost_mean",
+            )
         },
         "eval_all": summarize_records(records),
         "eval_by_risk": summarize_by_risk(records),
@@ -207,6 +235,9 @@ def run_cell(
     target_kappa: float,
     timing_method: str,
     timing_gate_mode: LOBGateMode,
+    include_agent_id: bool,
+    eval_gate_off: bool,
+    match_random_rate_source: str,
 ) -> Dict[str, object]:
     config = replace(
         base_config,
@@ -230,12 +261,15 @@ def run_cell(
             seed,
             base_gate_config,
             mappo_config,
+            include_agent_id=include_agent_id,
+            eval_gate_off=eval_gate_off,
         )
         timed_results.append(result)
         timed_records.extend(records)
 
+    rate_block = "training" if match_random_rate_source == "train" else "gate_metrics"
     timed_activation = float(np.mean([
-        float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
+        float(result[rate_block]["gate_activation_rate"])  # type: ignore[index]
         for result in timed_results
     ]))
     random_gate_config = LOBGateConfig(**{
@@ -259,6 +293,8 @@ def run_cell(
             seed,
             seeded_random_config,
             mappo_config,
+            include_agent_id=include_agent_id,
+            eval_gate_off=eval_gate_off,
         )
         random_results.append(result)
         random_records.extend(records)
@@ -286,6 +322,7 @@ def run_cell(
             "routing_relative_improvement_ticks": float(relative_improvement),
             "routing_target_kappa": float(target_kappa),
             "timing_method": timing_method,
+            "matched_random_rate_source": match_random_rate_source,
             "matched_random_rate": timed_activation,
         },
         "methods": {
@@ -382,6 +419,18 @@ def main() -> None:
     parser.add_argument("--p-high-to-low", type=float, default=None)
     parser.add_argument("--low-sigma", type=float, default=None)
     parser.add_argument("--high-sigma", type=float, default=None)
+    parser.add_argument("--seed-liquidity-levels", type=int, default=None)
+    parser.add_argument("--seed-liquidity-qty", type=int, default=None)
+    parser.add_argument("--risk-coupled-economics", action="store_true")
+    parser.add_argument("--mark-to-fundamental", action="store_true")
+    parser.add_argument("--informed-flow-prob", type=float, default=None)
+    parser.add_argument("--spread-elasticity", type=float, default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--eval-gate-off", action="store_true")
+    parser.add_argument("--match-random-rate-source", choices=["eval", "train"], default="eval")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -425,6 +474,25 @@ def main() -> None:
         config_kwargs["low_sigma"] = float(args.low_sigma)
     if args.high_sigma is not None:
         config_kwargs["high_sigma"] = float(args.high_sigma)
+    if args.seed_liquidity_levels is not None:
+        config_kwargs["seed_liquidity_levels"] = int(args.seed_liquidity_levels)
+    if args.seed_liquidity_qty is not None:
+        config_kwargs["seed_liquidity_qty"] = int(args.seed_liquidity_qty)
+    if args.risk_coupled_economics:
+        config_kwargs["risk_coupled_economics"] = True
+        config_kwargs["mark_to_fundamental"] = True
+    if args.mark_to_fundamental:
+        config_kwargs["mark_to_fundamental"] = True
+    if args.informed_flow_prob is not None:
+        config_kwargs["informed_flow_prob"] = float(args.informed_flow_prob)
+    if args.spread_elasticity is not None:
+        config_kwargs["spread_elasticity"] = float(args.spread_elasticity)
+    if args.targeted_fill_pricing is not None:
+        config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
+    if args.targeted_competitive_half_spread_ticks is not None:
+        config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.enforce_max_inventory:
+        config_kwargs["enforce_max_inventory"] = True
     base_config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     timing_gate_mode = TIMING_METHODS[args.timing_method]
@@ -478,6 +546,9 @@ def main() -> None:
                                     target_kappa,
                                     args.timing_method,
                                     timing_gate_mode,
+                                    args.agent_id_feature,
+                                    args.eval_gate_off,
+                                    args.match_random_rate_source,
                                 )
                             )
 
@@ -507,6 +578,9 @@ def main() -> None:
             "routing_relative_improvements": relative_improvements,
             "routing_target_kappas": target_kappas,
             "timing_method": args.timing_method,
+            "agent_id_feature": args.agent_id_feature,
+            "eval_gate_off": args.eval_gate_off,
+            "match_random_rate_source": args.match_random_rate_source,
             "device": device,
             "config": asdict(base_config),
             "gate_config": asdict(gate_config),

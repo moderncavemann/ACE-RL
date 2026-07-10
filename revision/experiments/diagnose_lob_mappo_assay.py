@@ -126,6 +126,7 @@ def evaluate_policy(
     trainer: MAPPOTrainer,
     seed: int,
     eval_episodes: int,
+    include_agent_id: bool = False,
 ) -> List[Record]:
     env = LocalLOBMarketEnv(config)
     records: List[Record] = []
@@ -133,7 +134,7 @@ def evaluate_policy(
         env.reset(seed=seed + 20_000 + ep)
         done = False
         while not done:
-            obs = agent_observations(env)
+            obs = agent_observations(env, include_agent_id=include_agent_id)
             critic_obs = critic_observations(env, obs)
             actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
             _, _, done, _, info = env.step(
@@ -152,6 +153,10 @@ def evaluate_policy(
                 "best_spread_ticks": float(info["best_spread_ticks"]),
                 "total_volume": float(info["total_volume"]),
                 "mean_reward": float(info["mean_reward"]),
+                "mean_spread_revenue": float(info.get("mean_spread_revenue", 0.0)),
+                "mean_adverse_selection_loss": float(info.get("mean_adverse_selection_loss", 0.0)),
+                "mean_inventory_penalty": float(info.get("mean_inventory_penalty", 0.0)),
+                "fundamental_shock_abs": abs(float(info.get("fundamental_shock", 0.0))),
                 "mean_abs_inventory": float(info["mean_abs_inventory"]),
                 "flow_concentration": flow_concentration(info["flow_shares"]),  # type: ignore[arg-type]
             }
@@ -160,10 +165,15 @@ def evaluate_policy(
     return records
 
 
-def make_trainer(config: LocalLOBConfig, seed: int, mappo_base: MAPPOConfig) -> MAPPOTrainer:
+def make_trainer(
+    config: LocalLOBConfig,
+    seed: int,
+    mappo_base: MAPPOConfig,
+    include_agent_id: bool = False,
+) -> MAPPOTrainer:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
-    obs = agent_observations(env)
+    obs = agent_observations(env, include_agent_id=include_agent_id)
     critic_obs = critic_observations(env, obs)
     return MAPPOTrainer(MAPPOConfig(
         **{
@@ -184,19 +194,33 @@ def run_seed(
     eval_episodes: int,
     checkpoint_episodes: Sequence[int],
     checkpoint_eval_episodes: int,
+    include_agent_id: bool = False,
 ) -> Dict[str, object]:
     env = LocalLOBMarketEnv(config)
-    trainer = make_trainer(config, seed, mappo_base)
+    trainer = make_trainer(config, seed, mappo_base, include_agent_id=include_agent_id)
     gate = LOBInterventionGate(config, LOBGateConfig(), "none")
     training_rows: List[Dict[str, float]] = []
     learning_curve: List[Dict[str, float]] = []
     checkpoints = set(int(x) for x in checkpoint_episodes if int(x) > 0)
 
     for ep in range(1, episodes + 1):
-        stats = rollout_training_episode(env, trainer, gate, routing_rho=0.0, seed=seed + ep - 1)
+        stats = rollout_training_episode(
+            env,
+            trainer,
+            gate,
+            routing_rho=0.0,
+            seed=seed + ep - 1,
+            include_agent_id=include_agent_id,
+        )
         training_rows.append(stats)
         if ep in checkpoints:
-            eval_records = evaluate_policy(config, trainer, seed + 100_000 + ep, checkpoint_eval_episodes)
+            eval_records = evaluate_policy(
+                config,
+                trainer,
+                seed + 100_000 + ep,
+                checkpoint_eval_episodes,
+                include_agent_id=include_agent_id,
+            )
             eval_summary = summarize_records(eval_records)
             learning_curve.append({
                 "seed": float(seed),
@@ -208,7 +232,13 @@ def run_seed(
                 "action_entropy": float(eval_summary.get("action_entropy_mean", 0.0)),
             })
 
-    final_records = evaluate_policy(config, trainer, seed, eval_episodes)
+    final_records = evaluate_policy(
+        config,
+        trainer,
+        seed,
+        eval_episodes,
+        include_agent_id=include_agent_id,
+    )
     final_summary = summarize_records(final_records)
     by_risk = {
         risk: summarize_records([row for row in final_records if row["risk_state"] == risk])
@@ -267,6 +297,9 @@ def write_seed_csv(path: Path, summary: Dict[str, object]) -> None:
                 "avg_agent_spread": final_eval.get("avg_agent_spread_mean", 0.0),
                 "best_spread_ticks": final_eval.get("best_spread_ticks_mean", 0.0),
                 "mean_reward": final_eval.get("mean_reward_mean", 0.0),
+                "mean_spread_revenue": final_eval.get("mean_spread_revenue_mean", 0.0),
+                "mean_adverse_selection_loss": final_eval.get("mean_adverse_selection_loss_mean", 0.0),
+                "mean_inventory_penalty": final_eval.get("mean_inventory_penalty_mean", 0.0),
                 "total_volume": final_eval.get("total_volume_mean", 0.0),
                 "flow_concentration": final_eval.get("flow_concentration_mean", 0.0),
                 "action_alignment": final_eval.get("action_alignment_mean", 0.0),
@@ -319,6 +352,22 @@ def main() -> None:
     parser.add_argument("--entropy-coef", type=float, default=0.01)
     parser.add_argument("--update-epochs", type=int, default=4)
     parser.add_argument("--minibatch-size", type=int, default=512)
+    parser.add_argument("--inventory-penalty", type=float, default=None)
+    parser.add_argument("--base-flow-intensity", type=float, default=None)
+    parser.add_argument("--p-low-to-high", type=float, default=None)
+    parser.add_argument("--p-high-to-low", type=float, default=None)
+    parser.add_argument("--low-sigma", type=float, default=None)
+    parser.add_argument("--high-sigma", type=float, default=None)
+    parser.add_argument("--seed-liquidity-levels", type=int, default=None)
+    parser.add_argument("--seed-liquidity-qty", type=int, default=None)
+    parser.add_argument("--risk-coupled-economics", action="store_true")
+    parser.add_argument("--mark-to-fundamental", action="store_true")
+    parser.add_argument("--informed-flow-prob", type=float, default=None)
+    parser.add_argument("--spread-elasticity", type=float, default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--agent-id-feature", action="store_true")
     parser.add_argument("--output-dir", default="revision/experiments/outputs/lob_mappo_no_intervention_assay_v1")
     args = parser.parse_args()
 
@@ -330,11 +379,43 @@ def main() -> None:
     checkpoints = parse_int_csv(args.checkpoint_episodes)
     device = choose_device(args.device)
 
-    base_config = LocalLOBConfig(
-        n_agents=args.n_agents,
-        episode_length=args.episode_length,
-        seed=seeds[0] if seeds else 0,
-    )
+    config_kwargs = {
+        "n_agents": args.n_agents,
+        "episode_length": args.episode_length,
+        "seed": seeds[0] if seeds else 0,
+    }
+    if args.inventory_penalty is not None:
+        config_kwargs["inventory_penalty"] = float(args.inventory_penalty)
+    if args.base_flow_intensity is not None:
+        config_kwargs["base_flow_intensity"] = float(args.base_flow_intensity)
+    if args.p_low_to_high is not None:
+        config_kwargs["p_low_to_high"] = float(args.p_low_to_high)
+    if args.p_high_to_low is not None:
+        config_kwargs["p_high_to_low"] = float(args.p_high_to_low)
+    if args.low_sigma is not None:
+        config_kwargs["low_sigma"] = float(args.low_sigma)
+    if args.high_sigma is not None:
+        config_kwargs["high_sigma"] = float(args.high_sigma)
+    if args.seed_liquidity_levels is not None:
+        config_kwargs["seed_liquidity_levels"] = int(args.seed_liquidity_levels)
+    if args.seed_liquidity_qty is not None:
+        config_kwargs["seed_liquidity_qty"] = int(args.seed_liquidity_qty)
+    if args.risk_coupled_economics:
+        config_kwargs["risk_coupled_economics"] = True
+        config_kwargs["mark_to_fundamental"] = True
+    if args.mark_to_fundamental:
+        config_kwargs["mark_to_fundamental"] = True
+    if args.informed_flow_prob is not None:
+        config_kwargs["informed_flow_prob"] = float(args.informed_flow_prob)
+    if args.spread_elasticity is not None:
+        config_kwargs["spread_elasticity"] = float(args.spread_elasticity)
+    if args.targeted_fill_pricing is not None:
+        config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
+    if args.targeted_competitive_half_spread_ticks is not None:
+        config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.enforce_max_inventory:
+        config_kwargs["enforce_max_inventory"] = True
+    base_config = LocalLOBConfig(**config_kwargs)
     base_mappo = MAPPOConfig(
         obs_dim=1,
         critic_obs_dim=1,
@@ -365,6 +446,7 @@ def main() -> None:
                     args.eval_episodes,
                     checkpoints,
                     args.checkpoint_eval_episodes,
+                    include_agent_id=args.agent_id_feature,
                 )
             )
         aggregate = aggregate_seed_results(
@@ -412,6 +494,9 @@ def main() -> None:
             "strong_failure_spread_threshold": args.strong_failure_spread_threshold,
             "checkpoint_episodes": checkpoints,
             "checkpoint_eval_episodes": args.checkpoint_eval_episodes,
+            "config": asdict(base_config),
+            "mappo_config": asdict(base_mappo),
+            "agent_id_feature": args.agent_id_feature,
         },
         "ranked_scenarios": ranked,
         "scenarios": scenarios_out,

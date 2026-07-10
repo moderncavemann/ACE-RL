@@ -43,10 +43,11 @@ def train_no_intervention_mappo(
     episodes: int,
     seed: int,
     mappo_base: MAPPOConfig,
+    include_agent_id: bool = False,
 ) -> MAPPOTrainer:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
-    obs = agent_observations(env)
+    obs = agent_observations(env, include_agent_id=include_agent_id)
     critic_obs = critic_observations(env, obs)
     mappo_config = MAPPOConfig(
         **{
@@ -60,7 +61,14 @@ def train_no_intervention_mappo(
     trainer = MAPPOTrainer(mappo_config)
     no_gate = LOBInterventionGate(config, LOBGateConfig(), "none")
     for ep in range(episodes):
-        rollout_training_episode(env, trainer, no_gate, routing_rho=0.0, seed=seed + ep)
+        rollout_training_episode(
+            env,
+            trainer,
+            no_gate,
+            routing_rho=0.0,
+            seed=seed + ep,
+            include_agent_id=include_agent_id,
+        )
     return trainer
 
 
@@ -70,6 +78,7 @@ def collect_passive_records(
     episodes: int,
     seed: int,
     gate_config: LOBGateConfig,
+    include_agent_id: bool = False,
 ) -> List[Record]:
     env = LocalLOBMarketEnv(config)
     gate = LOBInterventionGate(config, gate_config, "risk_aware")
@@ -79,7 +88,7 @@ def collect_passive_records(
         gate.reset()
         done = False
         while not done:
-            obs = agent_observations(env)
+            obs = agent_observations(env, include_agent_id=include_agent_id)
             critic_obs = critic_observations(env, obs)
             actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
             spreads = [config.half_spread_levels[int(actions[i])] for i in range(config.n_agents)]
@@ -123,6 +132,16 @@ def main() -> None:
     parser.add_argument("--p-high-to-low", type=float, default=None)
     parser.add_argument("--low-sigma", type=float, default=None)
     parser.add_argument("--high-sigma", type=float, default=None)
+    parser.add_argument("--seed-liquidity-levels", type=int, default=None)
+    parser.add_argument("--seed-liquidity-qty", type=int, default=None)
+    parser.add_argument("--risk-coupled-economics", action="store_true")
+    parser.add_argument("--mark-to-fundamental", action="store_true")
+    parser.add_argument("--informed-flow-prob", type=float, default=None)
+    parser.add_argument("--spread-elasticity", type=float, default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--agent-id-feature", action="store_true")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -150,6 +169,25 @@ def main() -> None:
         config_kwargs["low_sigma"] = float(args.low_sigma)
     if args.high_sigma is not None:
         config_kwargs["high_sigma"] = float(args.high_sigma)
+    if args.seed_liquidity_levels is not None:
+        config_kwargs["seed_liquidity_levels"] = int(args.seed_liquidity_levels)
+    if args.seed_liquidity_qty is not None:
+        config_kwargs["seed_liquidity_qty"] = int(args.seed_liquidity_qty)
+    if args.risk_coupled_economics:
+        config_kwargs["risk_coupled_economics"] = True
+        config_kwargs["mark_to_fundamental"] = True
+    if args.mark_to_fundamental:
+        config_kwargs["mark_to_fundamental"] = True
+    if args.informed_flow_prob is not None:
+        config_kwargs["informed_flow_prob"] = float(args.informed_flow_prob)
+    if args.spread_elasticity is not None:
+        config_kwargs["spread_elasticity"] = float(args.spread_elasticity)
+    if args.targeted_fill_pricing is not None:
+        config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
+    if args.targeted_competitive_half_spread_ticks is not None:
+        config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.enforce_max_inventory:
+        config_kwargs["enforce_max_inventory"] = True
     config = LocalLOBConfig(**config_kwargs)
     base_gate_config = LOBGateConfig()
     mappo_base = MAPPOConfig(
@@ -165,7 +203,13 @@ def main() -> None:
 
     records: List[Record] = []
     for seed in seeds:
-        trainer = train_no_intervention_mappo(replace(config, seed=seed), args.episodes, seed, mappo_base)
+        trainer = train_no_intervention_mappo(
+            replace(config, seed=seed),
+            args.episodes,
+            seed,
+            mappo_base,
+            include_agent_id=args.agent_id_feature,
+        )
         records.extend(
             collect_passive_records(
                 replace(config, seed=seed),
@@ -173,6 +217,7 @@ def main() -> None:
                 args.eval_episodes,
                 seed,
                 base_gate_config,
+                include_agent_id=args.agent_id_feature,
             )
         )
 
@@ -199,6 +244,7 @@ def main() -> None:
             "config": asdict(config),
             "device": device,
             "mappo_config": asdict(mappo_base),
+            "agent_id_feature": args.agent_id_feature,
             "score_summary": summarize(float(row["gate_score"]) for row in records),
             "stage": "local_lob_mappo_no_intervention_gate_calibration",
         },

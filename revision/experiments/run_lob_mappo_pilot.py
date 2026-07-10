@@ -67,7 +67,7 @@ def flow_concentration(flow_shares: np.ndarray) -> float:
     return float(np.sum(shares ** 2))
 
 
-def agent_observations(env: LocalLOBMarketEnv) -> np.ndarray:
+def agent_observations(env: LocalLOBMarketEnv, include_agent_id: bool = False) -> np.ndarray:
     cfg = env.config
     max_spread = float(max(cfg.half_spread_levels))
     risk = 1.0 if env.risk_state == "high" else 0.0
@@ -78,7 +78,7 @@ def agent_observations(env: LocalLOBMarketEnv) -> np.ndarray:
     t_frac = env.t / max(cfg.episode_length, 1)
     obs = []
     for agent_id in range(cfg.n_agents):
-        obs.append([
+        row = [
             risk,
             float(env.last_actions[agent_id]) / denom_actions,
             avg_action,
@@ -88,7 +88,10 @@ def agent_observations(env: LocalLOBMarketEnv) -> np.ndarray:
             best_spread,
             total_volume,
             t_frac,
-        ])
+        ]
+        if include_agent_id:
+            row.append(float(agent_id) / max(cfg.n_agents - 1, 1))
+        obs.append(row)
     return np.array(obs, dtype=np.float32)
 
 
@@ -115,6 +118,7 @@ def rollout_training_episode(
     gate: LOBInterventionGate,
     routing_rho: float,
     seed: int,
+    include_agent_id: bool = False,
 ) -> Dict[str, float]:
     env.reset(seed=seed)
     gate.reset()
@@ -131,7 +135,7 @@ def rollout_training_episode(
     routing_boost_rows: list[float] = []
 
     while not done:
-        obs = agent_observations(env)
+        obs = agent_observations(env, include_agent_id=include_agent_id)
         critic_obs = critic_observations(env, obs)
         actions, logp, values = trainer.act(obs, critic_obs, deterministic=False)
         spreads = [env.config.half_spread_levels[int(actions[i])] for i in range(env.config.n_agents)]
@@ -179,6 +183,8 @@ def evaluate_policy(
     method: str,
     seed: int,
     eval_episodes: int,
+    include_agent_id: bool = False,
+    gate_off: bool = False,
 ) -> List[Dict[str, object]]:
     records: List[Dict[str, object]] = []
     for ep in range(eval_episodes):
@@ -186,16 +192,17 @@ def evaluate_policy(
         gate.reset()
         done = False
         while not done:
-            obs = agent_observations(env)
+            obs = agent_observations(env, include_agent_id=include_agent_id)
             critic_obs = critic_observations(env, obs)
             actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
             spreads = [env.config.half_spread_levels[int(actions[i])] for i in range(env.config.n_agents)]
             decision = gate.decide(env.risk_state, spreads, env.last_flow_shares, env.last_total_volume)
-            boost = routing_rho if bool(decision["active"]) else 0.0
+            active = bool(decision["active"]) and not gate_off
+            boost = routing_rho if active else 0.0
             _, _, done, _, info = env.step(
                 {i: int(actions[i]) for i in range(env.config.n_agents)},
                 routing_flow_boost=boost,
-                gate_active=bool(decision["active"]),
+                gate_active=active,
                 gate_score=float(decision["score"]),
             )
             row = {
@@ -209,6 +216,7 @@ def evaluate_policy(
             row["gate_flow_concentration"] = float(decision["flow_concentration"])
             row["gate_volume_suppression"] = float(decision["volume_suppression"])
             row["gate_raw_active"] = bool(decision["raw_active"])
+            row["gate_would_active"] = bool(decision["active"])
             row["gate_controlled_recent_rate"] = float(decision["controlled_recent_rate"])
             row["gate_control_budget_open"] = bool(decision["control_budget_open"])
             row["gate_control_cooldown_open"] = bool(decision["control_cooldown_open"])
@@ -226,10 +234,12 @@ def run_method_seed(
     seed: int,
     gate_config: LOBGateConfig,
     mappo_base: MAPPOConfig,
+    include_agent_id: bool = False,
+    eval_gate_off: bool = False,
 ) -> Dict[str, object]:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
-    obs = agent_observations(env)
+    obs = agent_observations(env, include_agent_id=include_agent_id)
     critic_obs = critic_observations(env, obs)
     mappo_config = MAPPOConfig(
         **{
@@ -251,10 +261,21 @@ def run_method_seed(
                 gate,
                 routing_rho,
                 seed=seed + ep,
+                include_agent_id=include_agent_id,
             )
         )
 
-    records = evaluate_policy(env, trainer, gate, routing_rho, method, seed, eval_episodes)
+    records = evaluate_policy(
+        env,
+        trainer,
+        gate,
+        routing_rho,
+        method,
+        seed,
+        eval_episodes,
+        include_agent_id=include_agent_id,
+        gate_off=eval_gate_off,
+    )
     return {
         "method": method,
         "gate_mode": gate_mode,
@@ -289,6 +310,8 @@ def run_grid(
     gate_config: LOBGateConfig,
     mappo_config: MAPPOConfig,
     routing_rho_override: float | None = None,
+    include_agent_id: bool = False,
+    eval_gate_off: bool = False,
 ) -> Dict[str, List[Dict[str, object]]]:
     grouped: Dict[str, List[Dict[str, object]]] = {method: [] for method in methods}
     for method in methods:
@@ -314,6 +337,8 @@ def run_grid(
                     seed,
                     seed_gate_config,
                     mappo_config,
+                    include_agent_id=include_agent_id,
+                    eval_gate_off=eval_gate_off,
                 )
             )
     return grouped
@@ -383,6 +408,9 @@ def write_metrics_csv(path: Path, summary: Dict[str, object]) -> None:
             ("eval_all", "best_spread_ticks_mean"),
             ("eval_all", "total_volume_mean"),
             ("eval_all", "mean_reward_mean"),
+            ("eval_all", "mean_spread_revenue_mean"),
+            ("eval_all", "mean_adverse_selection_loss_mean"),
+            ("eval_all", "mean_inventory_penalty_mean"),
             ("eval_all", "mean_abs_inventory_mean"),
             ("eval_all", "routing_effective_multiplier_mean"),
             ("eval_all", "routing_targeted_volume_mean"),
@@ -438,6 +466,17 @@ def main() -> None:
     parser.add_argument("--p-high-to-low", type=float, default=None)
     parser.add_argument("--low-sigma", type=float, default=None)
     parser.add_argument("--high-sigma", type=float, default=None)
+    parser.add_argument("--seed-liquidity-levels", type=int, default=None)
+    parser.add_argument("--seed-liquidity-qty", type=int, default=None)
+    parser.add_argument("--risk-coupled-economics", action="store_true")
+    parser.add_argument("--mark-to-fundamental", action="store_true")
+    parser.add_argument("--informed-flow-prob", type=float, default=None)
+    parser.add_argument("--spread-elasticity", type=float, default=None)
+    parser.add_argument("--targeted-fill-pricing", choices=["agent_quote", "competitive_benchmark"], default=None)
+    parser.add_argument("--targeted-competitive-half-spread-ticks", type=float, default=None)
+    parser.add_argument("--enforce-max-inventory", action="store_true")
+    parser.add_argument("--agent-id-feature", action="store_true")
+    parser.add_argument("--eval-gate-off", action="store_true")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--hidden-dim", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
@@ -481,6 +520,25 @@ def main() -> None:
         config_kwargs["low_sigma"] = float(args.low_sigma)
     if args.high_sigma is not None:
         config_kwargs["high_sigma"] = float(args.high_sigma)
+    if args.seed_liquidity_levels is not None:
+        config_kwargs["seed_liquidity_levels"] = int(args.seed_liquidity_levels)
+    if args.seed_liquidity_qty is not None:
+        config_kwargs["seed_liquidity_qty"] = int(args.seed_liquidity_qty)
+    if args.risk_coupled_economics:
+        config_kwargs["risk_coupled_economics"] = True
+        config_kwargs["mark_to_fundamental"] = True
+    if args.mark_to_fundamental:
+        config_kwargs["mark_to_fundamental"] = True
+    if args.informed_flow_prob is not None:
+        config_kwargs["informed_flow_prob"] = float(args.informed_flow_prob)
+    if args.spread_elasticity is not None:
+        config_kwargs["spread_elasticity"] = float(args.spread_elasticity)
+    if args.targeted_fill_pricing is not None:
+        config_kwargs["targeted_fill_pricing"] = args.targeted_fill_pricing
+    if args.targeted_competitive_half_spread_ticks is not None:
+        config_kwargs["targeted_competitive_half_spread_ticks"] = float(args.targeted_competitive_half_spread_ticks)
+    if args.enforce_max_inventory:
+        config_kwargs["enforce_max_inventory"] = True
     config = LocalLOBConfig(**config_kwargs)
     gate_config = load_lob_gate_config(args.gate_config)
     mappo_config = MAPPOConfig(
@@ -502,11 +560,14 @@ def main() -> None:
         gate_config,
         mappo_config,
         routing_rho_override=args.routing_rho,
+        include_agent_id=args.agent_id_feature,
+        eval_gate_off=args.eval_gate_off,
     )
     gated_method = primary_gated_method(grouped)
 
+    rate_block = "training" if args.eval_gate_off else "gate_metrics"
     gated_rates = [
-        float(result["gate_metrics"]["gate_activation_rate"])  # type: ignore[index]
+        float(result[rate_block]["gate_activation_rate"])  # type: ignore[index]
         for result in grouped.get(gated_method, [])
     ]
     matched_rate = float(np.mean(gated_rates)) if args.random_rate == "auto" and gated_rates else float(args.random_rate)
@@ -521,6 +582,8 @@ def main() -> None:
         random_gate_config,
         mappo_config,
         routing_rho_override=args.routing_rho,
+        include_agent_id=args.agent_id_feature,
+        eval_gate_off=args.eval_gate_off,
     )["random_gate"]
 
     ordered_methods = [
@@ -554,6 +617,8 @@ def main() -> None:
             "gate_config_path": args.gate_config,
             "mappo_config": asdict(mappo_config),
             "primary_gated_method": gated_method,
+            "agent_id_feature": args.agent_id_feature,
+            "eval_gate_off": args.eval_gate_off,
             "stage": "local_lob_mappo_pilot_not_full_main",
         },
         "methods": methods_out,

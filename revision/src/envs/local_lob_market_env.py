@@ -25,6 +25,7 @@ RoutingMode = Literal[
     "continuous_reallocate",
     "balanced_reallocate",
 ]
+TargetedFillPricing = Literal["agent_quote", "competitive_benchmark"]
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,13 @@ class LocalLOBConfig:
     routing_withhold_rate: float = 0.50
     routing_relative_improvement_ticks: float = 1.0
     routing_target_kappa: float = 0.0
+    risk_coupled_economics: bool = False
+    mark_to_fundamental: bool = False
+    informed_flow_prob: float = 0.0
+    spread_elasticity: float = 0.0
+    targeted_fill_pricing: TargetedFillPricing = "agent_quote"
+    targeted_competitive_half_spread_ticks: float = 2.0
+    enforce_max_inventory: bool = False
     seed_liquidity_levels: int = 5
     seed_liquidity_qty: int = 8
     p_low_to_high: float = 0.04
@@ -195,6 +203,12 @@ class LocalLOBMarketEnv:
         self.last_routing_targeted_orders = 0
         self.last_routing_eligible_agents = 0
         self.last_wealth = np.zeros(config.n_agents, dtype=float)
+        self.last_fundamental_shock = 0.0
+        self.last_spread_revenue = np.zeros(config.n_agents, dtype=float)
+        self.last_adverse_selection_loss = np.zeros(config.n_agents, dtype=float)
+        self.last_inventory_penalty = np.zeros(config.n_agents, dtype=float)
+        self.last_mark_price = config.initial_mid_price
+        self._execution_mid = config.initial_mid_price
 
     def reset(self, seed: int | None = None) -> tuple[Dict[int, Tuple[int, ...]], dict[str, object]]:
         if seed is not None:
@@ -215,6 +229,12 @@ class LocalLOBMarketEnv:
         self.last_routing_targeted_volume = 0.0
         self.last_routing_targeted_orders = 0
         self.last_routing_eligible_agents = 0
+        self.last_fundamental_shock = 0.0
+        self.last_spread_revenue = np.zeros(self.config.n_agents, dtype=float)
+        self.last_adverse_selection_loss = np.zeros(self.config.n_agents, dtype=float)
+        self.last_inventory_penalty = np.zeros(self.config.n_agents, dtype=float)
+        self.last_mark_price = self.fundamental
+        self._execution_mid = self.fundamental
         self._seed_liquidity()
         self.last_wealth = self._wealth()
         return self._states(), self._info_stub()
@@ -231,10 +251,17 @@ class LocalLOBMarketEnv:
         half_spreads = np.array([self.config.half_spread_levels[a] for a in action_arr], dtype=float)
         self.last_agent_spreads = half_spreads
 
-        before_wealth = self._wealth()
         sigma = self.config.high_sigma if self.risk_state == "high" else self.config.low_sigma
-        self.fundamental += float(self.rng.normal(0.0, sigma))
-        mid = self.book.mid_price(self.fundamental)
+        fundamental_shock = float(self.rng.normal(0.0, sigma))
+        self.last_fundamental_shock = fundamental_shock
+        before_wealth = self._wealth()
+        if self.config.risk_coupled_economics:
+            mid = self._reference_mid()
+            self._execution_mid = mid
+        else:
+            self.fundamental += fundamental_shock
+            mid = self.book.mid_price(self.fundamental)
+            self._execution_mid = mid
 
         for agent_id in range(self.config.n_agents):
             self.book.cancel_agent_orders(agent_id)
@@ -245,10 +272,13 @@ class LocalLOBMarketEnv:
             self.agent_orders[agent_id] = [bid_id, ask_id]
 
         fills = self._route_external_flow(max(0.0, routing_flow_boost))
-        self._process_fills(fills)
+        fills = self._process_fills(fills)
+        if self.config.risk_coupled_economics:
+            self.fundamental += fundamental_shock
 
         after_wealth = self._wealth()
-        rewards_arr = after_wealth - before_wealth - self.config.inventory_penalty * (self.inventories ** 2)
+        self.last_inventory_penalty = self.config.inventory_penalty * (self.inventories ** 2)
+        rewards_arr = after_wealth - before_wealth - self.last_inventory_penalty
         rewards = {i: float(rewards_arr[i]) for i in range(self.config.n_agents)}
 
         agent_flow = np.zeros(self.config.n_agents, dtype=float)
@@ -268,12 +298,17 @@ class LocalLOBMarketEnv:
             "t": self.t,
             "risk_state": self.risk_state,
             "fundamental": float(self.fundamental),
+            "fundamental_shock": float(self.last_fundamental_shock),
+            "mark_price": float(self.last_mark_price),
             "best_spread_ticks": self.book.spread_ticks(),
             "avg_agent_spread": float(np.mean(half_spreads)),
             "agent_spreads": half_spreads.copy(),
             "total_volume": float(total_volume),
             "flow_shares": self.last_flow_shares.copy(),
             "mean_reward": float(np.mean(rewards_arr)),
+            "mean_spread_revenue": float(np.mean(self.last_spread_revenue)),
+            "mean_adverse_selection_loss": float(np.mean(self.last_adverse_selection_loss)),
+            "mean_inventory_penalty": float(np.mean(self.last_inventory_penalty)),
             "routing_flow_boost": float(routing_flow_boost),
             "routing_effective_multiplier": float(self.last_routing_multiplier),
             "routing_spread_cap_met": bool(self.last_routing_cap_met),
@@ -360,7 +395,7 @@ class LocalLOBMarketEnv:
         multiplier = max(0.0, multiplier)
         self.last_routing_multiplier = multiplier
         self.last_routing_cap_met = bool(cap_met)
-        intensity = self.config.base_flow_intensity * multiplier
+        intensity = self._flow_intensity() * multiplier
         n_orders = int(self.rng.poisson(intensity))
         return self._sample_book_external_orders(n_orders)
 
@@ -385,8 +420,9 @@ class LocalLOBMarketEnv:
 
         self.last_routing_multiplier = effective_multiplier
         self.last_routing_cap_met = bool(cap_met)
-        normal_orders = int(self.rng.poisson(self.config.base_flow_intensity * normal_multiplier))
-        targeted_orders = int(self.rng.poisson(self.config.base_flow_intensity * targeted_multiplier))
+        base_intensity = self._flow_intensity()
+        normal_orders = int(self.rng.poisson(base_intensity * normal_multiplier))
+        targeted_orders = int(self.rng.poisson(base_intensity * targeted_multiplier))
         fills = self._sample_book_external_orders(normal_orders)
         targeted_fills = self._sample_targeted_external_fills(targeted_orders, eligible_agents)
         self.last_routing_targeted_volume = float(sum(float(fill["quantity"]) for fill in targeted_fills))
@@ -416,8 +452,9 @@ class LocalLOBMarketEnv:
 
         self.last_routing_multiplier = effective_multiplier
         self.last_routing_cap_met = bool(cap_met)
-        normal_orders = int(self.rng.poisson(self.config.base_flow_intensity * normal_multiplier))
-        targeted_orders = int(self.rng.poisson(self.config.base_flow_intensity * targeted_multiplier))
+        base_intensity = self._flow_intensity()
+        normal_orders = int(self.rng.poisson(base_intensity * normal_multiplier))
+        targeted_orders = int(self.rng.poisson(base_intensity * targeted_multiplier))
         fills = self._sample_book_external_orders(normal_orders)
         targeted_fills = self._sample_targeted_external_fills(targeted_orders, eligible_agents)
         self.last_routing_targeted_volume = float(sum(float(fill["quantity"]) for fill in targeted_fills))
@@ -449,12 +486,13 @@ class LocalLOBMarketEnv:
 
         self.last_routing_multiplier = effective_multiplier
         self.last_routing_cap_met = bool(cap_met)
-        normal_orders = int(self.rng.poisson(self.config.base_flow_intensity * normal_multiplier))
+        base_intensity = self._flow_intensity()
+        normal_orders = int(self.rng.poisson(base_intensity * normal_multiplier))
         if balanced:
-            targeted_orders = int(self.rng.poisson(0.5 * self.config.base_flow_intensity * targeted_multiplier))
+            targeted_orders = int(self.rng.poisson(0.5 * base_intensity * targeted_multiplier))
             targeted_fills = self._sample_targeted_balanced_external_fills(targeted_orders, eligible_agents)
         else:
-            targeted_orders = int(self.rng.poisson(self.config.base_flow_intensity * targeted_multiplier))
+            targeted_orders = int(self.rng.poisson(base_intensity * targeted_multiplier))
             targeted_fills = self._sample_targeted_external_fills(targeted_orders, eligible_agents)
         fills = self._sample_book_external_orders(normal_orders)
         self.last_routing_targeted_volume = float(sum(float(fill["quantity"]) for fill in targeted_fills))
@@ -464,9 +502,9 @@ class LocalLOBMarketEnv:
 
     def _sample_book_external_orders(self, n_orders: int) -> list[dict[str, object]]:
         fills: list[dict[str, object]] = []
-        mid = self.book.mid_price(self.fundamental)
+        mid = self._reference_mid()
         for _ in range(n_orders):
-            side = "bid" if self.rng.random() < 0.5 else "ask"
+            side = self._sample_external_side()
             qty = int(self.rng.integers(1, 4))
             if side == "bid":
                 price = mid + (max(self.config.half_spread_levels) + 3) * self.config.tick_size
@@ -477,13 +515,18 @@ class LocalLOBMarketEnv:
         return fills
 
     def _sample_targeted_external_fills(self, n_orders: int, eligible_agents: Sequence[int]) -> list[dict[str, object]]:
+        eligible_agents = self._targetable_agents(eligible_agents)
+        self.last_routing_eligible_agents = len(eligible_agents)
         if n_orders <= 0 or not eligible_agents:
             return []
         fills: list[dict[str, object]] = []
-        mid = self.book.mid_price(self.fundamental)
+        mid = self._reference_mid()
         for _ in range(n_orders):
             agent_id = int(self.rng.choice(eligible_agents, p=self._target_agent_probabilities(eligible_agents)))
-            half = float(self.last_agent_spreads[agent_id]) * self.config.tick_size
+            half_ticks = self._target_fill_half_spread(agent_id)
+            if half_ticks is None:
+                continue
+            half = half_ticks * self.config.tick_size
             qty = int(self.rng.integers(1, 4))
             if self.rng.random() < 0.5:
                 fills.append({
@@ -510,13 +553,18 @@ class LocalLOBMarketEnv:
         n_pairs: int,
         eligible_agents: Sequence[int],
     ) -> list[dict[str, object]]:
+        eligible_agents = self._targetable_agents(eligible_agents)
+        self.last_routing_eligible_agents = len(eligible_agents)
         if n_pairs <= 0 or not eligible_agents:
             return []
         fills: list[dict[str, object]] = []
-        mid = self.book.mid_price(self.fundamental)
+        mid = self._reference_mid()
         for _ in range(n_pairs):
             agent_id = int(self.rng.choice(eligible_agents, p=self._target_agent_probabilities(eligible_agents)))
-            half = float(self.last_agent_spreads[agent_id]) * self.config.tick_size
+            half_ticks = self._target_fill_half_spread(agent_id)
+            if half_ticks is None:
+                continue
+            half = half_ticks * self.config.tick_size
             qty = int(self.rng.integers(1, 4))
             fills.append({
                 "price": round((mid + half) / self.config.tick_size) * self.config.tick_size,
@@ -535,6 +583,46 @@ class LocalLOBMarketEnv:
                 "passive_side": "bid",
             })
         return fills
+
+    def _flow_intensity(self) -> float:
+        intensity = float(self.config.base_flow_intensity)
+        elasticity = float(self.config.spread_elasticity)
+        if elasticity <= 0.0:
+            return intensity
+        full_avg_spread = 2.0 * float(np.mean(self.last_agent_spreads))
+        competitive_full_spread = 2.0 * float(min(self.config.half_spread_levels))
+        spread_markup = max(0.0, full_avg_spread - competitive_full_spread)
+        return float(intensity * np.exp(-elasticity * spread_markup))
+
+    def _reference_mid(self) -> float:
+        if self.config.risk_coupled_economics:
+            return float(self.fundamental)
+        return self.book.mid_price(self.fundamental)
+
+    def _sample_external_side(self) -> str:
+        informed_prob = float(np.clip(self.config.informed_flow_prob, 0.0, 1.0))
+        if informed_prob > 0.0 and self.rng.random() < informed_prob and self.last_fundamental_shock != 0.0:
+            return "bid" if self.last_fundamental_shock > 0.0 else "ask"
+        return "bid" if self.rng.random() < 0.5 else "ask"
+
+    def _targetable_agents(self, eligible_agents: Sequence[int]) -> list[int]:
+        if self.config.targeted_fill_pricing != "competitive_benchmark":
+            return [int(agent_id) for agent_id in eligible_agents]
+        cap = float(self.config.targeted_competitive_half_spread_ticks)
+        return [
+            int(agent_id)
+            for agent_id in eligible_agents
+            if float(self.last_agent_spreads[int(agent_id)]) <= cap
+        ]
+
+    def _target_fill_half_spread(self, agent_id: int) -> float | None:
+        own_half = float(self.last_agent_spreads[int(agent_id)])
+        if self.config.targeted_fill_pricing == "competitive_benchmark":
+            benchmark = float(self.config.targeted_competitive_half_spread_ticks)
+            if own_half > benchmark:
+                return None
+            return benchmark
+        return own_half
 
     def _target_agent_probabilities(self, eligible_agents: Sequence[int]) -> np.ndarray | None:
         kappa = float(self.config.routing_target_kappa)
@@ -561,22 +649,54 @@ class LocalLOBMarketEnv:
         full_spreads = 2.0 * half_spreads
         return [int(i) for i, spread in enumerate(full_spreads) if spread <= cap]
 
-    def _process_fills(self, fills: Sequence[dict[str, object]]) -> None:
+    def _process_fills(self, fills: Sequence[dict[str, object]]) -> list[dict[str, object]]:
+        self.last_spread_revenue = np.zeros(self.config.n_agents, dtype=float)
+        self.last_adverse_selection_loss = np.zeros(self.config.n_agents, dtype=float)
+        processed: list[dict[str, object]] = []
         for fill in fills:
             qty = float(fill["quantity"])
             price = float(fill["price"])
             buyer = int(fill["aggressor_id"]) if fill["aggressor_side"] == "bid" else int(fill["passive_id"])
             seller = int(fill["passive_id"]) if fill["aggressor_side"] == "bid" else int(fill["aggressor_id"])
+            if self.config.enforce_max_inventory:
+                max_qty = qty
+                if 0 <= buyer < self.config.n_agents:
+                    max_qty = min(max_qty, float(self.config.max_inventory) - float(self.inventories[buyer]))
+                if 0 <= seller < self.config.n_agents:
+                    max_qty = min(max_qty, float(self.config.max_inventory) + float(self.inventories[seller]))
+                if max_qty <= 0.0:
+                    continue
+                if max_qty < qty:
+                    fill = {**fill, "quantity": max_qty}
+                    qty = max_qty
             if 0 <= buyer < self.config.n_agents:
                 self.inventories[buyer] += qty
                 self.cash[buyer] -= price * qty
             if 0 <= seller < self.config.n_agents:
                 self.inventories[seller] -= qty
                 self.cash[seller] += price * qty
+            passive_id = int(fill["passive_id"])
+            if 0 <= passive_id < self.config.n_agents:
+                passive_side = str(fill["passive_side"])
+                if passive_side == "ask":
+                    spread_revenue = price - self._execution_mid
+                    inventory_delta = -qty
+                else:
+                    spread_revenue = self._execution_mid - price
+                    inventory_delta = qty
+                self.last_spread_revenue[passive_id] += spread_revenue * qty
+                adverse_pnl = inventory_delta * self.last_fundamental_shock
+                self.last_adverse_selection_loss[passive_id] += max(0.0, -adverse_pnl)
+            processed.append(fill)
+        return processed
 
     def _wealth(self) -> np.ndarray:
-        mid = self.book.mid_price(self.fundamental)
-        return self.cash + self.inventories * mid
+        if self.config.risk_coupled_economics or self.config.mark_to_fundamental:
+            mark = float(self.fundamental)
+        else:
+            mark = self.book.mid_price(self.fundamental)
+        self.last_mark_price = mark
+        return self.cash + self.inventories * mark
 
     def _advance_risk_state(self) -> None:
         if self.risk_state == "low" and self.rng.random() < self.config.p_low_to_high:
