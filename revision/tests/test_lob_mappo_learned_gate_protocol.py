@@ -16,6 +16,7 @@ from run_lob_mappo_learned_gate_pilot import (  # noqa: E402
     make_environment_config,
     rates_from_counts,
     risk_dose_exact,
+    risk_stratified_circular_schedule,
     risk_stratified_matched_schedule,
     schedule_counts,
     validate_gate_artifact,
@@ -35,6 +36,19 @@ class LearnedGateProtocolTest(unittest.TestCase):
         matched = [False, False, True, False]
         risk = ["low", "low", "high", "high"]
         self.assertFalse(risk_dose_exact(source, matched, risk))
+
+    def test_circular_schedule_preserves_stratum_dose_and_order(self) -> None:
+        source = [True, True, False, False, False, True, False, True]
+        risk = ["low", "low", "low", "low", "high", "high", "high", "high"]
+        shifted = risk_stratified_circular_schedule(source, risk, seed=19)
+        self.assertTrue(risk_dose_exact(source, shifted, risk))
+        for regime in ("low", "high"):
+            original = [value for value, state in zip(source, risk) if state == regime]
+            candidate = [value for value, state in zip(shifted, risk) if state == regime]
+            self.assertTrue(any(
+                candidate == original[offset:] + original[:offset]
+                for offset in range(len(original))
+            ))
 
     def test_schedule_classification_rates(self) -> None:
         rows = [

@@ -119,6 +119,28 @@ def risk_stratified_matched_schedule(
     return matched.tolist()
 
 
+def risk_stratified_circular_schedule(
+    schedule: Sequence[bool],
+    risk_path: Sequence[str],
+    seed: int,
+) -> list[bool]:
+    """Circularly shift each risk stratum while preserving its activation runs."""
+    if len(schedule) != len(risk_path):
+        raise ValueError("schedule and risk path must have the same length")
+    rng = np.random.default_rng(seed)
+    shifted = np.zeros(len(schedule), dtype=bool)
+    for risk in sorted(set(str(value) for value in risk_path)):
+        indices = np.asarray([
+            index for index, value in enumerate(risk_path) if str(value) == risk
+        ], dtype=int)
+        values = np.asarray([bool(schedule[index]) for index in indices], dtype=bool)
+        if len(values) > 1:
+            offset = int(rng.integers(1, len(values)))
+            values = np.roll(values, offset)
+        shifted[indices] = values
+    return shifted.tolist()
+
+
 def risk_dose_exact(
     source: Sequence[bool],
     matched: Sequence[bool],
@@ -211,6 +233,41 @@ def rates_from_counts(counts: Dict[str, int]) -> Dict[str, float]:
     }
 
 
+def train_response_variant(
+    config: LocalLOBConfig,
+    response: MAPPOTrainer,
+    gate_config: LOBGateConfig,
+    routing_rho: float,
+    response_episodes: int,
+    response_train_rate: float,
+    seed: int,
+) -> tuple[List[Dict[str, float]], bool]:
+    env = LocalLOBMarketEnv(config)
+    no_gate = LOBInterventionGate(config, gate_config, "none")
+    training: List[Dict[str, float]] = []
+    schedules_exact: list[bool] = []
+    for episode in range(response_episodes):
+        episode_seed = seed + 100_000 + episode
+        schedule = fixed_rate_low_risk_schedule(
+            config,
+            episode_seed,
+            response_train_rate,
+            schedule_seed=seed * 3_000_017 + episode,
+        )
+        stats, replayed = train_episode(
+            env,
+            response,
+            no_gate,
+            routing_rho,
+            episode_seed,
+            active_schedule=schedule,
+            announce_contract_strength=True,
+        )
+        training.append(stats)
+        schedules_exact.append(schedule == replayed)
+    return training, bool(all(schedules_exact))
+
+
 def run_seed(
     config: LocalLOBConfig,
     mappo: MAPPOConfig,
@@ -229,6 +286,7 @@ def run_seed(
     warm_updates: int,
     warm_low: int,
     warm_high: int,
+    include_full_main: bool = False,
 ) -> Dict[str, object]:
     base, warm = make_warm_trainer(
         config,
@@ -271,29 +329,49 @@ def run_seed(
     )
 
     response = make_response_adapter(contract_config, mappo, base, seed)
-    response_env = LocalLOBMarketEnv(contract_config)
-    response_gate = LOBInterventionGate(contract_config, gate_config, "none")
-    response_training: List[Dict[str, float]] = []
-    training_schedule_exact: list[bool] = []
-    for episode in range(response_episodes):
-        episode_seed = seed + 100_000 + episode
-        schedule = fixed_rate_low_risk_schedule(
-            contract_config,
-            episode_seed,
-            response_train_rate,
-            schedule_seed=seed * 3_000_017 + episode,
-        )
-        stats, replayed = train_episode(
-            response_env,
-            response,
-            response_gate,
+    response_training, response_schedule_exact = train_response_variant(
+        contract_config,
+        response,
+        gate_config,
+        routing_rho,
+        response_episodes,
+        response_train_rate,
+        seed,
+    )
+
+    fixed_config = replace(contract_config, routing_contract="fixed_share")
+    fixed_response: MAPPOTrainer | None = None
+    no_routing_response: MAPPOTrainer | None = None
+    fixed_training: List[Dict[str, float]] = []
+    no_routing_training: List[Dict[str, float]] = []
+    fixed_schedule_exact = True
+    no_routing_schedule_exact = True
+    if include_full_main:
+        fixed_response = make_response_adapter(fixed_config, mappo, base, seed)
+        fixed_training, fixed_schedule_exact = train_response_variant(
+            fixed_config,
+            fixed_response,
+            gate_config,
             routing_rho,
-            episode_seed,
-            active_schedule=schedule,
-            announce_contract_strength=True,
+            response_episodes,
+            response_train_rate,
+            seed,
         )
-        response_training.append(stats)
-        training_schedule_exact.append(schedule == replayed)
+        no_routing_response = make_response_adapter(
+            contract_config,
+            mappo,
+            base,
+            seed,
+        )
+        no_routing_training, no_routing_schedule_exact = train_response_variant(
+            contract_config,
+            no_routing_response,
+            gate_config,
+            0.0,
+            response_episodes,
+            response_train_rate,
+            seed,
+        )
 
     records: Dict[str, List[Dict[str, object]]] = {
         "base_no_intervention": [],
@@ -302,8 +380,21 @@ def run_seed(
         "oracle_gate": [],
         "response_gate_off": [],
     }
+    if include_full_main:
+        records.update({
+            "circular_shuffled": [],
+            "threshold_fixed_pool": [],
+            "always_on_fixed_pool": [],
+            "no_routing_trained": [],
+            "no_routing_gate_off": [],
+            "no_state_pool_learned": [],
+            "no_state_pool_matched": [],
+            "no_state_pool_gate_off": [],
+        })
     dose_exact: list[bool] = []
+    circular_dose_exact: list[bool] = []
     gate_off_equivalent: list[bool] = []
+    ablation_gate_off_equivalent: list[bool] = []
     counterfactual_rows: list[Dict[str, float]] = []
     gate_rows: List[Dict[str, object]] = []
     oracle_activation: list[float] = []
@@ -321,6 +412,16 @@ def run_seed(
             risk_path,
             seed=seed * 4_000_037 + episode,
         )
+        circular_schedule = risk_stratified_circular_schedule(
+            learned_schedule,
+            risk_path,
+            seed=seed * 5_000_011 + episode,
+        )
+        threshold_schedule = [
+            float(cast(Any, row["contract_severity"])) > 0.0
+            for row in episode_gate_rows
+        ]
+        always_schedule = [True] * len(learned_schedule)
         oracle_schedule = reference_schedule(
             contract_config,
             base,
@@ -333,6 +434,11 @@ def run_seed(
         dose_exact.append(risk_dose_exact(
             learned_schedule,
             matched_schedule,
+            risk_path,
+        ))
+        circular_dose_exact.append(risk_dose_exact(
+            learned_schedule,
+            circular_schedule,
             risk_path,
         ))
         oracle_activation.append(float(np.mean(oracle_schedule)))
@@ -388,6 +494,95 @@ def run_seed(
                 action_namespace=31_337,
                 announce_contract_strength=True,
             ))
+        if include_full_main:
+            if fixed_response is None or no_routing_response is None:
+                raise RuntimeError("full-main ablation policies were not trained")
+            records["circular_shuffled"].extend(evaluate_scheduled_policy(
+                contract_config,
+                response,
+                circular_schedule,
+                routing_rho,
+                eval_seed,
+                "circular_shuffled",
+                stochastic_actions=True,
+                action_namespace=31_337,
+                announce_contract_strength=True,
+            ))
+            no_routing_gate_off_rows = evaluate_scheduled_policy(
+                contract_config,
+                no_routing_response,
+                [False] * len(learned_schedule),
+                0.0,
+                eval_seed,
+                "no_routing_gate_off",
+                stochastic_actions=True,
+                action_namespace=31_337,
+                announce_contract_strength=True,
+            )
+            no_state_gate_off_rows = evaluate_scheduled_policy(
+                fixed_config,
+                fixed_response,
+                [False] * len(learned_schedule),
+                0.0,
+                eval_seed,
+                "no_state_pool_gate_off",
+                stochastic_actions=True,
+                action_namespace=31_337,
+                announce_contract_strength=True,
+            )
+            ablation_gate_off_equivalent.append(all(
+                np.isclose(
+                    float(base_row["avg_agent_spread"]),
+                    float(ablation_row["avg_agent_spread"]),
+                    atol=0.0,
+                    rtol=0.0,
+                )
+                for base_row, ablation_row in zip(
+                    base_rows,
+                    no_routing_gate_off_rows,
+                )
+            ) and all(
+                np.isclose(
+                    float(base_row["avg_agent_spread"]),
+                    float(ablation_row["avg_agent_spread"]),
+                    atol=0.0,
+                    rtol=0.0,
+                )
+                for base_row, ablation_row in zip(
+                    base_rows,
+                    no_state_gate_off_rows,
+                )
+            ))
+            records["no_routing_gate_off"].extend(no_routing_gate_off_rows)
+            records["no_state_pool_gate_off"].extend(no_state_gate_off_rows)
+            records["no_routing_trained"].extend(evaluate_scheduled_policy(
+                contract_config,
+                no_routing_response,
+                learned_schedule,
+                0.0,
+                eval_seed,
+                "no_routing_trained",
+                stochastic_actions=True,
+                action_namespace=31_337,
+                announce_contract_strength=True,
+            ))
+            for method, schedule in (
+                ("no_state_pool_learned", learned_schedule),
+                ("no_state_pool_matched", matched_schedule),
+                ("threshold_fixed_pool", threshold_schedule),
+                ("always_on_fixed_pool", always_schedule),
+            ):
+                records[method].extend(evaluate_scheduled_policy(
+                    fixed_config,
+                    fixed_response,
+                    schedule,
+                    routing_rho,
+                    eval_seed,
+                    method,
+                    stochastic_actions=True,
+                    action_namespace=31_337,
+                    announce_contract_strength=True,
+                ))
         counterfactual_rows.append(counterfactual_signal_response(
             contract_config,
             response,
@@ -407,14 +602,29 @@ def run_seed(
     methods["base_no_intervention"]["warm_start"] = warm
     methods["base_no_intervention"]["training"] = mean_training(equilibrium_training)
     methods["response_gate_off"]["training"] = mean_training(response_training)
+    if include_full_main:
+        methods["no_routing_gate_off"]["training"] = mean_training(
+            no_routing_training
+        )
+        methods["no_state_pool_gate_off"]["training"] = mean_training(
+            fixed_training
+        )
     diagnostic_keys = tuple(counterfactual_rows[0]) if counterfactual_rows else ()
     counts = schedule_counts(gate_rows)
     return {
         "seed": seed,
         "methods": methods,
-        "training_schedule_exact": bool(all(training_schedule_exact)),
+        "training_schedule_exact": bool(
+            response_schedule_exact
+            and fixed_schedule_exact
+            and no_routing_schedule_exact
+        ),
         "eval_risk_stratified_dose_exact": bool(all(dose_exact)),
+        "eval_circular_risk_stratified_dose_exact": bool(all(circular_dose_exact)),
         "gate_off_base_equivalent": bool(all(gate_off_equivalent)),
+        "ablation_gate_off_base_equivalent": bool(
+            all(ablation_gate_off_equivalent)
+        ),
         "calibration": calibration,
         "learned_gate_counts": counts,
         "learned_gate_rates": rates_from_counts(counts),
@@ -466,12 +676,14 @@ def aggregate(
     def all_metric(result: Dict[str, object], method: str, key: str) -> float:
         return float(all_block(result, method)[key])
 
-    method_names = (
-        "base_no_intervention",
-        "learned_gate",
-        "matched_random",
-        "oracle_gate",
-        "response_gate_off",
+    if not seed_results:
+        raise ValueError("at least one seed result is required")
+    method_names = tuple(
+        str(method)
+        for method in object_mapping(
+            seed_results[0]["methods"],
+            "methods",
+        )
     )
     methods: Dict[str, object] = {}
     for method in method_names:
@@ -506,6 +718,7 @@ def aggregate(
         - risk_metric(result, "learned_gate", "low", "avg_agent_spread_mean")
         for result in seed_results
     ]
+    low_delta_stats = mean_se(low_deltas)
     high_deltas = [
         risk_metric(result, "matched_random", "high", "avg_agent_spread_mean")
         - risk_metric(result, "learned_gate", "high", "avg_agent_spread_mean")
@@ -569,6 +782,56 @@ def aggregate(
         all_metric(result, "matched_random", "mean_reward_mean")
         for result in seed_results
     ]
+    include_full_main = "circular_shuffled" in method_names
+    circular_deltas: list[float] = []
+    no_state_pool_deltas: list[float] = []
+    no_routing_improvements: list[float] = []
+    if include_full_main:
+        circular_deltas = [
+            risk_metric(
+                result,
+                "circular_shuffled",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            - risk_metric(
+                result,
+                "learned_gate",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            for result in seed_results
+        ]
+        no_state_pool_deltas = [
+            risk_metric(
+                result,
+                "no_state_pool_matched",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            - risk_metric(
+                result,
+                "no_state_pool_learned",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            for result in seed_results
+        ]
+        no_routing_improvements = [
+            risk_metric(
+                result,
+                "base_no_intervention",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            - risk_metric(
+                result,
+                "no_routing_trained",
+                "low",
+                "avg_agent_spread_mean",
+            )
+            for result in seed_results
+        ]
     checks = {
         "gate_train_validation_and_eval_seeds_disjoint": provenance_disjoint,
         "training_schedule_exact": bool(all(
@@ -607,6 +870,11 @@ def aggregate(
         "paired_positive_seed_rate_at_least_70pct": bool(
             np.mean(np.asarray(low_deltas) > 0.0) >= min_positive_seed_rate
         ),
+        "paired_normal_approx_95pct_ci_lower_above_zero": bool(
+            float(low_delta_stats["mean"])
+            - 1.96 * float(low_delta_stats["se"])
+            > 0.0
+        ),
         "learned_improves_base_low_risk_spread": bool(
             float(np.mean(base_minus_learned)) > 0.0
         ),
@@ -617,13 +885,39 @@ def aggregate(
             float(np.mean(learned_rewards)) >= float(np.mean(matched_rewards)) - 0.005
         ),
     }
-    return {
+    if include_full_main:
+        checks.update({
+            "eval_circular_risk_stratified_dose_exact": bool(all(
+                bool(result["eval_circular_risk_stratified_dose_exact"])
+                for result in seed_results
+            )),
+            "ablation_gate_off_adapters_exactly_match_base": bool(all(
+                bool(result["ablation_gate_off_base_equivalent"])
+                for result in seed_results
+            )),
+            "learned_beats_circular_shuffle_on_low_risk_spread": bool(
+                float(np.mean(circular_deltas)) > 0.0
+            ),
+            "circular_paired_positive_seed_rate_at_least_70pct": bool(
+                np.mean(np.asarray(circular_deltas) > 0.0)
+                >= min_positive_seed_rate
+            ),
+            "state_dependent_pool_strengthens_timing_advantage": bool(
+                float(np.mean(low_deltas))
+                > float(np.mean(no_state_pool_deltas))
+            ),
+            "routing_training_strengthens_learned_improvement": bool(
+                float(np.mean(base_minus_learned))
+                > float(np.mean(no_routing_improvements))
+            ),
+        })
+    output: Dict[str, object] = {
         "methods": methods,
         "learned_gate_counts": aggregate_counts,
         "learned_gate_rates": gate_rates,
         "base_no_intervention_low_risk_spreads": no_low,
         "paired_matched_minus_learned_low_risk_spread": {
-            **mean_se(low_deltas),
+            **low_delta_stats,
             "positive_seed_count": int(np.sum(np.asarray(low_deltas) > 0.0)),
             "n_seeds": len(low_deltas),
             "values": low_deltas,
@@ -655,6 +949,34 @@ def aggregate(
         "pass_checks": checks,
         "passes_all": bool(all(checks.values())),
     }
+    if include_full_main:
+        output["full_main_diagnostics"] = {
+            "paired_circular_minus_learned_low_risk_spread": {
+                **mean_se(circular_deltas),
+                "positive_seed_count": int(np.sum(
+                    np.asarray(circular_deltas) > 0.0
+                )),
+                "n_seeds": len(circular_deltas),
+                "values": circular_deltas,
+            },
+            "paired_no_state_pool_matched_minus_learned_low_risk_spread": {
+                **mean_se(no_state_pool_deltas),
+                "positive_seed_count": int(np.sum(
+                    np.asarray(no_state_pool_deltas) > 0.0
+                )),
+                "n_seeds": len(no_state_pool_deltas),
+                "values": no_state_pool_deltas,
+            },
+            "paired_base_minus_no_routing_trained_low_risk_spread": {
+                **mean_se(no_routing_improvements),
+                "positive_seed_count": int(np.sum(
+                    np.asarray(no_routing_improvements) > 0.0
+                )),
+                "n_seeds": len(no_routing_improvements),
+                "values": no_routing_improvements,
+            },
+        }
+    return output
 
 
 def validate_gate_artifact(
@@ -706,7 +1028,23 @@ def validate_gate_artifact(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--stage", choices=("engineering", "screen", "heldout"), default="screen")
+    parser.add_argument(
+        "--stage",
+        choices=("engineering", "screen", "heldout", "full_main"),
+        default="screen",
+    )
+    parser.add_argument(
+        "--full-main-controls",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="run circular, aggressive-control, and trained-ablation arms",
+    )
+    parser.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="reuse completed per-seed files with the same protocol fingerprint",
+    )
     parser.add_argument("--learned-gate-artifact", required=True)
     parser.add_argument("--equilibrium-episodes", type=int, default=100)
     parser.add_argument("--response-episodes", type=int, default=100)
@@ -773,10 +1111,67 @@ def main() -> None:
         device=device,
     )
 
+    include_full_main = bool(args.stage == "full_main" or args.full_main_controls)
+    artifact_sha256 = hashlib.sha256(artifact_bytes).hexdigest()
+    protocol_identity = {
+        "stage": args.stage,
+        "seeds": seeds,
+        "include_full_main_controls": include_full_main,
+        "equilibrium_episodes": args.equilibrium_episodes,
+        "response_episodes": args.response_episodes,
+        "eval_episodes": args.eval_episodes,
+        "response_train_rate": args.response_train_rate,
+        "calibration_episodes": args.calibration_episodes,
+        "calibration_quantile": args.calibration_quantile,
+        "calibration_upper_quantile": args.calibration_upper_quantile,
+        "min_expected_response": args.min_expected_response,
+        "min_positive_seed_rate": args.min_positive_seed_rate,
+        "min_activation": args.min_activation,
+        "max_activation": args.max_activation,
+        "max_high_risk_fpr": args.max_high_risk_fpr,
+        "min_target_recall": args.min_target_recall,
+        "routing_rho": args.routing_rho,
+        "warm_start_steps": args.warm_start_steps,
+        "warm_start_updates": args.warm_start_updates,
+        "warm_start_low_half_spread": args.warm_start_low_half_spread,
+        "warm_start_high_half_spread": args.warm_start_high_half_spread,
+        "gate_artifact_sha256": artifact_sha256,
+        "config": asdict(config),
+        "gate_config": asdict(gate_config),
+        "mappo_config": asdict(mappo),
+    }
+    protocol_fingerprint = hashlib.sha256(json.dumps(
+        protocol_identity,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")).hexdigest()
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    seed_dir = output_dir / "seed_results"
+    seed_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = output_dir / "run_manifest.json"
+    if manifest_path.exists() and args.resume:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("protocol_fingerprint") != protocol_fingerprint:
+            raise ValueError("resume manifest does not match the current protocol")
+    else:
+        manifest_path.write_text(json.dumps({
+            "protocol_fingerprint": protocol_fingerprint,
+            "protocol_identity": protocol_identity,
+        }, indent=2), encoding="utf-8")
+
     seed_results: List[Dict[str, object]] = []
     for seed in seeds:
+        seed_path = seed_dir / f"seed_{seed}.json"
+        if args.resume and seed_path.exists():
+            envelope = json.loads(seed_path.read_text(encoding="utf-8"))
+            if envelope.get("protocol_fingerprint") != protocol_fingerprint:
+                raise ValueError(f"seed {seed} result has a different protocol")
+            print(f"seed={seed} resume-complete", flush=True)
+            seed_results.append(envelope["result"])
+            continue
         print(f"seed={seed} learned-gate-vs-matched-random", flush=True)
-        seed_results.append(run_seed(
+        result = run_seed(
             replace(config, seed=seed),
             mappo,
             gate_config,
@@ -794,13 +1189,29 @@ def main() -> None:
             args.warm_start_updates,
             args.warm_start_low_half_spread,
             args.warm_start_high_half_spread,
-        ))
+            include_full_main=include_full_main,
+        )
+        seed_results.append(result)
+        temporary_path = seed_path.with_suffix(".json.tmp")
+        temporary_path.write_text(json.dumps({
+            "protocol_fingerprint": protocol_fingerprint,
+            "result": result,
+        }, indent=2), encoding="utf-8")
+        temporary_path.replace(seed_path)
 
+    stage_name = (
+        "local_lob_mappo_learned_gate_full_main"
+        if args.stage == "full_main"
+        else f"local_lob_mappo_learned_gate_{args.stage}_not_full_main"
+    )
     summary: Dict[str, object] = {
         "metadata": {
-            "stage": f"local_lob_mappo_learned_gate_{args.stage}_not_full_main",
+            "stage": stage_name,
             "device": device,
             "seeds": seeds,
+            "protocol_fingerprint": protocol_fingerprint,
+            "per_seed_resume_enabled": args.resume,
+            "full_main_controls_and_ablations": include_full_main,
             "equilibrium_episodes": args.equilibrium_episodes,
             "response_episodes": args.response_episodes,
             "eval_episodes": args.eval_episodes,
@@ -809,7 +1220,7 @@ def main() -> None:
             "calibration_quantile": args.calibration_quantile,
             "calibration_upper_quantile": args.calibration_upper_quantile,
             "gate_artifact": str(artifact_path),
-            "gate_artifact_sha256": hashlib.sha256(artifact_bytes).hexdigest(),
+            "gate_artifact_sha256": artifact_sha256,
             "gate_provenance": provenance,
             "primary_comparator": "within_episode_risk_stratified_exact_dose_permutation",
             "schedule_source": "passive_base_policy_crn_reference_path",
@@ -840,8 +1251,6 @@ def main() -> None:
             args.min_target_recall,
         ),
     }
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2),
         encoding="utf-8",

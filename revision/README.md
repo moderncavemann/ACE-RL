@@ -322,3 +322,13 @@ outcomes here; this validates deployable timing, not generic latent-collusion
 discovery. The next allowed step is a frozen larger-seed full-main package,
 not another gate/routing search. See
 `revision/notes/lob_mappo_learned_gate_v1_summary.md`.
+
+The frozen 20-seed local-LOB/MAPPO full-main protocol uses seeds 60-79,
+sequential MPS training, per-seed atomic checkpoints, exact-dose random and
+circular controls, aggressive fixed-pool controls, and trained routing/pool
+ablations:
+
+`python revision/experiments/run_lob_mappo_learned_gate_pilot.py --stage full_main --learned-gate-artifact revision/configs/lob_mappo_learned_gate_v1.json --seeds 60-79 --equilibrium-episodes 100 --response-episodes 100 --response-train-rate 1.0 --calibration-episodes 5 --calibration-quantile 0.75 --calibration-upper-quantile 0.90 --eval-episodes 10 --episode-length 100 --warm-start-steps 200 --warm-start-updates 20 --device mps --output-dir revision/experiments/outputs/lob_mappo_learned_gate_full_main_20seed_v1`
+
+See `revision/notes/lob_mappo_learned_gate_full_main_protocol.md`. Do not alter
+the frozen artifact, protocol, or acceptance rules after launch.
