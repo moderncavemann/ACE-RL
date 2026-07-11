@@ -301,3 +301,24 @@ Both MAPPO batches pass every joint acceptance check with 5/5 positive timing
 seeds in each batch. The mechanism gate is now open for a full-main learned-gate
 experiment. Oracle timing is an upper-bound pilot, not the final method claim.
 See `revision/notes/lob_mappo_state_contingent_contract_v3_summary.md`.
+
+Learned-gate v1 closes the next mechanism gate:
+
+1. Train on passive seeds 35-39 and select the frozen probability threshold on
+   passive validation seeds 40-44:
+   `python revision/experiments/train_lob_mappo_learned_gate.py --train-seeds 35-39 --validation-seeds 40-44 --equilibrium-episodes 100 --calibration-episodes 5 --calibration-quantile 0.75 --calibration-upper-quantile 0.90 --record-episodes 10 --episode-length 100 --warm-start-steps 200 --warm-start-updates 20 --device mps --frozen-artifact revision/configs/lob_mappo_learned_gate_v1.json --output-dir revision/experiments/outputs/lob_mappo_learned_gate_v1`
+2. Screen on seeds 45-49:
+   `python revision/experiments/run_lob_mappo_learned_gate_pilot.py --stage screen --learned-gate-artifact revision/configs/lob_mappo_learned_gate_v1.json --seeds 45-49 --equilibrium-episodes 100 --response-episodes 100 --response-train-rate 1.0 --calibration-episodes 5 --calibration-quantile 0.75 --calibration-upper-quantile 0.90 --eval-episodes 10 --episode-length 100 --warm-start-steps 200 --warm-start-updates 20 --device mps --output-dir revision/experiments/outputs/lob_mappo_learned_gate_100_5seed_screen_v1`
+3. Held-out confirmation: rerun command 2 with `--stage heldout`,
+   `--seeds 50-54`, and output directory
+   `lob_mappo_learned_gate_100_5seed_heldout_v1`.
+
+Both batches pass all registered checks. The paired exact-dose
+`matched_random - learned_gate` low-risk spread difference is
+`0.0876 +/- 0.0215` in the screen and `0.1040 +/- 0.0157` held out, with 5/5
+positive seeds in each. The learned gate is an oracle-distillation classifier,
+uses the simulator's true risk regime, and exactly matches oracle market
+outcomes here; this validates deployable timing, not generic latent-collusion
+discovery. The next allowed step is a frozen larger-seed full-main package,
+not another gate/routing search. See
+`revision/notes/lob_mappo_learned_gate_v1_summary.md`.

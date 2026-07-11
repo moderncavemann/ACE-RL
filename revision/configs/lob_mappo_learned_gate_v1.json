@@ -1,0 +1,260 @@
+{
+  "metadata": {
+    "stage": "passive_local_lob_mappo_learned_gate_training",
+    "train_seeds": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "validation_seeds": [
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "equilibrium_episodes": 100,
+    "calibration_episodes": 5,
+    "calibration_quantile": 0.75,
+    "calibration_upper_quantile": 0.9,
+    "record_episodes": 10,
+    "episode_length": 100,
+    "device": "mps",
+    "sklearn_version": "1.5.1",
+    "label_definition": "low_risk AND calibrated_contract_severity_gt_zero",
+    "uses_intervention_outcomes": false,
+    "environment_config": {
+      "n_agents": 10,
+      "half_spread_levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "tick_size": 0.01,
+      "initial_mid_price": 100.0,
+      "episode_length": 100,
+      "max_inventory": 20,
+      "inventory_penalty": 0.0001,
+      "base_flow_intensity": 2.0,
+      "routing_mode": "platform_reallocate",
+      "routing_flow_multiplier": 1.25,
+      "routing_spread_cap_ticks": 4.0,
+      "routing_withhold_rate": 0.5,
+      "routing_relative_improvement_ticks": 0.5,
+      "routing_target_kappa": 4.0,
+      "routing_eligibility_mode": "soft_rank",
+      "routing_target_half_spread_cap": 3.0,
+      "routing_routable_fraction": 0.9,
+      "routing_platform_balanced": false,
+      "routing_contract": "excess_spread_pool",
+      "routing_excess_reference_half_spread": 4.0,
+      "routing_excess_scale_ticks": 1.0,
+      "common_random_numbers": true,
+      "risk_coupled_economics": true,
+      "mark_to_fundamental": true,
+      "informed_flow_prob": 0.7,
+      "spread_elasticity": 0.14,
+      "targeted_fill_pricing": "agent_quote",
+      "targeted_competitive_half_spread_ticks": 2.0,
+      "enforce_max_inventory": true,
+      "quote_priority_mode": "rotating",
+      "agent_quote_quantity": 1,
+      "seed_liquidity_levels": 5,
+      "seed_liquidity_qty": 0,
+      "p_low_to_high": 0.08,
+      "p_high_to_low": 0.08,
+      "low_sigma": 0.005,
+      "high_sigma": 0.08,
+      "seed": 35
+    },
+    "mappo_config": {
+      "obs_dim": 1,
+      "critic_obs_dim": 1,
+      "n_actions": 7,
+      "n_agents": 10,
+      "policy_mode": "multihead",
+      "policy_advantage_mode": "gae",
+      "hidden_dim": 64,
+      "learning_rate": 0.001,
+      "gamma": 0.96,
+      "gae_lambda": 0.95,
+      "clip_ratio": 0.2,
+      "entropy_coef": 0.005,
+      "value_coef": 0.5,
+      "max_grad_norm": 0.5,
+      "update_epochs": 4,
+      "minibatch_size": 512,
+      "seed": 42,
+      "device": "mps"
+    }
+  },
+  "model": {
+    "feature_names": [
+      "low_risk",
+      "contract_severity",
+      "spread_entropy",
+      "flow_concentration",
+      "volume_suppression",
+      "low_risk_x_severity",
+      "low_risk_x_volume_suppression"
+    ],
+    "feature_mean": [
+      0.5174,
+      0.1251,
+      0.25140988361744043,
+      0.4591429751406678,
+      0.6551599999999872,
+      0.04979999999999999,
+      0.3371600000000005
+    ],
+    "feature_scale": [
+      0.4996971482808345,
+      0.32295508975707327,
+      0.15609401966258218,
+      0.327131581389575,
+      0.42600161314249163,
+      0.21217907531138966,
+      0.4470829166944373
+    ],
+    "coefficients": [
+      0.9398313895384429,
+      1.1700266448631362,
+      0.21125719328481413,
+      -0.012386410585559317,
+      -0.21686094681059714,
+      4.5233674161089,
+      0.3874326117589213
+    ],
+    "intercept": -6.71776184722306,
+    "probability_threshold": 0.5,
+    "expected_volume": 2.5
+  },
+  "train_metrics": {
+    "activation_rate": 0.0544,
+    "target_prevalence": 0.0544,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "negative_fpr": 0.0,
+    "high_risk_fpr": 0.0
+  },
+  "validation_metrics": {
+    "activation_rate": 0.0784,
+    "target_prevalence": 0.0784,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "negative_fpr": 0.0,
+    "high_risk_fpr": 0.0
+  },
+  "train_calibrations": [
+    {
+      "seed": 35,
+      "threshold_spread": 6.0,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 264.0,
+      "spread_mean": 5.715151515151516,
+      "spread_std": 0.3207436549562189
+    },
+    {
+      "seed": 36,
+      "threshold_spread": 5.6,
+      "contract_scale_ticks": 0.20000000000000018,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 222.0,
+      "spread_mean": 5.3495495495495495,
+      "spread_std": 0.3869198939077685
+    },
+    {
+      "seed": 37,
+      "threshold_spread": 5.4,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 233.0,
+      "spread_mean": 5.120171673819742,
+      "spread_std": 0.31154600741159927
+    },
+    {
+      "seed": 38,
+      "threshold_spread": 6.0,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 321.0,
+      "spread_mean": 5.892211838006231,
+      "spread_std": 0.2883540658187288
+    },
+    {
+      "seed": 39,
+      "threshold_spread": 5.4,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 222.0,
+      "spread_mean": 5.183783783783784,
+      "spread_std": 0.25646261007730753
+    }
+  ],
+  "validation_calibrations": [
+    {
+      "seed": 40,
+      "threshold_spread": 5.4,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 278.0,
+      "spread_mean": 5.21978417266187,
+      "spread_std": 0.34002320620317916
+    },
+    {
+      "seed": 41,
+      "threshold_spread": 5.7,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 267.0,
+      "spread_mean": 5.413483146067416,
+      "spread_std": 0.26921623428405517
+    },
+    {
+      "seed": 42,
+      "threshold_spread": 6.0,
+      "contract_scale_ticks": 0.1,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 211.0,
+      "spread_mean": 5.752132701421801,
+      "spread_std": 0.41674966791572626
+    },
+    {
+      "seed": 43,
+      "threshold_spread": 5.3,
+      "contract_scale_ticks": 0.10000000000000053,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 258.0,
+      "spread_mean": 4.997674418604651,
+      "spread_std": 0.3376767676685969
+    },
+    {
+      "seed": 44,
+      "threshold_spread": 5.4,
+      "contract_scale_ticks": 0.2999999999999998,
+      "quantile": 0.75,
+      "upper_quantile": 0.9,
+      "n_low_risk_records": 312.0,
+      "spread_mean": 5.286217948717949,
+      "spread_std": 0.3109679737585281
+    }
+  ]
+}
