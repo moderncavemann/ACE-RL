@@ -332,3 +332,11 @@ ablations:
 
 See `revision/notes/lob_mappo_learned_gate_full_main_protocol.md`. Do not alter
 the frozen artifact, protocol, or acceptance rules after launch.
+
+The full-main run completed on all 20 seeds and passes every registered check.
+The primary exact-dose `matched_random - learned_gate` low-risk spread delta is
+`0.09998 +/- 0.01204`, with 95% t interval `[0.07478, 0.12519]`, 19 positive
+seeds, one tie, and no negative seeds. Circular timing and both trained
+ablations support the mechanism. Threshold and always-on controls obtain lower
+raw spread but intervene much more often and reduce seller reward. See
+`revision/notes/lob_mappo_learned_gate_full_main_v1_summary.md`.

@@ -217,6 +217,10 @@ claim must fail if the paired mean is not positive, fewer than 70% of seeds are
 positive, protocol integrity fails, or the reward/market-quality trade-off is
 not reported.
 
+Status update: the frozen seeds 60-79 full-main package has now completed and
+passes every registered check. See
+`revision/notes/lob_mappo_learned_gate_full_main_v1_summary.md`.
+
 ## Reproduction
 
 Train and freeze the gate:
