@@ -29,6 +29,7 @@ RoutingMode = Literal[
 TargetedFillPricing = Literal["agent_quote", "competitive_benchmark", "resting_quote"]
 QuotePriorityMode = Literal["fixed", "rotating"]
 RoutingEligibilityMode = Literal["relative", "absolute_cap", "soft_rank"]
+RoutingContract = Literal["fixed_share", "excess_spread_pool"]
 
 
 @dataclass(frozen=True)
@@ -51,6 +52,9 @@ class LocalLOBConfig:
     routing_target_half_spread_cap: float = 3.0
     routing_routable_fraction: float = 0.50
     routing_platform_balanced: bool = True
+    routing_contract: RoutingContract = "fixed_share"
+    routing_excess_reference_half_spread: float = 4.0
+    routing_excess_scale_ticks: float = 1.0
     common_random_numbers: bool = False
     risk_coupled_economics: bool = False
     mark_to_fundamental: bool = False
@@ -251,6 +255,9 @@ class LocalLOBMarketEnv:
         self.last_routing_targeted_volume = 0.0
         self.last_routing_targeted_orders = 0
         self.last_routing_eligible_agents = 0
+        self.last_routing_contract_severity = 1.0
+        self.last_routing_contract_alpha = 0.0
+        self.last_routing_effective_alpha = 0.0
         self.last_wealth = np.zeros(config.n_agents, dtype=float)
         self.last_fundamental_shock = 0.0
         self.last_spread_revenue = np.zeros(config.n_agents, dtype=float)
@@ -281,6 +288,9 @@ class LocalLOBMarketEnv:
         self.last_routing_targeted_volume = 0.0
         self.last_routing_targeted_orders = 0
         self.last_routing_eligible_agents = 0
+        self.last_routing_contract_severity = 1.0
+        self.last_routing_contract_alpha = 0.0
+        self.last_routing_effective_alpha = 0.0
         self.last_fundamental_shock = 0.0
         self.last_spread_revenue = np.zeros(self.config.n_agents, dtype=float)
         self.last_adverse_selection_loss = np.zeros(self.config.n_agents, dtype=float)
@@ -297,7 +307,13 @@ class LocalLOBMarketEnv:
         routing_flow_boost: float = 0.0,
         gate_active: bool = False,
         gate_score: float = 0.0,
+        routing_state_severity: float | None = None,
     ) -> tuple[Dict[int, Tuple[int, ...]], Dict[int, float], bool, bool, dict[str, object]]:
+        pre_action_avg_spread = float(np.mean(self.last_agent_spreads))
+        if routing_state_severity is None:
+            routing_state_severity = self._routing_contract_severity(
+                pre_action_avg_spread
+            )
         action_arr = self._coerce_actions(actions)
         self.last_actions = action_arr.copy()
         half_spreads = np.array([self.config.half_spread_levels[a] for a in action_arr], dtype=float)
@@ -329,7 +345,10 @@ class LocalLOBMarketEnv:
             ask_id, _ = self.book.submit_order(agent_id, "ask", mid + half, quote_quantity)
             self.agent_orders[agent_id] = [bid_id, ask_id]
 
-        fills = self._route_external_flow(max(0.0, routing_flow_boost))
+        fills = self._route_external_flow(
+            max(0.0, routing_flow_boost),
+            float(routing_state_severity),
+        )
         fills = self._process_fills(fills)
         if self.config.risk_coupled_economics:
             self.fundamental += fundamental_shock
@@ -373,6 +392,9 @@ class LocalLOBMarketEnv:
             "routing_targeted_volume": float(self.last_routing_targeted_volume),
             "routing_targeted_orders": float(self.last_routing_targeted_orders),
             "routing_eligible_agents": float(self.last_routing_eligible_agents),
+            "routing_contract_severity": float(self.last_routing_contract_severity),
+            "routing_contract_alpha": float(self.last_routing_contract_alpha),
+            "routing_effective_alpha": float(self.last_routing_effective_alpha),
             "gate_active": bool(gate_active),
             "gate_score": float(gate_score),
             "mean_abs_inventory": float(np.mean(np.abs(self.inventories))),
@@ -413,11 +435,22 @@ class LocalLOBMarketEnv:
             self.book.submit_order(-1, "bid", mid - level * self.config.tick_size, qty)
             self.book.submit_order(-1, "ask", mid + level * self.config.tick_size, qty)
 
-    def _route_external_flow(self, routing_flow_boost: float) -> list[dict[str, object]]:
+    def _route_external_flow(
+        self,
+        routing_flow_boost: float,
+        routing_state_severity: float,
+    ) -> list[dict[str, object]]:
         best_spread = self.book.spread_ticks()
         cap_met = 0.0 < best_spread <= self.config.routing_spread_cap_ticks
         self.last_routing_targeted_volume = 0.0
         self.last_routing_targeted_orders = 0
+        self.last_routing_contract_severity = float(
+            np.clip(routing_state_severity, 0.0, 1.0)
+        )
+        self.last_routing_contract_alpha = float(
+            np.clip(routing_flow_boost, 0.0, 1.0)
+        )
+        self.last_routing_effective_alpha = self.last_routing_contract_alpha
         eligible_agents = self._routing_eligible_agents()
         if self.config.routing_mode in {"continuous_reallocate", "balanced_reallocate"}:
             eligible_agents = list(range(self.config.n_agents))
@@ -437,6 +470,7 @@ class LocalLOBMarketEnv:
                 routing_flow_boost,
                 cap_met,
                 eligible_agents,
+                routing_state_severity,
             )
         if self.config.routing_mode == "continuous_reallocate":
             return self._route_external_flow_continuous_reallocate(
@@ -564,11 +598,19 @@ class LocalLOBMarketEnv:
         routing_flow_boost: float,
         cap_met: bool,
         eligible_agents: list[int],
+        routing_state_severity: float,
     ) -> list[dict[str, object]]:
         base_intensity = self._flow_intensity()
         routable_fraction = float(np.clip(self.config.routing_routable_fraction, 0.0, 1.0))
         lit_orders = int(self.rng.poisson(base_intensity * (1.0 - routable_fraction)))
-        alpha = float(np.clip(routing_flow_boost, 0.0, 1.0)) if eligible_agents else 0.0
+        nominal_alpha = float(np.clip(routing_flow_boost, 0.0, 1.0))
+        severity = float(np.clip(routing_state_severity, 0.0, 1.0))
+        contract_alpha = nominal_alpha
+        if self.config.routing_contract == "excess_spread_pool":
+            contract_alpha *= severity
+        alpha = contract_alpha if eligible_agents else 0.0
+        self.last_routing_contract_alpha = contract_alpha
+        self.last_routing_effective_alpha = alpha
 
         fills = self._sample_book_external_orders(lit_orders)
         if self.config.routing_platform_balanced:
@@ -591,6 +633,19 @@ class LocalLOBMarketEnv:
         self.last_routing_targeted_orders = targeted_orders
         self.last_routing_targeted_volume = targeted_volume
         return fills
+
+    def _routing_contract_severity(self, pre_action_avg_spread: float) -> float:
+        if self.config.routing_contract != "excess_spread_pool":
+            return 1.0
+        reference = float(self.config.routing_excess_reference_half_spread)
+        scale = max(float(self.config.routing_excess_scale_ticks), 1e-8)
+        return float(np.clip((pre_action_avg_spread - reference) / scale, 0.0, 1.0))
+
+    def current_routing_contract_severity(self) -> float:
+        """Return the announced pool strength from the current pre-action state."""
+        return self._routing_contract_severity(
+            float(np.mean(self.last_agent_spreads))
+        )
 
     def _route_external_flow_continuous_reallocate(
         self,

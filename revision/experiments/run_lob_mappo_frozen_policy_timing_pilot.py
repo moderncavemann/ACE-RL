@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Sequence
 
 import numpy as np
+import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -111,6 +112,8 @@ def counterfactual_signal_response(
     trainer: MAPPOTrainer,
     seed: int,
     threshold_spread: float,
+    stochastic_path: bool = False,
+    action_namespace: int = 53_159,
 ) -> Dict[str, float]:
     """Compare signal-off and signal-on actions at the exact same states.
 
@@ -125,6 +128,10 @@ def counterfactual_signal_response(
     low_high_spread_reductions: list[float] = []
     all_action_changes: list[float] = []
     low_cap_compliance_gains: list[float] = []
+    expected_reductions: list[float] = []
+    low_expected_reductions: list[float] = []
+    low_high_spread_expected_reductions: list[float] = []
+    distribution_l1_shifts: list[float] = []
     spread_levels = np.asarray(config.half_spread_levels, dtype=float)
     cap = float(config.routing_target_half_spread_cap)
     done = False
@@ -132,23 +139,81 @@ def counterfactual_signal_response(
         risk_state = str(env.risk_state)
         prior_avg_spread = float(np.mean(env.last_agent_spreads))
         obs_off = agent_observations(env, include_gate_signal=True, gate_signal=0.0)
-        obs_on = agent_observations(env, include_gate_signal=True, gate_signal=1.0)
+        announced_strength = env.current_routing_contract_severity()
+        obs_on = agent_observations(
+            env,
+            include_gate_signal=True,
+            gate_signal=announced_strength,
+        )
         critic_off = critic_observations(env, obs_off)
         critic_on = critic_observations(env, obs_on)
-        actions_off, _, _ = trainer.act(obs_off, critic_off, deterministic=True)
-        actions_on, _, _ = trainer.act(obs_on, critic_on, deterministic=True)
+        action_uniforms = None
+        if stochastic_path:
+            action_uniforms = np.random.default_rng(np.random.SeedSequence([
+                int(seed),
+                int(env.t),
+                int(action_namespace),
+            ])).random(config.n_agents)
+        actions_off, _, _ = trainer.act(
+            obs_off,
+            critic_off,
+            deterministic=not stochastic_path,
+            action_uniforms=action_uniforms,
+        )
+        actions_on, _, _ = trainer.act(
+            obs_on,
+            critic_on,
+            deterministic=not stochastic_path,
+            action_uniforms=action_uniforms,
+        )
+        obs_off_t = torch.as_tensor(
+            obs_off,
+            dtype=torch.float32,
+            device=trainer.device,
+        )
+        obs_on_t = torch.as_tensor(
+            obs_on,
+            dtype=torch.float32,
+            device=trainer.device,
+        )
+        agent_ids_t = None
+        if trainer.config.policy_mode != "shared":
+            agent_ids_t = torch.arange(
+                config.n_agents,
+                dtype=torch.long,
+                device=trainer.device,
+            )
+        with torch.no_grad():
+            probs_off = trainer.model.distribution(obs_off_t, agent_ids_t).probs
+            probs_on = trainer.model.distribution(obs_on_t, agent_ids_t).probs
+            spread_levels_t = torch.as_tensor(
+                spread_levels,
+                dtype=probs_off.dtype,
+                device=trainer.device,
+            )
+            expected_off = torch.sum(probs_off * spread_levels_t, dim=-1)
+            expected_on = torch.sum(probs_on * spread_levels_t, dim=-1)
+            expected_reduction = float(torch.mean(expected_off - expected_on).cpu())
+            distribution_l1 = float(torch.mean(torch.sum(
+                torch.abs(probs_off - probs_on),
+                dim=-1,
+            )).cpu())
         spreads_off = spread_levels[actions_off]
         spreads_on = spread_levels[actions_on]
         reduction = float(np.mean(spreads_off - spreads_on))
         all_reductions.append(reduction)
         all_action_changes.append(float(np.mean(actions_off != actions_on)))
+        expected_reductions.append(expected_reduction)
+        distribution_l1_shifts.append(distribution_l1)
         if risk_state == "low":
             low_reductions.append(reduction)
+            low_expected_reductions.append(expected_reduction)
             low_cap_compliance_gains.append(float(
                 np.mean(spreads_on <= cap) - np.mean(spreads_off <= cap)
             ))
             if prior_avg_spread >= threshold_spread:
                 low_high_spread_reductions.append(reduction)
+                low_high_spread_expected_reductions.append(expected_reduction)
         _, _, done, _, _ = env.step(
             {i: int(actions_off[i]) for i in range(config.n_agents)},
             routing_flow_boost=0.0,
@@ -165,6 +230,14 @@ def counterfactual_signal_response(
         "low_risk_high_spread_half_spread_reduction": safe_mean(
             low_high_spread_reductions
         ),
+        "expected_half_spread_reduction": safe_mean(expected_reductions),
+        "low_risk_expected_half_spread_reduction": safe_mean(
+            low_expected_reductions
+        ),
+        "low_risk_high_spread_expected_half_spread_reduction": safe_mean(
+            low_high_spread_expected_reductions
+        ),
+        "action_distribution_l1_shift": safe_mean(distribution_l1_shifts),
         "action_change_rate": safe_mean(all_action_changes),
         "low_risk_cap_compliance_gain": safe_mean(low_cap_compliance_gains),
         "low_risk_state_count": float(len(low_reductions)),

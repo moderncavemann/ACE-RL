@@ -285,3 +285,19 @@ but timing does not beat the equal-dose low-risk shuffled comparator: the final
 gate-off `yoked - timed` spread difference is `-0.3166 +/- 0.2927` with only
 `2/5` positive seeds. Do not launch a learned-gate or full-main sweep. See
 `revision/notes/lob_mappo_structural_redesign_v2_summary.md`.
+
+State-contingent contract v3 supersedes that no-go for experiment planning:
+
+1. Soft-rank fixed-policy economics:
+   `python revision/experiments/validate_lob_assay_economics.py --seeds 0-99 --inventory-penalty 0.0001 --low-sigma 0.005 --high-sigma 0.08 --informed-flow-prob 0.7 --spread-elasticity 0.14 --agent-quote-quantity 1 --no-routing-platform-balanced --routing-contract excess_spread_pool --routing-eligibility-mode soft_rank --routing-routable-fraction 0.9 --routing-rho 1.0 --routing-target-kappa 4.0 --output-dir revision/experiments/outputs/lob_assay_excess_spread_soft_rank_contract_100seed_v3`
+2. Scripted oracle timing:
+   `python revision/experiments/validate_lob_state_contingent_routing_timing.py --seeds 0-99 --routing-eligibility-mode soft_rank --routing-target-kappa 4.0 --undercut-half-spread 4 --output-dir revision/experiments/outputs/lob_state_contingent_soft_rank_routing_timing_100seed_v2`
+3. MAPPO screen:
+   `python revision/experiments/run_lob_mappo_contract_response_pilot.py --equilibrium-episodes 100 --response-episodes 100 --response-train-rate 1.0 --calibration-episodes 5 --calibration-quantile 0.75 --calibration-upper-quantile 0.90 --eval-episodes 10 --episode-length 100 --seeds 25-29 --warm-start-steps 200 --warm-start-updates 20 --device mps --output-dir revision/experiments/outputs/lob_mappo_contract_local_advantage_100_5seed_screen_v1`
+4. Held-out confirmation: rerun command 3 with `--seeds 30-34` and output
+   directory `lob_mappo_contract_local_advantage_100_5seed_heldout_v1`.
+
+Both MAPPO batches pass every joint acceptance check with 5/5 positive timing
+seeds in each batch. The mechanism gate is now open for a full-main learned-gate
+experiment. Oracle timing is an upper-bound pilot, not the final method claim.
+See `revision/notes/lob_mappo_state_contingent_contract_v3_summary.md`.

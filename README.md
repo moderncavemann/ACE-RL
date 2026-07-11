@@ -60,6 +60,11 @@ The current toy-scale validation notes are under `revision/notes/`.
   decision. Economic acceptance and seller response pass; MAPPO timing versus
   a risk-stratified equal-dose shuffled schedule fails, so full main remains
   no-go.
+- `revision/notes/lob_mappo_state_contingent_contract_v3_summary.md` records the
+  superseding state-contingent soft-rank contract. Fixed-policy, scripted
+  oracle, fresh MAPPO screen, and held-out oracle timing all pass. This clears
+  the mechanism gate for a full-main learned-gate experiment; it is not itself
+  a completed full-main result.
 
 Gate-v2 feature diagnostic and calibration:
 

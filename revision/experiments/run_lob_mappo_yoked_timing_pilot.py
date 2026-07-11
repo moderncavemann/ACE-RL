@@ -132,6 +132,7 @@ def train_episode(
     routing_rho: float,
     seed: int,
     active_schedule: Sequence[bool] | None = None,
+    announce_contract_strength: bool = False,
 ) -> tuple[Dict[str, float], list[bool]]:
     env.reset(seed=seed)
     gate.reset()
@@ -144,6 +145,8 @@ def train_episode(
     schedule: list[bool] = []
     active_low: list[float] = []
     targeted_volume: list[float] = []
+    contract_alpha: list[float] = []
+    effective_alpha: list[float] = []
     done = False
     t = 0
     while not done:
@@ -154,10 +157,13 @@ def train_episode(
             env.last_total_volume,
         )
         active = bool(decision["active"]) if active_schedule is None else bool(active_schedule[t])
+        announced_strength = float(active)
+        if announce_contract_strength:
+            announced_strength *= env.current_routing_contract_severity()
         obs = agent_observations(
             env,
             include_gate_signal=True,
-            gate_signal=float(active),
+            gate_signal=announced_strength,
         )
         critic_obs = critic_observations(env, obs)
         actions, logp, values = trainer.act(obs, critic_obs, deterministic=False)
@@ -177,6 +183,8 @@ def train_episode(
         schedule.append(active)
         active_low.append(float(active and str(info["risk_state"]) == "low"))
         targeted_volume.append(float(info.get("routing_targeted_volume", 0.0)))
+        contract_alpha.append(float(info.get("routing_contract_alpha", 0.0)))
+        effective_alpha.append(float(info.get("routing_effective_alpha", 0.0)))
         t += 1
 
     stats = trainer.update_episode(
@@ -192,6 +200,8 @@ def train_episode(
         "gate_activation_rate": activation,
         "active_low_share": float(np.sum(active_low) / max(np.sum(schedule), 1.0)),
         "routing_targeted_volume": float(np.mean(targeted_volume)),
+        "routing_contract_alpha": float(np.mean(contract_alpha)),
+        "routing_effective_alpha": float(np.mean(effective_alpha)),
     })
     return stats, schedule
 
@@ -202,6 +212,8 @@ def reference_schedule(
     gate_config: LOBGateConfig,
     timing_mode: LOBGateMode,
     seed: int,
+    stochastic_actions: bool = False,
+    action_namespace: int = 31_337,
 ) -> list[bool]:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
@@ -218,7 +230,19 @@ def reference_schedule(
         )
         obs = agent_observations(env, include_gate_signal=True, gate_signal=0.0)
         critic_obs = critic_observations(env, obs)
-        actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
+        action_uniforms = None
+        if stochastic_actions:
+            action_uniforms = np.random.default_rng(np.random.SeedSequence([
+                int(seed),
+                int(env.t),
+                int(action_namespace),
+            ])).random(config.n_agents)
+        actions, _, _ = trainer.act(
+            obs,
+            critic_obs,
+            deterministic=not stochastic_actions,
+            action_uniforms=action_uniforms,
+        )
         _, _, done, _, _ = env.step(
             {i: int(actions[i]) for i in range(config.n_agents)},
             routing_flow_boost=0.0,
@@ -236,6 +260,9 @@ def evaluate_scheduled_policy(
     routing_rho: float,
     seed: int,
     method: str,
+    stochastic_actions: bool = False,
+    action_namespace: int = 31_337,
+    announce_contract_strength: bool = False,
 ) -> List[Dict[str, object]]:
     env = LocalLOBMarketEnv(config)
     env.reset(seed=seed)
@@ -244,13 +271,28 @@ def evaluate_scheduled_policy(
     t = 0
     while not done:
         active = bool(schedule[t])
+        announced_strength = float(active)
+        if announce_contract_strength:
+            announced_strength *= env.current_routing_contract_severity()
         obs = agent_observations(
             env,
             include_gate_signal=True,
-            gate_signal=float(active),
+            gate_signal=announced_strength,
         )
         critic_obs = critic_observations(env, obs)
-        actions, _, _ = trainer.act(obs, critic_obs, deterministic=True)
+        action_uniforms = None
+        if stochastic_actions:
+            action_uniforms = np.random.default_rng(np.random.SeedSequence([
+                int(seed),
+                int(t),
+                int(action_namespace),
+            ])).random(config.n_agents)
+        actions, _, _ = trainer.act(
+            obs,
+            critic_obs,
+            deterministic=not stochastic_actions,
+            action_uniforms=action_uniforms,
+        )
         _, _, done, _, info = env.step(
             {i: int(actions[i]) for i in range(config.n_agents)},
             routing_flow_boost=routing_rho if active else 0.0,
@@ -413,6 +455,8 @@ def run_seed(
                 "gate_activation_rate",
                 "active_low_share",
                 "routing_targeted_volume",
+                "routing_contract_alpha",
+                "routing_effective_alpha",
             )
         }
         block["warm_start"] = warm[method]
@@ -537,6 +581,12 @@ def aggregate(seed_results: Sequence[Dict[str, object]]) -> Dict[str, object]:
         for result in seed_results
     ]
     activation = float(dict(dict(methods_out["timed"])["training"])["gate_activation_rate"]["mean"])
+    timed_effective_alpha = float(
+        dict(dict(methods_out["timed"])["training"])["routing_effective_alpha"]["mean"]
+    )
+    yoked_effective_alpha = float(
+        dict(dict(methods_out["yoked_random"])["training"])["routing_effective_alpha"]["mean"]
+    )
     gate_off_low_deltas = [
         metric(
             result,
@@ -578,6 +628,9 @@ def aggregate(seed_results: Sequence[Dict[str, object]]) -> Dict[str, object]:
         ),
         "no_intervention_failure_rate_at_least_70pct": bool(np.mean(np.asarray(no_low) >= 4.0) >= 0.70),
         "timed_activation_in_5_to_40pct": bool(0.05 <= activation <= 0.40),
+        "timed_contract_allocates_more_effective_pool_than_yoked": bool(
+            timed_effective_alpha > yoked_effective_alpha
+        ),
         "timed_training_beats_yoked_on_gate_off_low_risk_spread": bool(
             float(np.mean(gate_off_low_deltas)) > 0.0
         ),
@@ -640,6 +693,13 @@ def main() -> None:
         action=argparse.BooleanOptionalAction,
         default=False,
     )
+    parser.add_argument(
+        "--routing-contract",
+        choices=["fixed_share", "excess_spread_pool"],
+        default="fixed_share",
+    )
+    parser.add_argument("--routing-excess-reference-half-spread", type=float, default=4.0)
+    parser.add_argument("--routing-excess-scale-ticks", type=float, default=1.0)
     parser.add_argument("--routing-relative-improvement-ticks", type=float, default=0.5)
     parser.add_argument("--routing-target-kappa", type=float, default=4.0)
     parser.add_argument("--p-low-to-high", type=float, default=0.08)
@@ -671,6 +731,9 @@ def main() -> None:
         routing_mode="platform_reallocate",
         routing_routable_fraction=args.routing_routable_fraction,
         routing_platform_balanced=args.routing_platform_balanced,
+        routing_contract=args.routing_contract,
+        routing_excess_reference_half_spread=args.routing_excess_reference_half_spread,
+        routing_excess_scale_ticks=args.routing_excess_scale_ticks,
         routing_relative_improvement_ticks=args.routing_relative_improvement_ticks,
         routing_target_kappa=args.routing_target_kappa,
         routing_eligibility_mode="absolute_cap",
