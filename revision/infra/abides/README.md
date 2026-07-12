@@ -60,3 +60,16 @@ official event kernel, exchange, market configuration, and Gym pause/step path
 work. It does not provide the ten controlled market makers required by the
 ACE-RL MAPPO experiment. That requires a separate multi-agent controller and
 routing adapter.
+
+## Resource Guidance
+
+The verified host path uses Apple Virtualization with Rosetta for the amd64
+container. Docker exposes 24 CPU cores and about 7.65 GiB RAM. A full-day,
+official-scale RMSC04 worker used about 188 MiB at peak and completed in about
+25.7 seconds.
+
+Use persistent workers rather than starting a new container per episode. With
+the current host load, start the future ABIDES adapter pilot at 16 workers and
+increase to 20 only after checking the concurrent MPS training job. The current
+Docker memory allocation is sufficient for the observed direct-kernel workers;
+increasing RAM alone will not accelerate the single-threaded event loop.

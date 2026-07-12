@@ -68,6 +68,38 @@ last trade of 99,974, confirming deterministic smoke behavior.
 
 The backend path contains no fallback to the repository's local LOB.
 
+## Resource and Parallelism Benchmark
+
+The host had 32 physical CPU cores and 512 GiB unified memory. During the
+benchmark it remained about 79% CPU idle, had no compressed or swapped memory,
+and had about 296 GiB unused memory. Docker used Apple Virtualization with
+Rosetta and exposed 24 CPU cores and 7.65 GiB RAM to Linux containers.
+
+One official-scale RMSC04 worker simulated the complete 09:30-16:00 trading day
+in `25.66` seconds. It produced 53,799 order-history events and reached an
+observed peak memory use of about `188 MiB`.
+
+| Full-day workers | Wall time | Serial-equivalent speedup | Throughput |
+| ---: | ---: | ---: | ---: |
+| 1 | 25.66 s | 1.00x | 0.039 seeds/s |
+| 16 | 38.03 s | 10.80x | 0.421 seeds/s |
+| 20 | 40.85 s | 12.56x | 0.490 seeds/s |
+
+The resource decision is therefore:
+
+- do not increase Docker memory merely to accelerate the current kernel;
+- use 16 persistent direct-kernel workers while the separate MPS job runs;
+- allow 20 workers when maximizing ABIDES throughput still leaves the host
+  training job stable;
+- avoid one container launch per episode, because VM/container startup is a
+  material fraction of short runs;
+- remeasure memory after the ten-agent adapter exists, and raise Docker to
+  32 GiB only if per-worker memory or rollout buffering makes 7.65 GiB binding.
+
+The ABIDES event loop is CPU-bound and effectively single-threaded per worker.
+MAPPO remains a separate host-side MPS workload; additional Docker RAM does not
+increase policy-update or single-seed simulation speed.
+
 ## Diagnosed Compatibility Failures
 
 Three failures were isolated during construction:
