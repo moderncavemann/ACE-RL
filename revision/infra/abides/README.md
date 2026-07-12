@@ -43,6 +43,25 @@ fallback path.
 | `abides-markets` | Core and Markets without pomegranate, Gym, or Ray |
 | `abides-rmsc04` | Adds frozen pomegranate for the RMSC04 order-size model |
 | `abides-gym` | Adds frozen Gym/Ray dependencies and ABIDES-Gym |
+| `abides-ace` | Adds the ACE-RL ten-market-maker coordinator adapter |
+
+Build and run the fail-closed multi-agent integrity check with:
+
+```bash
+docker build --platform linux/amd64 \
+  --target abides-ace \
+  --tag ace-rl-abides-ace:f9cbe51 \
+  revision/infra/abides
+docker run --rm --platform linux/amd64 ace-rl-abides-ace:f9cbe51
+docker run --rm --platform linux/amd64 \
+  --entrypoint python \
+  ace-rl-abides-ace:f9cbe51 -m pip check
+```
+
+The adapter check controls ten distinct `TradingAgent` instances through one
+kernel-pausing coordinator. It requires real resting orders and exchange fills,
+then checks action-to-agent mapping, quoted execution price, cash conservation,
+inventory conservation, and same-seed determinism.
 
 `requirements-gym.lock` records the fully resolved dependency set that passed
 on 2026-07-12. In particular, `setuptools==57.5.0` is needed to build

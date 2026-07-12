@@ -75,3 +75,16 @@ RUN python -m pip install --no-cache-dir \
 COPY smoke_gym.py /opt/ace-abides/smoke_gym.py
 ENTRYPOINT ["python", "/opt/ace-abides/smoke_gym.py"]
 CMD []
+
+
+FROM abides-rmsc04 AS abides-ace
+
+# ACE-RL keeps its adapter outside the archived upstream tree. The adapter uses
+# the official Kernel, ExchangeAgent, TradingAgent, and OrderBook without
+# importing Ray or RLlib into this runtime.
+COPY ace_abides /opt/ace-abides/ace_abides
+COPY smoke_multiagent.py /opt/ace-abides/smoke_multiagent.py
+ENV PYTHONPATH=/opt/ace-abides
+
+ENTRYPOINT ["python", "/opt/ace-abides/smoke_multiagent.py"]
+CMD []
