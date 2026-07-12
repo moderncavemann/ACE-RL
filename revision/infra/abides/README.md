@@ -108,6 +108,27 @@ python3 revision/experiments/run_abides_learned_gate_screen.py \
 python3 revision/experiments/run_abides_mappo_full_main.py
 ```
 
+The full-main runner checkpoints every completed seed atomically. Re-running
+the same command validates the protocol fingerprint and frozen artifact hashes,
+loads `checkpoints/seed_<seed>.json`, and schedules only missing seeds. An
+interrupted in-progress seed is rerun from its beginning; completed seeds are
+never repeated.
+
+Runtime records are written under
+`revision/experiments/outputs/abides_mappo_full_main_v1/`:
+
+- `manifest.json`: immutable run configuration and artifact hashes;
+- `run_state.json`: completed, pending, and failed seeds;
+- `LOGBOOK.md`: human-readable progress table;
+- `logbook.jsonl`: append-only machine-readable events;
+- `checkpoints/`: one atomic checkpoint per completed seed.
+
+Monitor a run with:
+
+```bash
+tail -f revision/experiments/outputs/abides_mappo_full_main_v1/logbook.jsonl
+```
+
 The bridge keeps ABIDES on container CPUs and returns ten observations and
 rewards to host PyTorch, where MAPPO can use Apple MPS.
 
