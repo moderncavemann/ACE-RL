@@ -108,6 +108,19 @@ python3 revision/experiments/run_abides_learned_gate_screen.py \
 python3 revision/experiments/run_abides_mappo_full_main.py
 ```
 
+The completed command above is a frozen-policy timing confirmation. The next
+adaptive acceptance stage trains a separate MAPPO policy for each core routing
+method from identical initialization:
+
+```bash
+python3 revision/experiments/run_abides_mappo_adaptive_pilot.py
+```
+
+Its frozen scope and stop rules are recorded in
+`revision/notes/abides_mappo_adaptive_pilot_protocol.md`. Passing this pilot is
+required before adding governance baselines and a second ABIDES ecology; the
+pilot is not itself the final paper main.
+
 The full-main runner checkpoints every completed seed atomically. Re-running
 the same command validates the protocol fingerprint and frozen artifact hashes,
 loads `checkpoints/seed_<seed>.json`, and schedules only missing seeds. An

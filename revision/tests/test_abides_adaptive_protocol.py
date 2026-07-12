@@ -1,0 +1,43 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_adaptive_pilot_has_disjoint_independent_seed_splits() -> None:
+    config = json.loads(
+        (ROOT / "revision/configs/abides_mappo_adaptive_pilot_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    training = set(config["training_seeds"])
+    evaluation = set(config["evaluation_seeds"])
+    prior = set(range(300000, 300005))
+    prior.update(range(310000, 310005))
+    prior.update(range(320000, 320005))
+    prior.update(range(330000, 330005))
+    prior.update(range(340000, 340020))
+    assert len(training) == config["required_training_seed_count"] == 5
+    assert len(evaluation) == 10
+    assert training.isdisjoint(evaluation)
+    assert training.isdisjoint(prior)
+    assert evaluation.isdisjoint(prior)
+
+
+def test_adaptive_pilot_core_methods_are_frozen() -> None:
+    config = json.loads(
+        (ROOT / "revision/configs/abides_mappo_adaptive_pilot_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert config["methods"] == [
+        "no_intervention",
+        "learned_gate",
+        "matched_random",
+        "spread_only_threshold",
+        "always_on",
+    ]
+    assert config["checkpoint_interval_episodes"] == 1
+    assert config["device"] == "cpu"

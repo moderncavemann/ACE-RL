@@ -68,6 +68,9 @@ The current toy-scale validation notes are under `revision/notes/`.
 - `revision/notes/abides_mappo_full_main_v1_summary.md` records the completed
   20-seed N=10 ABIDES/MAPPO full-main timing experiment, including equal-dose
   controls, paired inference, claim boundaries, runtime, and recovery records.
+- `revision/notes/abides_mappo_adaptive_pilot_protocol.md` freezes the next
+  five-training-seed adaptive-policy acceptance gate. It separates the
+  completed frozen-policy timing result from the still-missing paper main.
 
 Gate-v2 feature diagnostic and calibration:
 
