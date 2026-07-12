@@ -1,0 +1,9 @@
+{
+  "controller": "per_episode_token_budget",
+  "gate_artifact": "revision/configs/abides_learned_gate_v1.json",
+  "gate_artifact_sha256": "f05d4c9f2ca16b8219f9786659ad076da81d4452e3d1cdd4a56ccae040c572cc",
+  "max_activation_rate": 0.35,
+  "min_reporting_rate": 0.05,
+  "policy": "accept positive proposals in chronological order until the episode budget is exhausted",
+  "proposals_may_be_created_by_controller": false
+}

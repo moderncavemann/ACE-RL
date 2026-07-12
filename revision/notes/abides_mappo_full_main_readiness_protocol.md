@@ -91,6 +91,9 @@ supporting evidence, not a substitute for any gate below.
 - A five-seed screen must have at least 4/5 positive paired effects; a fresh
   five-seed holdout must also have at least 4/5 before a 20-seed main launch.
 - Activation remains in `[0.05, 0.35]`; reward and volume guardrails pass.
+- The frozen probability threshold feeds a deterministic per-episode token
+  budget capped at 35% of decisions. The controller may reject excess positive
+  proposals but may not create activations or alter proposal probabilities.
 
 ## Full-Main Launch
 

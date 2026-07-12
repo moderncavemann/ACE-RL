@@ -100,6 +100,11 @@ python3 revision/experiments/smoke_abides_docker_env.py
 python3 revision/experiments/smoke_abides_mappo.py
 python3 revision/experiments/train_abides_mappo_passive.py
 python3 revision/experiments/train_abides_learned_gate.py
+python3 revision/experiments/run_abides_learned_gate_screen.py
+python3 revision/experiments/run_abides_learned_gate_screen.py \
+  --stage holdout \
+  --seeds 330000,330001,330002,330003,330004 \
+  --output-dir revision/experiments/outputs/abides_learned_gate_holdout_v1
 ```
 
 The bridge keeps ABIDES on container CPUs and returns ten observations and

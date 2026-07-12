@@ -158,3 +158,38 @@ class ABIDESLearnedGateModel:
     @classmethod
     def load(cls, path: str | Path) -> "ABIDESLearnedGateModel":
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
+@dataclass
+class ABIDESGateActivationController:
+    """Enforce the preregistered per-episode intervention-rate ceiling."""
+
+    episode_steps: int
+    max_activation_rate: float = 0.35
+    accepted: int = 0
+    proposed: int = 0
+
+    def __post_init__(self) -> None:
+        if self.episode_steps <= 0:
+            raise ValueError("episode_steps must be positive")
+        if not 0.0 < self.max_activation_rate <= 1.0:
+            raise ValueError("max_activation_rate must be in (0, 1]")
+
+    @property
+    def budget(self) -> int:
+        return int(np.floor(self.episode_steps * self.max_activation_rate + 1e-12))
+
+    def decide(self, proposed: bool) -> bool:
+        self.proposed += int(bool(proposed))
+        if not proposed or self.accepted >= self.budget:
+            return False
+        self.accepted += 1
+        return True
+
+    @property
+    def proposal_rate(self) -> float:
+        return self.proposed / self.episode_steps
+
+    @property
+    def activation_rate(self) -> float:
+        return self.accepted / self.episode_steps
