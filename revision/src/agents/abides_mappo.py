@@ -96,6 +96,7 @@ def rollout_episode(
     routing_enabled: bool = True,
     reward_scale: float = 10.0,
     action_namespace: int = 73_117,
+    deterministic: bool = False,
 ) -> dict[str, Any]:
     if gate_schedule is not None and gate_decision is not None:
         raise ValueError("provide either gate_schedule or gate_decision, not both")
@@ -113,13 +114,15 @@ def rollout_episode(
     for step in range(episode_steps):
         obs = actor_observations(state, gate_signal=0.0)
         critic = centralized_critic_observations(state, obs, episode_steps)
-        action_uniforms = np.random.default_rng(
-            np.random.SeedSequence([int(seed), int(step), int(action_namespace)])
-        ).random(10)
+        action_uniforms = None
+        if not deterministic:
+            action_uniforms = np.random.default_rng(
+                np.random.SeedSequence([int(seed), int(step), int(action_namespace)])
+            ).random(10)
         actions, logp, values = trainer.act(
             obs,
             critic,
-            deterministic=False,
+            deterministic=deterministic,
             action_uniforms=action_uniforms,
         )
         if gate_schedule is not None:

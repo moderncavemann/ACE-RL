@@ -98,6 +98,7 @@ episode:
 ```bash
 python3 revision/experiments/smoke_abides_docker_env.py
 python3 revision/experiments/smoke_abides_mappo.py
+python3 revision/experiments/train_abides_mappo_passive.py
 ```
 
 The bridge keeps ABIDES on container CPUs and returns ten observations and
