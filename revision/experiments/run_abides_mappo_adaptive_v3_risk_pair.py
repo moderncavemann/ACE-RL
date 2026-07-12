@@ -429,6 +429,10 @@ def aggregate(
         "response_converged": all(bool(row["convergence"]["stable"]) for row in rows),
         "risk_aware_beats_random_mean": float(paired["mean"]) > 0.0,
         "risk_aware_beats_random_seed_rate": int(paired["positive"]) >= required,
+        "risk_aware_positive_ci": (
+            not bool(config.get("require_positive_ci_lower_bound", False))
+            or float(paired["ci_low"]) > 0.0
+        ),
         "activation_in_range": 0.05
         <= methods["risk_aware"]["activation_rate"]
         <= float(config["max_activation_rate"]),
