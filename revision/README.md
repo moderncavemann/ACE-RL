@@ -340,3 +340,18 @@ seeds, one tie, and no negative seeds. Circular timing and both trained
 ablations support the mechanism. Threshold and always-on controls obtain lower
 raw spread but intervene much more often and reduce seller reward. See
 `revision/notes/lob_mappo_learned_gate_full_main_v1_summary.md`.
+
+## ABIDES Dependency Smoke
+
+The official modular ABIDES commit is now reproducibly isolated under Docker:
+
+```bash
+revision/infra/abides/run_smoke.sh
+```
+
+RMSC04 passes at its official 1,117-agent scale for a five-minute market
+window, and ABIDES-Gym completes reset plus one step with no dependency errors
+or fallback backend. This opens the dependency gate only. A ten-controlled-
+market-maker adapter and demand-conserving routing integration are still
+required before any ABIDES/MAPPO pilot or full-main claim. See
+`revision/notes/abides_dependency_smoke_v1_summary.md`.
