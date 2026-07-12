@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "revision"))
 
 from src.interventions.abides_gate import (
     ABIDESGateActivationController,
+    ABIDESTwoStageGateModel,
     abides_gate_features,
 )
 
@@ -40,6 +41,19 @@ def test_learned_features_ignore_diagnostic_risk() -> None:
     low = abides_gate_features(sample_state("low"), actions)
     high = abides_gate_features(sample_state("high"), actions)
     np.testing.assert_array_equal(low, high)
+
+
+def test_two_stage_gate_separates_risk_probability_from_opportunity() -> None:
+    model = ABIDESTwoStageGateModel.load(
+        ROOT / "revision/configs/abides_two_stage_gate_v1.json"
+    )
+    state = sample_state("low")
+    aligned = model.decide(state, [6] * 10)
+    undercut = model.decide(state, [5] + [6] * 9)
+    assert aligned["risk_probability"] == undercut["risk_probability"]
+    assert aligned["opportunity"] is False
+    assert undercut["opportunity"] is True
+    assert aligned["active"] is False
 
 
 def test_full_main_seeds_are_disjoint_from_all_gate_splits() -> None:

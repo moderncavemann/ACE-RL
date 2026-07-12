@@ -121,6 +121,17 @@ Its frozen scope and stop rules are recorded in
 required before adding governance baselines and a second ABIDES ecology; the
 pilot is not itself the final paper main.
 
+Adaptive pilot v1 failed because its joint risk/opportunity classifier saturated
+after policy adaptation. The failure analysis is in
+`revision/notes/abides_mappo_adaptive_pilot_v1_summary.md`. The only permitted
+follow-up is the fresh-seed two-stage protocol in
+`revision/notes/abides_mappo_adaptive_two_stage_protocol.md`, run with:
+
+```bash
+python3 revision/experiments/run_abides_mappo_adaptive_pilot.py \
+  --config revision/configs/abides_mappo_adaptive_two_stage_pilot_v1.json
+```
+
 The full-main runner checkpoints every completed seed atomically. Re-running
 the same command validates the protocol fingerprint and frozen artifact hashes,
 loads `checkpoints/seed_<seed>.json`, and schedules only missing seeds. An

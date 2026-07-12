@@ -1,0 +1,38 @@
+{
+  "protocol_version": "abides_adaptive_gate_shift_diagnostic_v1",
+  "docker_image": "ace-rl-abides-ace:f9cbe51",
+  "source_gate_artifact": "revision/configs/abides_learned_gate_v1.json",
+  "source_gate_artifact_sha256": "f05d4c9f2ca16b8219f9786659ad076da81d4452e3d1cdd4a56ccae040c572cc",
+  "passive_train_records": "revision/experiments/outputs/abides_learned_gate_v1/train_records.json",
+  "passive_validation_records": "revision/experiments/outputs/abides_learned_gate_v1/validation_records.json",
+  "adaptive_pilot_output": "revision/experiments/outputs/abides_mappo_adaptive_pilot_v1",
+  "adaptive_training_seeds": [
+    410000,
+    410001,
+    410002,
+    410003,
+    410004
+  ],
+  "diagnostic_environment_seeds": [
+    421000,
+    421001,
+    421002,
+    421003,
+    421004
+  ],
+  "policy_variants": [
+    "learned_gate",
+    "no_intervention"
+  ],
+  "episode_steps": 100,
+  "risk_feature_names": [
+    "public_volatility",
+    "absolute_lagged_return"
+  ],
+  "max_activation_rate": 0.35,
+  "maximum_high_risk_activation_rate": 0.15,
+  "minimum_activation_rate": 0.05,
+  "minimum_target_recall": 0.25,
+  "action_namespace": 171117,
+  "output_dir": "revision/experiments/outputs/abides_adaptive_gate_shift_diagnostic_v1"
+}

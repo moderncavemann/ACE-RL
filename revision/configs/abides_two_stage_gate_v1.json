@@ -1,0 +1,20 @@
+{
+  "coefficients": [
+    -0.8736034375933434,
+    -0.9391221473588206
+  ],
+  "feature_mean": [
+    0.3243443610130201,
+    0.2475
+  ],
+  "feature_names": [
+    "public_volatility",
+    "absolute_lagged_return"
+  ],
+  "feature_scale": [
+    0.29649577045872144,
+    0.388739951638626
+  ],
+  "intercept": 0.35759784430165453,
+  "probability_threshold": 0.681
+}

@@ -52,6 +52,7 @@ from src.envs.abides_docker_env import ABIDESDockerDealerEnv  # noqa: E402
 from src.interventions.abides_gate import (  # noqa: E402
     ABIDESGateActivationController,
     ABIDESLearnedGateModel,
+    ABIDESTwoStageGateModel,
 )
 
 DEPLOYED_METHODS = (
@@ -62,6 +63,17 @@ DEPLOYED_METHODS = (
     "always_on",
 )
 GATE_OFF_METHODS = ("learned_gate_off", "matched_random_gate_off")
+AdaptiveGateModel = ABIDESLearnedGateModel | ABIDESTwoStageGateModel
+
+
+def load_adaptive_gate_model(config: Mapping[str, Any]) -> AdaptiveGateModel:
+    path = REPO / str(config["gate_artifact"])
+    gate_type = str(config.get("gate_type", "joint"))
+    if gate_type == "joint":
+        return ABIDESLearnedGateModel.load(path)
+    if gate_type == "two_stage":
+        return ABIDESTwoStageGateModel.load(path)
+    raise ValueError(f"unknown adaptive gate type: {gate_type}")
 
 
 def atomic_torch_save(path: Path, payload: Any) -> None:
@@ -296,7 +308,7 @@ def train_seed_policies(
     output_dir: Path,
     seed: int,
     fingerprint: str,
-    model: ABIDESLearnedGateModel,
+    model: AdaptiveGateModel,
 ) -> tuple[
     dict[str, MAPPOTrainer],
     dict[str, list[dict[str, Any]]],
@@ -539,7 +551,7 @@ def evaluate_seed_policies(
     config: Mapping[str, Any],
     seed: int,
     trainers: Mapping[str, MAPPOTrainer],
-    model: ABIDESLearnedGateModel,
+    model: AdaptiveGateModel,
 ) -> dict[str, Any]:
     episode_steps = int(config["episode_steps"])
     records: dict[str, list[dict[str, Any]]] = {
@@ -698,7 +710,7 @@ def run_seed(
     started = time.perf_counter()
     torch.set_num_threads(1)
     output_dir = Path(output_dir_raw)
-    model = ABIDESLearnedGateModel.load(REPO / config["gate_artifact"])
+    model = load_adaptive_gate_model(config)
     trainers, history, training_dose_exact, training_paths_equal = train_seed_policies(
         config, output_dir, seed, fingerprint, model
     )

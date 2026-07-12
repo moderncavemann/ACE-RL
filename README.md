@@ -71,6 +71,11 @@ The current toy-scale validation notes are under `revision/notes/`.
 - `revision/notes/abides_mappo_adaptive_pilot_protocol.md` freezes the next
   five-training-seed adaptive-policy acceptance gate. It separates the
   completed frozen-policy timing result from the still-missing paper main.
+- `revision/notes/abides_mappo_adaptive_pilot_v1_summary.md` records why the
+  original joint gate fails after separate adaptive MAPPO training.
+- `revision/notes/abides_mappo_adaptive_two_stage_protocol.md` freezes the
+  fresh-seed follow-up that separates exogenous risk inference from current
+  routing opportunity.
 
 Gate-v2 feature diagnostic and calibration:
 

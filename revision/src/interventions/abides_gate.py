@@ -23,6 +23,11 @@ FEATURE_NAMES = (
     "severity_x_calm",
 )
 
+RISK_FEATURE_NAMES = (
+    "public_volatility",
+    "absolute_lagged_return",
+)
+
 
 def _normalized_entropy(actions: np.ndarray, n_actions: int = 7) -> float:
     counts = np.bincount(actions.astype(int), minlength=n_actions).astype(float)
@@ -121,9 +126,9 @@ class ABIDESLearnedGateModel:
         values = np.asarray(features, dtype=float)
         if values.shape != (len(FEATURE_NAMES),):
             raise ValueError("ABIDES gate feature vector has wrong shape")
-        standardized = (
-            values - np.asarray(self.feature_mean)
-        ) / np.asarray(self.feature_scale)
+        standardized = (values - np.asarray(self.feature_mean)) / np.asarray(
+            self.feature_scale
+        )
         logit = float(
             np.dot(standardized, np.asarray(self.coefficients)) + self.intercept
         )
@@ -132,7 +137,9 @@ class ABIDESLearnedGateModel:
         exp_logit = float(np.exp(logit))
         return float(exp_logit / (1.0 + exp_logit))
 
-    def decide(self, state: Mapping[str, Any], actions: Sequence[int]) -> dict[str, Any]:
+    def decide(
+        self, state: Mapping[str, Any], actions: Sequence[int]
+    ) -> dict[str, Any]:
         features = abides_gate_features(state, actions)
         probability = self.probability(features)
         return {
@@ -157,6 +164,89 @@ class ABIDESLearnedGateModel:
 
     @classmethod
     def load(cls, path: str | Path) -> "ABIDESLearnedGateModel":
+        return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
+@dataclass(frozen=True)
+class ABIDESTwoStageGateModel:
+    """Separate exogenous risk inference from current routing opportunity."""
+
+    feature_names: tuple[str, ...]
+    feature_mean: tuple[float, ...]
+    feature_scale: tuple[float, ...]
+    coefficients: tuple[float, ...]
+    intercept: float
+    probability_threshold: float
+
+    def __post_init__(self) -> None:
+        if self.feature_names != RISK_FEATURE_NAMES:
+            raise ValueError("two-stage gate risk feature schema mismatch")
+        size = len(RISK_FEATURE_NAMES)
+        if not all(
+            len(values) == size
+            for values in (
+                self.feature_mean,
+                self.feature_scale,
+                self.coefficients,
+            )
+        ):
+            raise ValueError("two-stage gate parameter dimension mismatch")
+        if any(value <= 0.0 for value in self.feature_scale):
+            raise ValueError("two-stage gate feature scales must be positive")
+        if not 0.0 <= self.probability_threshold <= 1.0:
+            raise ValueError("two-stage gate threshold outside [0, 1]")
+
+    def probability(self, full_features: Sequence[float]) -> float:
+        values_by_name = dict(zip(FEATURE_NAMES, full_features))
+        values = np.asarray(
+            [values_by_name[name] for name in self.feature_names], dtype=float
+        )
+        standardized = (values - np.asarray(self.feature_mean)) / np.asarray(
+            self.feature_scale
+        )
+        logit = float(
+            np.dot(standardized, np.asarray(self.coefficients)) + self.intercept
+        )
+        if logit >= 0.0:
+            return float(1.0 / (1.0 + np.exp(-logit)))
+        exp_logit = float(np.exp(logit))
+        return float(exp_logit / (1.0 + exp_logit))
+
+    def decide(
+        self, state: Mapping[str, Any], actions: Sequence[int]
+    ) -> dict[str, Any]:
+        features = abides_gate_features(state, actions)
+        values_by_name = dict(zip(FEATURE_NAMES, features))
+        risk_probability = self.probability(features)
+        opportunity = bool(
+            float(values_by_name["contract_severity"]) > 0.0
+            and float(values_by_name["eligible_fraction"]) > 0.0
+        )
+        return {
+            "active": bool(
+                risk_probability >= self.probability_threshold and opportunity
+            ),
+            "risk_probability": risk_probability,
+            "opportunity": opportunity,
+            "features": features.tolist(),
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, values: Mapping[str, Any]) -> "ABIDESTwoStageGateModel":
+        return cls(
+            feature_names=tuple(values["feature_names"]),
+            feature_mean=tuple(float(x) for x in values["feature_mean"]),
+            feature_scale=tuple(float(x) for x in values["feature_scale"]),
+            coefficients=tuple(float(x) for x in values["coefficients"]),
+            intercept=float(values["intercept"]),
+            probability_threshold=float(values["probability_threshold"]),
+        )
+
+    @classmethod
+    def load(cls, path: str | Path) -> "ABIDESTwoStageGateModel":
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 

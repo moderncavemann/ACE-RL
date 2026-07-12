@@ -41,3 +41,18 @@ def test_adaptive_pilot_core_methods_are_frozen() -> None:
     ]
     assert config["checkpoint_interval_episodes"] == 1
     assert config["device"] == "cpu"
+
+
+def test_two_stage_adaptive_pilot_uses_fresh_splits() -> None:
+    config = json.loads(
+        (
+            ROOT / "revision/configs/abides_mappo_adaptive_two_stage_pilot_v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    prior = set(range(410000, 410005))
+    prior.update(range(420000, 420010))
+    prior.update(range(421000, 421005))
+    assert config["gate_type"] == "two_stage"
+    assert set(config["training_seeds"]).isdisjoint(prior)
+    assert set(config["evaluation_seeds"]).isdisjoint(prior)
+    assert set(config["training_seeds"]).isdisjoint(config["evaluation_seeds"])
