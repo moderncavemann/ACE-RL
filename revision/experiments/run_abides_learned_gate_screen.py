@@ -114,6 +114,16 @@ def summarize(rollout: dict) -> dict[str, float]:
 def paired_summary(delta: Sequence[float]) -> dict[str, float | int]:
     values = np.asarray(delta, dtype=float)
     avg = float(np.mean(values))
+    if len(values) == 1:
+        return {
+            "mean": avg,
+            "se": 0.0,
+            "ci_low": avg,
+            "ci_high": avg,
+            "positive": int(values[0] > 1e-9),
+            "ties": int(abs(values[0]) <= 1e-9),
+            "negative": int(values[0] < -1e-9),
+        }
     se = float(np.std(values, ddof=1) / sqrt(len(values)))
     critical = float(t.ppf(0.975, len(values) - 1))
     return {
@@ -139,7 +149,7 @@ def main() -> None:
     parser.add_argument("--device", default="mps")
     parser.add_argument(
         "--checkpoint",
-        default="revision/experiments/outputs/abides_mappo_passive_v1/model.pt",
+        default="revision/configs/abides_mappo_passive_v1.pt",
     )
     parser.add_argument(
         "--gate-artifact",

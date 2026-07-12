@@ -138,7 +138,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--checkpoint",
-        default="revision/experiments/outputs/abides_mappo_passive_v1/model.pt",
+        default="revision/configs/abides_mappo_passive_v1.pt",
     )
     parser.add_argument("--train-seeds", default="300000,300001,300002,300003,300004")
     parser.add_argument("--validation-seeds", default="310000,310001,310002,310003,310004")

@@ -41,6 +41,10 @@ def main() -> None:
         "--output-dir",
         default="revision/experiments/outputs/abides_mappo_passive_v1",
     )
+    parser.add_argument(
+        "--frozen-checkpoint",
+        default="revision/configs/abides_mappo_passive_v1.pt",
+    )
     args = parser.parse_args()
     if args.device == "mps" and not torch.backends.mps.is_available():
         raise RuntimeError("MPS is unavailable")
@@ -125,6 +129,9 @@ def main() -> None:
         "episode_steps": args.episode_steps,
     }
     torch.save(checkpoint, output_dir / "model.pt")
+    frozen_checkpoint = ROOT.parent / args.frozen_checkpoint
+    frozen_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(checkpoint, frozen_checkpoint)
     summary = {
         "status": "pass" if passed else "fail",
         "backend": "abides",

@@ -25,7 +25,8 @@ gate or routing efficacy.
 
 The actor consumes only public state and each maker's private inventory/flow;
 it does not receive the simulator risk label. The checkpoint is saved as a CPU
-state dict under ignored experiment outputs so it can be loaded on CPU or MPS.
+state dict at `revision/configs/abides_mappo_passive_v1.pt` so a clean checkout
+can load it on CPU or MPS.
 
 ## Result
 

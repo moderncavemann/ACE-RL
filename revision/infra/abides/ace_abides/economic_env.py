@@ -481,6 +481,11 @@ class EconomicCoordinator(CoreGymAgent):
                 "mean_inventory_penalty": float(np.mean(penalty)),
                 "flow_shares": self.last_flow_shares.tolist(),
                 "avg_half_spread": float(np.mean(self.last_half_spreads)),
+                "diagnostic_current_risk": (
+                    self.path[self.step_id].risk_state
+                    if self.step_id < self.config.episode_steps
+                    else None
+                ),
             }
         )
         self.raw_state = {
