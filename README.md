@@ -76,6 +76,11 @@ The current toy-scale validation notes are under `revision/notes/`.
 - `revision/notes/abides_mappo_adaptive_two_stage_protocol.md` freezes the
   fresh-seed follow-up that separates exogenous risk inference from current
   routing opportunity.
+- `revision/notes/abides_mappo_adaptive_two_stage_extension_v1_summary.md`
+  records the final checkpoint extension decision. Risk control remains good,
+  but learned timing falls to 3/5 positive policy seeds versus exact-dose
+  matched random and training remains nonconverged; adaptive paper main is
+  therefore no-go under the frozen protocol.
 
 Gate-v2 feature diagnostic and calibration:
 

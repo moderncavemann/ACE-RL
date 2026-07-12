@@ -355,3 +355,20 @@ or fallback backend. This opens the dependency gate only. A ten-controlled-
 market-maker adapter and demand-conserving routing integration are still
 required before any ABIDES/MAPPO pilot or full-main claim. See
 `revision/notes/abides_dependency_smoke_v1_summary.md`.
+
+## ABIDES Adaptive MAPPO Decision
+
+The later controlled-market-maker adapter, demand-conserving routing contract,
+and resumable per-method MAPPO trainer are implemented. The completed
+frozen-policy 20-seed experiment is not the adaptive paper main: it holds the
+seller policy fixed while comparing intervention schedules.
+
+The separate adaptive experiment trains independent policies under no
+intervention, a learned two-stage gate, exact-dose matched random, a
+spread-only threshold, and always-on routing. Its frozen episode-150 extension
+completed all five policy seeds and all integrity checks, but learned timing
+beats matched random on only `3/5` online seeds. The paired mean is `0.10224`
+ticks with 95% CI `[-0.13011, 0.33460]`; only `2/5` seeds satisfy the all-method
+convergence check. Therefore adaptive paper main, governance baselines, and a
+second-environment pilot remain no-go under this protocol. See
+`revision/notes/abides_mappo_adaptive_two_stage_extension_v1_summary.md`.
