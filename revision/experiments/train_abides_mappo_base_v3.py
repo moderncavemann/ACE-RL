@@ -149,7 +149,14 @@ def load_or_initialize(
     fingerprint: str,
 ):
     path = checkpoint_path(output_dir, seed)
-    if not path.exists():
+    expected_fingerprint = fingerprint
+    if not path.exists() and config.get("parent_output_dir"):
+        parent_output = REPO / str(config["parent_output_dir"])
+        path = checkpoint_path(parent_output, seed)
+        expected_fingerprint = str(config["parent_protocol_fingerprint"])
+        if not path.exists():
+            raise FileNotFoundError(f"missing parent base checkpoint: {path}")
+    elif not path.exists():
         trainer = make_abides_trainer(
             seed=seed,
             episode_steps=int(config["episode_steps"]),
@@ -162,14 +169,21 @@ def load_or_initialize(
         )
         return trainer, 0, [], []
     payload = torch.load(path, map_location="cpu", weights_only=False)
-    if payload.get("protocol_fingerprint") != fingerprint:
+    if payload.get("protocol_fingerprint") != expected_fingerprint:
         raise RuntimeError(f"base checkpoint fingerprint mismatch: {path}")
     if int(payload.get("seed", -1)) != seed:
         raise RuntimeError(f"base checkpoint seed mismatch: {path}")
+    completed = int(payload["completed_episodes"])
+    if config.get("parent_output_dir") and expected_fingerprint != fingerprint:
+        if completed != int(config["parent_completed_episodes"]):
+            raise RuntimeError(
+                f"parent base checkpoint expected {config['parent_completed_episodes']} "
+                f"episodes, got {completed}"
+            )
     trainer = trainer_from_payload(payload["trainer"], str(config["device"]))
     return (
         trainer,
-        int(payload["completed_episodes"]),
+        completed,
         list(payload["training_history"]),
         list(payload["evaluation_history"]),
     )
@@ -290,6 +304,54 @@ def validate_config(config: Mapping[str, Any]) -> dict[str, str]:
     }
 
 
+def validate_parent_extension(config: Mapping[str, Any]) -> None:
+    if not config.get("parent_output_dir"):
+        return
+    parent_output = REPO / str(config["parent_output_dir"])
+    parent_manifest = json.loads(
+        (parent_output / "manifest.json").read_text(encoding="utf-8")
+    )
+    parent_summary = json.loads(
+        (parent_output / "base_summary.json").read_text(encoding="utf-8")
+    )
+    if parent_manifest.get("protocol_fingerprint") != config.get(
+        "parent_protocol_fingerprint"
+    ):
+        raise RuntimeError("parent base protocol fingerprint mismatch")
+    if parent_summary.get("status") != "fail":
+        raise RuntimeError("base extension requires a failed parent convergence gate")
+    if not all(
+        bool(row.get("convergence", {}).get("failure_mode"))
+        for row in parent_summary.get("rows", [])
+    ):
+        raise RuntimeError("parent base run failed the market failure-mode gate")
+    parent_config = parent_manifest["config"]
+    frozen_fields = (
+        "docker_image",
+        "episode_steps",
+        "base_training_seeds",
+        "base_fixed_evaluation_seeds",
+        "base_episodes_per_update",
+        "base_evaluation_interval",
+        "base_required_stable_evaluations",
+        "base_maximum_fixed_panel_spread_range",
+        "base_maximum_fixed_panel_reward_range_fraction",
+        "base_minimum_failure_spread",
+        "learning_rate",
+        "entropy_coefficient",
+        "reward_scale",
+        "routing_allocation_mode",
+        "routing_target_kappa",
+        "routing_routable_fraction",
+        "base_environment_seed_namespace",
+        "base_action_namespace",
+        "base_evaluation_action_namespace",
+    )
+    for field in frozen_fields:
+        if config.get(field) != parent_config.get(field):
+            raise RuntimeError(f"base extension changed frozen field: {field}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -316,6 +378,7 @@ def main() -> None:
             f"abides_mappo_adaptive_v3_base_smoke_{args.smoke_episodes}"
         )
     artifacts = validate_config(config)
+    validate_parent_extension(config)
     fingerprint = protocol_fingerprint(config)
     output_dir = REPO / str(config["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
