@@ -49,6 +49,7 @@ class ABIDESDealerMarketConfig:
     routing_excess_reference_half_spread: float = 4.0
     routing_excess_scale_ticks: float = 2.0
     routing_undercut_delta_ticks: float = 1.0
+    routing_eligibility_reference: Literal["modal"] = "modal"
     seed: int = 42
 
     @property
@@ -289,10 +290,14 @@ class EconomicCoordinator(CoreGymAgent):
             if gate_active and routing_enabled
             else 0.0
         )
+        spread_values, spread_counts = np.unique(
+            half_spreads, return_counts=True
+        )
+        modal_candidates = spread_values[spread_counts == np.max(spread_counts)]
+        modal_half_spread = float(np.max(modal_candidates))
         eligible_indices = np.flatnonzero(
             half_spreads
-            <= float(np.mean(half_spreads))
-            - self.config.routing_undercut_delta_ticks
+            <= modal_half_spread - self.config.routing_undercut_delta_ticks
         )
         if eligible_indices.size:
             minimum = float(np.min(half_spreads[eligible_indices]))
@@ -356,6 +361,7 @@ class EconomicCoordinator(CoreGymAgent):
             "routing_severity": severity,
             "routing_effective_alpha": effective_alpha,
             "eligible_agent_count": int(target_indices.size),
+            "modal_half_spread": modal_half_spread,
             "targeted_event_count": target_count,
             "planned_flow_quantity": total_quantity,
             "avg_half_spread": float(np.mean(half_spreads)),

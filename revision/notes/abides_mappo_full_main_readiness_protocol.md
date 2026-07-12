@@ -51,6 +51,9 @@ supporting evidence, not a substitute for any gate below.
 - No self-trade, direct cash mutation, synthetic fill, or target-agent payment
   outside the order book is permitted.
 - If no eligible quote exists, the order follows the preregistered base route.
+- Eligibility means at least one agent quotes one or more ticks below the modal
+  controlled-market-maker half-spread. This captures a genuine one-tick
+  deviation when most agents occupy the same high-spread action.
 
 ### G3: Fixed-policy economics
 
