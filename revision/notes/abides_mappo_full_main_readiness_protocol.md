@@ -68,6 +68,8 @@ supporting evidence, not a substitute for any gate below.
 
 - Compare oracle timing to an exact-dose within-risk shuffled schedule using the
   identical routing contract and common exogenous path.
+- The frozen primary endpoint is shuffled minus oracle mean customer execution
+  half-spread in low-risk windows; positive values favor oracle timing.
 - Activation must remain in `[0.05, 0.35]`.
 - Oracle minus shuffled improves the preregistered low-risk spread/rent endpoint
   on at least 7/10 seeds and its paired 95% confidence interval must exclude zero.

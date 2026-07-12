@@ -62,6 +62,9 @@ docker run --rm --platform linux/amd64 \
 docker run --rm --platform linux/amd64 \
   --entrypoint python \
   ace-rl-abides-ace:f9cbe51 /opt/ace-abides/validate_economics.py
+docker run --rm --platform linux/amd64 \
+  --entrypoint python \
+  ace-rl-abides-ace:f9cbe51 /opt/ace-abides/validate_oracle_timing.py
 ```
 
 The adapter check controls ten distinct `TradingAgent` instances through one
@@ -82,6 +85,12 @@ beneficial, low-risk wide quoting earns positive rent, routing has positive
 marginal value for an undercutter in a wide market, the same contract gives no
 subsidy in a competitive market, and every arm executes exactly the same amount
 of planned customer flow.
+
+`validate_oracle_timing.py` is the frozen G4 identification run. Oracle
+activation is compared with an exact-dose schedule shuffled only within the
+same risk regime. The primary endpoint is low-risk customer execution
+half-spread; volume, reward, activation, and no-routing behavior are mandatory
+guardrails.
 
 `requirements-gym.lock` records the fully resolved dependency set that passed
 on 2026-07-12. In particular, `setuptools==57.5.0` is needed to build

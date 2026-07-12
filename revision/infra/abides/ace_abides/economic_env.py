@@ -423,6 +423,7 @@ class EconomicCoordinator(CoreGymAgent):
                 self.last_rewards = np.zeros(self.config.n_agents, dtype=float)
 
         total_execution_quantity = float(np.sum(new_execution_quantity))
+        total_spread_revenue = float(np.sum(spread_revenue))
         if total_execution_quantity > 0:
             self.last_flow_shares = (
                 new_execution_quantity / total_execution_quantity
@@ -463,6 +464,11 @@ class EconomicCoordinator(CoreGymAgent):
                 "realized_flow_quantity": total_execution_quantity,
                 "mean_reward": float(np.mean(self.last_rewards)),
                 "mean_spread_revenue": float(np.mean(spread_revenue)),
+                "mean_execution_half_spread": (
+                    total_spread_revenue / total_execution_quantity
+                    if total_execution_quantity > 0
+                    else 0.0
+                ),
                 "mean_adverse_selection_component": float(
                     np.mean(adverse_selection)
                 ),
