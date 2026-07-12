@@ -148,6 +148,8 @@ def rollout_episode(
                 "step": step,
                 "actions": actions.tolist(),
                 "gate_active": active,
+                "pre_info": dict(state["info"]),
+                "pre_observations": state["observations"],
                 "info": dict(next_state["info"]),
                 "mean_reward_unscaled": float(np.mean(next_state["rewards"])),
             }
