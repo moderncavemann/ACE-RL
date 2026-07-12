@@ -18,8 +18,11 @@ from abides_markets.agents import AdaptiveMarketMakerAgent, ExchangeAgent
 from abides_markets.agents.trading_agent import TradingAgent
 from abides_markets.configs import rmsc04
 from abides_markets.messages.marketdata import L2DataMsg, L2SubReqMsg
+from abides_markets.messages.order import MarketOrderMsg
 from abides_markets.orders import Order, Side
 from abides_markets.utils import generate_latency_model
+
+from .routing import RoutedMarketOrder, RoutedOrderBook
 
 
 @dataclass
@@ -35,6 +38,8 @@ class FlowInstructionMsg(Message):
     decision_id: int
     side: str
     quantity: int
+    eligible_agent_ids: Tuple[int, ...] = ()
+    route_kind: str = "lit"
 
 
 class CoreGymAgent(Agent, ABC):
@@ -156,12 +161,27 @@ class MarketOrderTaker(TradingAgent):
             return
 
         side = Side.BID if message.side == "BUY" else Side.ASK
-        self.place_market_order(
-            self.symbol,
-            message.quantity,
-            side,
-            tag=f"ace_flow_d{message.decision_id}",
-        )
+        if message.eligible_agent_ids:
+            order = RoutedMarketOrder(
+                agent_id=self.id,
+                time_placed=self.current_time,
+                symbol=self.symbol,
+                quantity=message.quantity,
+                side=side,
+                eligible_agent_ids=message.eligible_agent_ids,
+                fallback_to_lit=True,
+                route_kind=message.route_kind,
+                tag=f"ace_flow_d{message.decision_id}",
+            )
+            self.orders[order.order_id] = deepcopy(order)
+            self.send_message(self.exchange_id, MarketOrderMsg(order))
+        else:
+            self.place_market_order(
+                self.symbol,
+                message.quantity,
+                side,
+                tag=f"ace_flow_d{message.decision_id}",
+            )
 
     def order_executed(self, order: Order) -> None:
         super().order_executed(order)
@@ -267,6 +287,10 @@ class MultiMarketMakerCoordinator(CoreGymAgent):
                     decision_id=self.decision_id,
                     side=side,
                     quantity=int(flow["quantity"]),
+                    eligible_agent_ids=tuple(
+                        int(agent_id) for agent_id in flow.get("eligible_agent_ids", ())
+                    ),
+                    route_kind=str(flow.get("route_kind", "lit")),
                 ),
                 delay=int(flow.get("delay_ns", str_to_ns("1ms"))),
             )
@@ -315,6 +339,7 @@ def build_integrity_config(
     num_market_makers: int = 10,
     starting_cash: int = 10_000_000,
     symbol: str = "ABM",
+    routed_book: bool = False,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """Build a minimal real-exchange config for adapter integrity checks."""
 
@@ -339,6 +364,11 @@ def build_integrity_config(
     exchange = agents[0]
     if not isinstance(exchange, ExchangeAgent):
         raise RuntimeError("integrity config must retain the real ABIDES exchange")
+    if routed_book:
+        previous_book = exchange.order_books[symbol]
+        routed = RoutedOrderBook(exchange, symbol)
+        routed.last_trade = previous_book.last_trade
+        exchange.order_books[symbol] = routed
 
     rng = np.random.RandomState(seed ^ 0xACE)
     controlled: List[ControlledMarketMaker] = []

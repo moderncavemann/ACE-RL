@@ -28,8 +28,8 @@ def book_orders(exchange, symbol: str) -> List:
     return orders
 
 
-def run_integrity_episode(seed: int) -> Dict:
-    config, handles = build_integrity_config(seed=seed)
+def run_integrity_episode(seed: int, routed_book: bool = False) -> Dict:
+    config, handles = build_integrity_config(seed=seed, routed_book=routed_book)
     kernel = make_kernel(config)
     kernel.initialize()
 
@@ -119,7 +119,9 @@ def main() -> None:
     assert commit == EXPECTED_COMMIT, (commit, EXPECTED_COMMIT)
     first = run_integrity_episode(seed=17)
     second = run_integrity_episode(seed=17)
+    routed_gate_off = run_integrity_episode(seed=17, routed_book=True)
     assert first == second
+    assert first == routed_gate_off
     print(
         json.dumps(
             {
@@ -131,6 +133,7 @@ def main() -> None:
                 "inventory_conserved": True,
                 "cash_conserved": True,
                 "same_seed_deterministic": True,
+                "routed_book_gate_off_equivalent": True,
             },
             sort_keys=True,
         )

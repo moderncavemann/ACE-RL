@@ -5,9 +5,12 @@ from .adapter import (
     MultiMarketMakerCoordinator,
     build_integrity_config,
 )
+from .routing import RoutedMarketOrder, RoutedOrderBook
 
 __all__ = [
     "ControlledMarketMaker",
     "MultiMarketMakerCoordinator",
     "build_integrity_config",
+    "RoutedMarketOrder",
+    "RoutedOrderBook",
 ]

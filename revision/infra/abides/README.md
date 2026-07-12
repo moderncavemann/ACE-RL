@@ -56,12 +56,22 @@ docker run --rm --platform linux/amd64 ace-rl-abides-ace:f9cbe51
 docker run --rm --platform linux/amd64 \
   --entrypoint python \
   ace-rl-abides-ace:f9cbe51 -m pip check
+docker run --rm --platform linux/amd64 \
+  --entrypoint python \
+  ace-rl-abides-ace:f9cbe51 /opt/ace-abides/smoke_routing.py
 ```
 
 The adapter check controls ten distinct `TradingAgent` instances through one
 kernel-pausing coordinator. It requires real resting orders and exchange fills,
 then checks action-to-agent mapping, quoted execution price, cash conservation,
 inventory conservation, and same-seed determinism.
+
+The routing smoke sends the same unit of customer demand first to its base
+dealer and then to a lower-spread target dealer. It requires equal quantity,
+consumption of real resting orders, execution at each resting quote, and
+counterparty cash/inventory conservation. The multi-agent smoke also requires
+the routed `OrderBook` to be economically identical to upstream when routing is
+off.
 
 `requirements-gym.lock` records the fully resolved dependency set that passed
 on 2026-07-12. In particular, `setuptools==57.5.0` is needed to build

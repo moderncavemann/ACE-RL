@@ -84,6 +84,7 @@ FROM abides-rmsc04 AS abides-ace
 # importing Ray or RLlib into this runtime.
 COPY ace_abides /opt/ace-abides/ace_abides
 COPY smoke_multiagent.py /opt/ace-abides/smoke_multiagent.py
+COPY smoke_routing.py /opt/ace-abides/smoke_routing.py
 ENV PYTHONPATH=/opt/ace-abides
 
 ENTRYPOINT ["python", "/opt/ace-abides/smoke_multiagent.py"]
