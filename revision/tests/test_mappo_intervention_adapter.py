@@ -121,6 +121,36 @@ class InterventionAdapterTest(unittest.TestCase):
         )
         np.testing.assert_allclose(np.mean(advantages, axis=1), 0.0)
 
+    def test_signal_only_adapter_is_exactly_off_at_zero_signal(self) -> None:
+        base = self.make_trainer(policy_mode="multihead")
+        adapter = MAPPOTrainer(MAPPOConfig(
+            obs_dim=3,
+            critic_obs_dim=4,
+            n_actions=4,
+            n_agents=3,
+            policy_mode="intervention_adapter",
+            adapter_risk_feature_index=None,
+            hidden_dim=8,
+            seed=9,
+        ))
+        adapter.initialize_intervention_adapter(base)
+        obs = torch.tensor([
+            [1.0, 0.2, 0.0],
+            [1.0, 0.4, 0.0],
+            [1.0, 0.6, 0.0],
+        ])
+        agent_ids = torch.arange(3)
+        base_logits = base.model.distribution(obs, agent_ids).logits
+        adapter_logits = adapter.model.distribution(obs, agent_ids).logits
+        torch.testing.assert_close(adapter_logits, base_logits)
+
+        with torch.no_grad():
+            adapter.model.intervention_adapter_heads[0].bias[0] = 2.0
+        signaled = obs.clone()
+        signaled[:, -1] = 1.0
+        active_logits = adapter.model.distribution(signaled, agent_ids).logits
+        self.assertFalse(torch.allclose(active_logits, base_logits))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -50,6 +50,8 @@ class ABIDESDealerMarketConfig:
     routing_excess_scale_ticks: float = 2.0
     routing_undercut_delta_ticks: float = 1.0
     routing_eligibility_reference: Literal["modal"] = "modal"
+    routing_allocation_mode: Literal["hard_min", "soft_rank"] = "hard_min"
+    routing_target_kappa: float = 4.0
     seed: int = 42
 
     @property
@@ -283,11 +285,23 @@ class EconomicCoordinator(CoreGymAgent):
                 1.0,
             )
         )
+        announced_strength_raw = actions.get("routing_strength")
+        announced_strength = (
+            None
+            if announced_strength_raw is None
+            else float(np.clip(float(announced_strength_raw), 0.0, 1.0))
+        )
         gate_active = bool(actions.get("gate_active", False))
+        if announced_strength is not None:
+            gate_active = announced_strength > 0.0
         routing_enabled = bool(actions.get("routing_enabled", True))
+        if announced_strength is None:
+            contract_strength = severity if gate_active else 0.0
+        else:
+            contract_strength = announced_strength
         effective_alpha = (
-            self.config.routing_routable_fraction * severity
-            if gate_active and routing_enabled
+            self.config.routing_routable_fraction * contract_strength
+            if routing_enabled
             else 0.0
         )
         spread_values, spread_counts = np.unique(
@@ -299,7 +313,13 @@ class EconomicCoordinator(CoreGymAgent):
             half_spreads
             <= modal_half_spread - self.config.routing_undercut_delta_ticks
         )
-        if eligible_indices.size:
+        target_probabilities: Optional[np.ndarray] = None
+        if self.config.routing_allocation_mode == "soft_rank":
+            target_indices = np.arange(self.config.n_agents, dtype=int)
+            centered = half_spreads - float(np.min(half_spreads))
+            weights = np.exp(-self.config.routing_target_kappa * centered)
+            target_probabilities = weights / float(np.sum(weights))
+        elif eligible_indices.size:
             minimum = float(np.min(half_spreads[eligible_indices]))
             target_indices = eligible_indices[half_spreads[eligible_indices] == minimum]
         else:
@@ -322,10 +342,17 @@ class EconomicCoordinator(CoreGymAgent):
                 target_indices.size
                 and event.route_uniform < effective_alpha
             ):
-                target_slot = min(
-                    int(event.target_uniform * len(target_indices)),
-                    len(target_indices) - 1,
-                )
+                if target_probabilities is None:
+                    target_slot = min(
+                        int(event.target_uniform * len(target_indices)),
+                        len(target_indices) - 1,
+                    )
+                else:
+                    cumulative = np.cumsum(target_probabilities)
+                    target_slot = min(
+                        int(np.searchsorted(cumulative, event.target_uniform, side="right")),
+                        len(target_indices) - 1,
+                    )
                 destination_index = int(target_indices[target_slot])
                 route_kind = f"targeted_s{self.step_id}"
                 target_count += 1
@@ -359,6 +386,7 @@ class EconomicCoordinator(CoreGymAgent):
             "gate_active": gate_active,
             "routing_enabled": routing_enabled,
             "routing_severity": severity,
+            "routing_signal_strength": contract_strength,
             "routing_effective_alpha": effective_alpha,
             "eligible_agent_count": int(target_indices.size),
             "modal_half_spread": modal_half_spread,
@@ -634,6 +662,7 @@ class ABIDESDealerMarketEnv:
         actions: Sequence[int],
         gate_active: bool = False,
         routing_enabled: bool = True,
+        routing_strength: Optional[float] = None,
     ) -> Dict[str, Any]:
         if self.closed or self.kernel is None:
             raise RuntimeError("reset must be called before step")
@@ -644,6 +673,7 @@ class ABIDESDealerMarketEnv:
                     "actions": list(actions),
                     "gate_active": gate_active,
                     "routing_enabled": routing_enabled,
+                    "routing_strength": routing_strength,
                 },
             )
         )

@@ -10,6 +10,7 @@ from src.agents.mappo import MAPPOConfig, MAPPOTrainer
 from src.envs.abides_docker_env import ABIDESDockerDealerEnv
 
 GateDecision = Callable[[Mapping[str, Any], np.ndarray, int], bool]
+ContractDecision = Callable[[Mapping[str, Any], int], float]
 
 
 def actor_observations(
@@ -50,6 +51,10 @@ def make_abides_trainer(
     episode_steps: int,
     device: str,
     entropy_coef: float = 0.02,
+    policy_mode: str = "multihead",
+    policy_advantage_mode: str = "relative_immediate",
+    learning_rate: float = 1e-3,
+    adapter_risk_feature_index: int | None = 0,
 ) -> MAPPOTrainer:
     dummy_state = {
         "observations": [[0.0] * 6 for _ in range(10)],
@@ -67,10 +72,10 @@ def make_abides_trainer(
             critic_obs_dim=critic.shape[1],
             n_actions=7,
             n_agents=10,
-            policy_mode="multihead",
-            policy_advantage_mode="relative_immediate",
+            policy_mode=policy_mode,
+            policy_advantage_mode=policy_advantage_mode,
             hidden_dim=64,
-            learning_rate=1e-3,
+            learning_rate=learning_rate,
             gamma=0.96,
             gae_lambda=0.95,
             clip_ratio=0.20,
@@ -79,6 +84,7 @@ def make_abides_trainer(
             max_grad_norm=0.50,
             update_epochs=4,
             minibatch_size=512,
+            adapter_risk_feature_index=adapter_risk_feature_index,
             seed=seed,
             device=device,
         )
@@ -93,15 +99,26 @@ def rollout_episode(
     train: bool,
     gate_schedule: Sequence[bool] | None = None,
     gate_decision: GateDecision | None = None,
+    announced_signal_schedule: Sequence[float] | None = None,
+    announced_signal_decision: ContractDecision | None = None,
     routing_enabled: bool = True,
     reward_scale: float = 10.0,
     action_namespace: int = 73_117,
     deterministic: bool = False,
+    defer_update: bool = False,
 ) -> dict[str, Any]:
     if gate_schedule is not None and gate_decision is not None:
         raise ValueError("provide either gate_schedule or gate_decision, not both")
+    if (announced_signal_schedule is not None or announced_signal_decision is not None) and (
+        gate_schedule is not None or gate_decision is not None
+    ):
+        raise ValueError("announced signals cannot be combined with post-action gates")
+    if announced_signal_schedule is not None and announced_signal_decision is not None:
+        raise ValueError("provide either announced signal schedule or decision, not both")
     if gate_schedule is not None and len(gate_schedule) != episode_steps:
         raise ValueError("gate schedule length must match episode_steps")
+    if announced_signal_schedule is not None and len(announced_signal_schedule) != episode_steps:
+        raise ValueError("announced signal schedule length must match episode_steps")
 
     state = env.reset(seed=seed)
     obs_rows = []
@@ -112,7 +129,19 @@ def rollout_episode(
     reward_rows = []
     records = []
     for step in range(episode_steps):
-        obs = actor_observations(state, gate_signal=0.0)
+        announced_strength: float | None = None
+        if announced_signal_schedule is not None:
+            announced_strength = float(
+                np.clip(float(announced_signal_schedule[step]), 0.0, 1.0)
+            )
+        elif announced_signal_decision is not None:
+            announced_strength = float(
+                np.clip(float(announced_signal_decision(state, step)), 0.0, 1.0)
+            )
+        obs = actor_observations(
+            state,
+            gate_signal=0.0 if announced_strength is None else announced_strength,
+        )
         critic = centralized_critic_observations(state, obs, episode_steps)
         action_uniforms = None
         if not deterministic:
@@ -125,7 +154,9 @@ def rollout_episode(
             deterministic=deterministic,
             action_uniforms=action_uniforms,
         )
-        if gate_schedule is not None:
+        if announced_strength is not None:
+            active = announced_strength > 0.0
+        elif gate_schedule is not None:
             active = bool(gate_schedule[step])
         elif gate_decision is not None:
             active = bool(gate_decision(state, actions, step))
@@ -135,6 +166,7 @@ def rollout_episode(
             actions,
             gate_active=active,
             routing_enabled=routing_enabled,
+            routing_strength=announced_strength,
         )
         rewards = np.asarray(next_state["rewards"], dtype=float) / reward_scale
         obs_rows.append(obs)
@@ -148,6 +180,7 @@ def rollout_episode(
                 "step": step,
                 "actions": actions.tolist(),
                 "gate_active": active,
+                "gate_signal": 0.0 if announced_strength is None else announced_strength,
                 "pre_info": dict(state["info"]),
                 "pre_observations": state["observations"],
                 "info": dict(next_state["info"]),
@@ -159,20 +192,29 @@ def rollout_episode(
         raise RuntimeError("ABIDES episode did not finish at configured horizon")
     env.close_episode()
 
+    trajectory = {
+        "obs": np.stack(obs_rows),
+        "critic_obs": np.stack(critic_rows),
+        "actions": np.stack(action_rows),
+        "old_logp": np.stack(logp_rows),
+        "rewards": np.stack(reward_rows),
+        "values": np.stack(value_rows),
+    }
     update = {}
-    if train:
+    if train and not defer_update:
         update = trainer.update_episode(
-            np.stack(obs_rows),
-            np.stack(critic_rows),
-            np.stack(action_rows),
-            np.stack(logp_rows),
-            np.stack(reward_rows),
-            np.stack(value_rows),
+            trajectory["obs"],
+            trajectory["critic_obs"],
+            trajectory["actions"],
+            trajectory["old_logp"],
+            trajectory["rewards"],
+            trajectory["values"],
         )
         if not all(np.isfinite(float(value)) for value in update.values()):
             raise FloatingPointError(f"non-finite MAPPO update: {update}")
     return {
         "update": update,
+        "trajectory": trajectory if train else None,
         "records": records,
         "mean_action": float(np.mean(action_rows)),
         "mean_half_spread": float(np.mean(np.asarray(action_rows) + 1)),
@@ -181,5 +223,8 @@ def rollout_episode(
         ),
         "activation_rate": float(
             np.mean([record["gate_active"] for record in records])
+        ),
+        "mean_gate_signal": float(
+            np.mean([record["gate_signal"] for record in records])
         ),
     }

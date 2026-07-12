@@ -65,17 +65,19 @@ class ABIDESDockerDealerEnv:
         actions: Sequence[int],
         gate_active: bool = False,
         routing_enabled: bool = True,
+        routing_strength: float | None = None,
     ) -> dict[str, Any]:
         if not self._episode_open:
             raise RuntimeError("reset must be called before step")
-        response = self._request(
-            {
-                "cmd": "step",
-                "actions": [int(value) for value in actions],
-                "gate_active": bool(gate_active),
-                "routing_enabled": bool(routing_enabled),
-            }
-        )
+        payload = {
+            "cmd": "step",
+            "actions": [int(value) for value in actions],
+            "gate_active": bool(gate_active),
+            "routing_enabled": bool(routing_enabled),
+        }
+        if routing_strength is not None:
+            payload["routing_strength"] = float(routing_strength)
+        response = self._request(payload)
         state = response["state"]
         self._validate_state(state)
         return state

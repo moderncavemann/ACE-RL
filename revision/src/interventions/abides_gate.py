@@ -87,6 +87,15 @@ def abides_gate_features(
     )
 
 
+def abides_lagged_actions(state: Mapping[str, Any]) -> np.ndarray:
+    """Recover the previous quote actions available before the next decision."""
+    observations = np.asarray(state["observations"], dtype=float)
+    if observations.shape != (10, 6):
+        raise ValueError("lagged ABIDES observations must have shape (10, 6)")
+    actions = np.rint(observations[:, 1] * 6.0).astype(int)
+    return np.clip(actions, 0, 6)
+
+
 def abides_gate_target(post_info: Mapping[str, Any]) -> bool:
     return bool(
         post_info.get("last_step_risk") == "low"
@@ -231,6 +240,32 @@ class ABIDESTwoStageGateModel:
             "features": features.tolist(),
         }
 
+    def announced_strength(
+        self,
+        state: Mapping[str, Any],
+        include_spread_severity: bool = True,
+    ) -> dict[str, Any]:
+        """Compute a pre-action contract signal from lagged observable state."""
+        features = abides_gate_features(state, abides_lagged_actions(state))
+        values_by_name = dict(zip(FEATURE_NAMES, features))
+        risk_probability = self.probability(features)
+        severity = (
+            float(values_by_name["contract_severity"])
+            if include_spread_severity
+            else 1.0
+        )
+        proposed = bool(
+            risk_probability >= self.probability_threshold and severity > 0.0
+        )
+        strength = risk_probability * severity if proposed else 0.0
+        return {
+            "strength": float(np.clip(strength, 0.0, 1.0)),
+            "proposed": proposed,
+            "risk_probability": risk_probability,
+            "severity": severity,
+            "features": features.tolist(),
+        }
+
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
@@ -283,3 +318,53 @@ class ABIDESGateActivationController:
     @property
     def activation_rate(self) -> float:
         return self.accepted / self.episode_steps
+
+
+@dataclass
+class ABIDESPacedSignalController:
+    """Pace continuous interventions without exhausting an episode budget early."""
+
+    episode_steps: int
+    target_rate: float = 0.35
+    burst_capacity: float = 2.0
+    tokens: float = 0.0
+    steps: int = 0
+    proposed: int = 0
+    accepted: int = 0
+    accepted_strength: float = 0.0
+
+    def __post_init__(self) -> None:
+        if self.episode_steps <= 0:
+            raise ValueError("episode_steps must be positive")
+        if not 0.0 < self.target_rate <= 1.0:
+            raise ValueError("target_rate must be in (0, 1]")
+        if self.burst_capacity < 1.0:
+            raise ValueError("burst_capacity must be at least one")
+
+    def decide(self, proposed_strength: float) -> float:
+        if self.steps >= self.episode_steps:
+            raise RuntimeError("signal controller exceeded the episode horizon")
+        strength = float(np.clip(proposed_strength, 0.0, 1.0))
+        self.steps += 1
+        self.tokens = min(self.burst_capacity, self.tokens + self.target_rate)
+        self.proposed += int(strength > 0.0)
+        if strength <= 0.0 or self.tokens + 1e-12 < 1.0:
+            return 0.0
+        self.tokens -= 1.0
+        self.accepted += 1
+        self.accepted_strength += strength
+        return strength
+
+    @property
+    def proposal_rate(self) -> float:
+        return self.proposed / self.episode_steps
+
+    @property
+    def activation_rate(self) -> float:
+        return self.accepted / self.episode_steps
+
+    @property
+    def mean_strength(self) -> float:
+        if self.accepted == 0:
+            return 0.0
+        return self.accepted_strength / self.accepted

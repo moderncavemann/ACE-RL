@@ -41,6 +41,11 @@ def main() -> None:
                     actions=[int(value) for value in request["actions"]],
                     gate_active=bool(request.get("gate_active", False)),
                     routing_enabled=bool(request.get("routing_enabled", True)),
+                    routing_strength=(
+                        None
+                        if request.get("routing_strength") is None
+                        else float(request["routing_strength"])
+                    ),
                 )
                 write({"ok": True, "state": state})
             elif command == "close_episode":

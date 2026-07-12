@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Literal
+from typing import Dict, Literal, Sequence
 
 import numpy as np
 import torch
@@ -34,6 +34,7 @@ class MAPPOConfig:
     max_grad_norm: float = 0.50
     update_epochs: int = 4
     minibatch_size: int = 512
+    adapter_risk_feature_index: int | None = 0
     seed: int = 42
     device: str = "cpu"
 
@@ -44,6 +45,7 @@ class ActorCritic(nn.Module):
         self.policy_mode = config.policy_mode
         self.n_agents = config.n_agents
         self.n_actions = config.n_actions
+        self.adapter_risk_feature_index = config.adapter_risk_feature_index
         if config.policy_mode == "independent":
             self.actors = nn.ModuleList([
                 self._actor_network(config) for _ in range(config.n_agents)
@@ -99,9 +101,13 @@ class ActorCritic(nn.Module):
                 adapter_logits = torch.stack([
                     head(obs) for head in self.intervention_adapter_heads
                 ], dim=1)
-                low_risk = (obs[:, 0] < 0.5).to(dtype=all_logits.dtype)
                 announced_strength = torch.clamp(obs[:, -1], 0.0, 1.0)
-                adapter_strength = low_risk * announced_strength
+                adapter_strength = announced_strength
+                if self.adapter_risk_feature_index is not None:
+                    low_risk = (
+                        obs[:, self.adapter_risk_feature_index] < 0.5
+                    ).to(dtype=all_logits.dtype)
+                    adapter_strength = low_risk * adapter_strength
                 all_logits = (
                     all_logits
                     + adapter_strength[:, None, None] * adapter_logits
@@ -219,15 +225,74 @@ class MAPPOTrainer:
         rewards: np.ndarray,
         values: np.ndarray,
     ) -> Dict[str, float]:
-        gae_advantages, returns = self._gae(rewards, values)
-        advantages = self._actor_advantages(rewards, gae_advantages)
-        flat_obs = obs.reshape((-1, self.config.obs_dim))
-        flat_critic = critic_obs.reshape((-1, self.config.critic_obs_dim))
-        flat_actions = actions.reshape(-1)
-        flat_old_logp = old_logp.reshape(-1)
-        flat_adv = advantages.reshape(-1)
-        flat_returns = returns.reshape(-1)
-        flat_agent_ids = np.tile(np.arange(obs.shape[1], dtype=np.int64), obs.shape[0])
+        return self.update_episodes([
+            {
+                "obs": obs,
+                "critic_obs": critic_obs,
+                "actions": actions,
+                "old_logp": old_logp,
+                "rewards": rewards,
+                "values": values,
+            }
+        ])
+
+    def update_episodes(
+        self,
+        episodes: Sequence[dict[str, np.ndarray]],
+    ) -> Dict[str, float]:
+        """Apply one PPO update to complete, independently terminated episodes."""
+        if not episodes:
+            raise ValueError("at least one episode is required for a MAPPO update")
+        flat_obs_rows = []
+        flat_critic_rows = []
+        flat_action_rows = []
+        flat_logp_rows = []
+        flat_advantage_rows = []
+        flat_return_rows = []
+        flat_value_rows = []
+        raw_advantages = []
+        raw_gae_advantages = []
+        raw_returns = []
+        flat_agent_rows = []
+        for episode in episodes:
+            obs = episode["obs"]
+            critic_obs = episode["critic_obs"]
+            actions = episode["actions"]
+            old_logp = episode["old_logp"]
+            rewards = episode["rewards"]
+            values = episode["values"]
+            gae_advantages, returns = self._gae(rewards, values)
+            advantages = self._actor_advantages(rewards, gae_advantages)
+            flat_obs_rows.append(obs.reshape((-1, self.config.obs_dim)))
+            flat_critic_rows.append(
+                critic_obs.reshape((-1, self.config.critic_obs_dim))
+            )
+            flat_action_rows.append(actions.reshape(-1))
+            flat_logp_rows.append(old_logp.reshape(-1))
+            flat_advantage_rows.append(advantages.reshape(-1))
+            flat_return_rows.append(returns.reshape(-1))
+            flat_value_rows.append(values.reshape(-1))
+            raw_advantages.append(advantages.reshape(-1))
+            raw_gae_advantages.append(gae_advantages.reshape(-1))
+            raw_returns.append(returns.reshape(-1))
+            flat_agent_rows.append(
+                np.tile(
+                    np.arange(obs.shape[1], dtype=np.int64),
+                    obs.shape[0],
+                )
+            )
+
+        flat_obs = np.concatenate(flat_obs_rows)
+        flat_critic = np.concatenate(flat_critic_rows)
+        flat_actions = np.concatenate(flat_action_rows)
+        flat_old_logp = np.concatenate(flat_logp_rows)
+        flat_adv = np.concatenate(flat_advantage_rows)
+        flat_returns = np.concatenate(flat_return_rows)
+        flat_values = np.concatenate(flat_value_rows)
+        flat_agent_ids = np.concatenate(flat_agent_rows)
+        all_advantages = np.concatenate(raw_advantages)
+        all_gae_advantages = np.concatenate(raw_gae_advantages)
+        all_returns = np.concatenate(raw_returns)
 
         adv_std = float(np.std(flat_adv))
         if adv_std > 1e-8:
@@ -240,12 +305,23 @@ class MAPPOTrainer:
         policy_losses: list[float] = []
         value_losses: list[float] = []
         entropies: list[float] = []
+        approximate_kls: list[float] = []
+        clip_fractions: list[float] = []
+        gradient_norms: list[float] = []
 
         for _ in range(self.config.update_epochs):
             self.np_rng.shuffle(idx)
             for start in range(0, n, batch_size):
                 batch = idx[start:start + batch_size]
-                loss, p_loss, v_loss, entropy = self._update_minibatch(
+                (
+                    loss,
+                    p_loss,
+                    v_loss,
+                    entropy,
+                    approximate_kl,
+                    clip_fraction,
+                    gradient_norm,
+                ) = self._update_minibatch(
                     flat_obs[batch],
                     flat_critic[batch],
                     flat_actions[batch],
@@ -258,17 +334,42 @@ class MAPPOTrainer:
                 policy_losses.append(p_loss)
                 value_losses.append(v_loss)
                 entropies.append(entropy)
+                approximate_kls.append(approximate_kl)
+                clip_fractions.append(clip_fraction)
+                gradient_norms.append(gradient_norm)
+
+        return_variance = float(np.var(flat_returns))
+        explained_variance = (
+            1.0 - float(np.var(flat_returns - flat_values)) / return_variance
+            if return_variance > 1e-8
+            else 0.0
+        )
 
         return {
             "loss": float(np.mean(losses)) if losses else 0.0,
             "policy_loss": float(np.mean(policy_losses)) if policy_losses else 0.0,
             "value_loss": float(np.mean(value_losses)) if value_losses else 0.0,
             "entropy": float(np.mean(entropies)) if entropies else 0.0,
-            "advantage_mean": float(np.mean(advantages)) if advantages.size else 0.0,
-            "gae_advantage_mean": (
-                float(np.mean(gae_advantages)) if gae_advantages.size else 0.0
+            "approximate_kl": (
+                float(np.mean(approximate_kls)) if approximate_kls else 0.0
             ),
-            "return_mean": float(np.mean(returns)) if returns.size else 0.0,
+            "clip_fraction": (
+                float(np.mean(clip_fractions)) if clip_fractions else 0.0
+            ),
+            "gradient_norm": (
+                float(np.mean(gradient_norms)) if gradient_norms else 0.0
+            ),
+            "explained_variance": explained_variance,
+            "advantage_mean": (
+                float(np.mean(all_advantages)) if all_advantages.size else 0.0
+            ),
+            "gae_advantage_mean": (
+                float(np.mean(all_gae_advantages))
+                if all_gae_advantages.size
+                else 0.0
+            ),
+            "return_mean": float(np.mean(all_returns)) if all_returns.size else 0.0,
+            "episodes_per_update": float(len(episodes)),
         }
 
     def pretrain_actor(
@@ -328,7 +429,7 @@ class MAPPOTrainer:
         advantages: np.ndarray,
         returns: np.ndarray,
         agent_ids: np.ndarray,
-    ) -> tuple[float, float, float, float]:
+    ) -> tuple[float, float, float, float, float, float, float]:
         obs_t = torch.as_tensor(obs, dtype=torch.float32, device=self.device)
         critic_t = torch.as_tensor(critic_obs, dtype=torch.float32, device=self.device)
         actions_t = torch.as_tensor(actions, dtype=torch.long, device=self.device)
@@ -345,17 +446,26 @@ class MAPPOTrainer:
         values = self.model.value(critic_t)
         value_loss = torch.mean((returns_t - values) ** 2)
         entropy = torch.mean(dist.entropy())
+        approximate_kl = torch.mean(old_logp_t - logp)
+        clip_fraction = torch.mean(
+            (torch.abs(ratio - 1.0) > self.config.clip_ratio).float()
+        )
         loss = policy_loss + self.config.value_coef * value_loss - self.config.entropy_coef * entropy
 
         self.optimizer.zero_grad()
         loss.backward()
-        nn.utils.clip_grad_norm_(self.model.parameters(), self.config.max_grad_norm)
+        gradient_norm = nn.utils.clip_grad_norm_(
+            self.model.parameters(), self.config.max_grad_norm
+        )
         self.optimizer.step()
         return (
             float(loss.detach().cpu()),
             float(policy_loss.detach().cpu()),
             float(value_loss.detach().cpu()),
             float(entropy.detach().cpu()),
+            float(approximate_kl.detach().cpu()),
+            float(clip_fraction.detach().cpu()),
+            float(gradient_norm.detach().cpu()),
         )
 
     def _gae(self, rewards: np.ndarray, values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
