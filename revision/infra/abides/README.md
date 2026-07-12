@@ -112,7 +112,12 @@ The full-main runner checkpoints every completed seed atomically. Re-running
 the same command validates the protocol fingerprint and frozen artifact hashes,
 loads `checkpoints/seed_<seed>.json`, and schedules only missing seeds. An
 interrupted in-progress seed is rerun from its beginning; completed seeds are
-never repeated.
+never repeated. A pending run also rejects a different git commit so seed
+outputs from different implementations cannot be mixed.
+
+The frozen 20-seed run completed on 2026-07-12. Results and claim boundaries
+are recorded in
+`revision/notes/abides_mappo_full_main_v1_summary.md`.
 
 Runtime records are written under
 `revision/experiments/outputs/abides_mappo_full_main_v1/`:
@@ -156,8 +161,8 @@ container. Docker exposes 24 CPU cores and about 7.65 GiB RAM. A full-day,
 official-scale RMSC04 worker used about 188 MiB at peak and completed in about
 25.7 seconds.
 
-Use persistent workers rather than starting a new container per episode. With
-the current host load, start the future ABIDES adapter pilot at 16 workers and
-increase to 20 only after checking the concurrent MPS training job. The current
-Docker memory allocation is sufficient for the observed direct-kernel workers;
-increasing RAM alone will not accelerate the single-threaded event loop.
+Use persistent workers rather than starting a new container per episode. The
+formal 20-seed run used 16 CPU workers and completed in 73.33 seconds while the
+other host task retained MPS. The current Docker memory allocation is
+sufficient for the observed direct-kernel workers; increasing RAM alone will
+not accelerate the single-threaded event loop.

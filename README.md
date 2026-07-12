@@ -65,6 +65,9 @@ The current toy-scale validation notes are under `revision/notes/`.
   oracle, fresh MAPPO screen, and held-out oracle timing all pass. This clears
   the mechanism gate for a full-main learned-gate experiment; it is not itself
   a completed full-main result.
+- `revision/notes/abides_mappo_full_main_v1_summary.md` records the completed
+  20-seed N=10 ABIDES/MAPPO full-main timing experiment, including equal-dose
+  controls, paired inference, claim boundaries, runtime, and recovery records.
 
 Gate-v2 feature diagnostic and calibration:
 

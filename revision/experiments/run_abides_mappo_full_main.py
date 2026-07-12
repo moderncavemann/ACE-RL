@@ -668,17 +668,24 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
             resume = False
 
         rows = load_checkpoints(output_dir, config["seeds"], fingerprint)
-        workers = min(
-            int(config["workers"]),
-            max(1, len(config["seeds"]) - len(rows)),
-        )
+        pending_seed_count = len(config["seeds"]) - len(rows)
+        if (
+            pending_seed_count
+            and manifest.get("git_commit") != current_git_commit()
+        ):
+            raise RuntimeError(
+                "cannot resume pending seeds from a different git commit; "
+                f"expected {manifest.get('git_commit')}"
+            )
+        launched_workers = min(int(config["workers"]), pending_seed_count)
         append_logbook(
             output_dir / "logbook.jsonl",
             {
                 "event": "run_resumed" if resume else "run_started",
                 "protocol_fingerprint": fingerprint,
                 "completed_seeds": sorted(int(row["seed"]) for row in rows),
-                "workers": workers,
+                "configured_workers": int(config["workers"]),
+                "launched_workers": launched_workers,
             },
         )
         persist_run_state(output_dir, manifest, "running", rows)
@@ -689,7 +696,7 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
             output_dir,
             fingerprint,
             rows,
-            workers,
+            launched_workers,
         )
         if failures:
             persist_run_state(output_dir, manifest, "failed", rows, failures)
@@ -711,7 +718,8 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
             "protocol_fingerprint": fingerprint,
             "backend": "abides",
             "seeds": [int(seed) for seed in config["seeds"]],
-            "workers": workers,
+            "workers": int(config["workers"]),
+            "launched_workers_this_invocation": launched_workers,
             "episode_steps": config["episode_steps"],
             "seed_runtime_seconds": {
                 "mean": float(mean(row["elapsed_seconds"] for row in rows)),
