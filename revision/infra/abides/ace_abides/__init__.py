@@ -6,6 +6,7 @@ from .adapter import (
     build_integrity_config,
 )
 from .routing import RoutedMarketOrder, RoutedOrderBook
+from .economic_env import ABIDESDealerMarketConfig, ABIDESDealerMarketEnv
 
 __all__ = [
     "ControlledMarketMaker",
@@ -13,4 +14,6 @@ __all__ = [
     "build_integrity_config",
     "RoutedMarketOrder",
     "RoutedOrderBook",
+    "ABIDESDealerMarketConfig",
+    "ABIDESDealerMarketEnv",
 ]

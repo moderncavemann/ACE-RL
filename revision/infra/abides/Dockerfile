@@ -85,6 +85,7 @@ FROM abides-rmsc04 AS abides-ace
 COPY ace_abides /opt/ace-abides/ace_abides
 COPY smoke_multiagent.py /opt/ace-abides/smoke_multiagent.py
 COPY smoke_routing.py /opt/ace-abides/smoke_routing.py
+COPY validate_economics.py /opt/ace-abides/validate_economics.py
 ENV PYTHONPATH=/opt/ace-abides
 
 ENTRYPOINT ["python", "/opt/ace-abides/smoke_multiagent.py"]

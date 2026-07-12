@@ -31,6 +31,12 @@ class QuoteInstructionMsg(Message):
     reference_price: int
     half_spread: int
     quantity: int
+    cancel_existing: bool = True
+
+
+@dataclass
+class CancelQuotesMsg(Message):
+    decision_id: int
 
 
 @dataclass
@@ -93,6 +99,9 @@ class ControlledMarketMaker(TradingAgent):
         self, current_time: NanosecondTime, sender_id: int, message: Message
     ) -> None:
         super().receive_message(current_time, sender_id, message)
+        if isinstance(message, CancelQuotesMsg):
+            self.cancel_all_orders()
+            return
         if not isinstance(message, QuoteInstructionMsg):
             return
 
@@ -102,7 +111,8 @@ class ControlledMarketMaker(TradingAgent):
             raise ValueError("quote quantity must be positive")
 
         self.last_instruction = message
-        self.cancel_all_orders()
+        if message.cancel_existing:
+            self.cancel_all_orders()
         self.place_limit_order(
             self.symbol,
             message.quantity,

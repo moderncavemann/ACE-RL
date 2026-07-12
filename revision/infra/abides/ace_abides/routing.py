@@ -159,6 +159,7 @@ class RoutedOrderBook(OrderBook):
         matched_order: Order,
         used_fallback: bool,
     ) -> None:
+        self.last_trade = matched_order.fill_price
         self.routed_executions.append(
             {
                 "time": int(self.owner.current_time),

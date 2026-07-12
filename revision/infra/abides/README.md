@@ -59,6 +59,9 @@ docker run --rm --platform linux/amd64 \
 docker run --rm --platform linux/amd64 \
   --entrypoint python \
   ace-rl-abides-ace:f9cbe51 /opt/ace-abides/smoke_routing.py
+docker run --rm --platform linux/amd64 \
+  --entrypoint python \
+  ace-rl-abides-ace:f9cbe51 /opt/ace-abides/validate_economics.py
 ```
 
 The adapter check controls ten distinct `TradingAgent` instances through one
@@ -72,6 +75,13 @@ consumption of real resting orders, execution at each resting quote, and
 counterparty cash/inventory conservation. The multi-agent smoke also requires
 the routed `OrderBook` to be economically identical to upstream when routing is
 off.
+
+`validate_economics.py` is the frozen G3 fixed-policy assay. It uses ten seeds
+and checks that risk changes adverse-selection economics, high-risk widening is
+beneficial, low-risk wide quoting earns positive rent, routing has positive
+marginal value for an undercutter in a wide market, the same contract gives no
+subsidy in a competitive market, and every arm executes exactly the same amount
+of planned customer flow.
 
 `requirements-gym.lock` records the fully resolved dependency set that passed
 on 2026-07-12. In particular, `setuptools==57.5.0` is needed to build
