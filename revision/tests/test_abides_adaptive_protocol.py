@@ -56,3 +56,21 @@ def test_two_stage_adaptive_pilot_uses_fresh_splits() -> None:
     assert set(config["training_seeds"]).isdisjoint(prior)
     assert set(config["evaluation_seeds"]).isdisjoint(prior)
     assert set(config["training_seeds"]).isdisjoint(config["evaluation_seeds"])
+
+
+def test_two_stage_extension_preserves_training_and_refreshes_evaluation() -> None:
+    pilot = json.loads(
+        (
+            ROOT / "revision/configs/abides_mappo_adaptive_two_stage_pilot_v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    extension = json.loads(
+        (
+            ROOT / "revision/configs/abides_mappo_adaptive_two_stage_extension_v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert extension["training_seeds"] == pilot["training_seeds"]
+    assert extension["parent_completed_episodes"] == pilot["train_episodes"]
+    assert extension["train_episodes"] == 150
+    assert set(extension["evaluation_seeds"]).isdisjoint(pilot["evaluation_seeds"])
+    assert extension["gate_artifact_sha256"] == pilot["gate_artifact_sha256"]

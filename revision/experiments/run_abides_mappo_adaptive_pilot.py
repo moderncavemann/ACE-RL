@@ -276,13 +276,20 @@ def load_or_initialize_training(
     bool,
 ]:
     checkpoint = training_checkpoint_path(output_dir, seed)
-    if not checkpoint.exists():
+    expected_fingerprint = fingerprint
+    if not checkpoint.exists() and config.get("parent_output_dir"):
+        parent_output = REPO / str(config["parent_output_dir"])
+        checkpoint = training_checkpoint_path(parent_output, seed)
+        expected_fingerprint = str(config["parent_protocol_fingerprint"])
+        if not checkpoint.exists():
+            raise FileNotFoundError(f"missing parent training checkpoint: {checkpoint}")
+    elif not checkpoint.exists():
         trainers = make_trainers(config, seed)
         history = {method: [] for method in config["methods"]}
         return trainers, history, 0, True, True
 
     payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
-    if payload.get("protocol_fingerprint") != fingerprint:
+    if payload.get("protocol_fingerprint") != expected_fingerprint:
         raise RuntimeError(f"training checkpoint fingerprint mismatch: {checkpoint}")
     if int(payload.get("seed", -1)) != seed:
         raise RuntimeError(f"training checkpoint seed mismatch: {checkpoint}")
@@ -292,6 +299,12 @@ def load_or_initialize_training(
     }
     history = {method: list(payload["history"][method]) for method in config["methods"]}
     completed = int(payload["completed_episodes"])
+    if config.get("parent_output_dir") and expected_fingerprint != fingerprint:
+        if completed != int(config["parent_completed_episodes"]):
+            raise RuntimeError(
+                f"parent checkpoint expected {config['parent_completed_episodes']} "
+                f"episodes, got {completed}"
+            )
     if any(len(rows) != completed for rows in history.values()):
         raise RuntimeError("training checkpoint histories are not episode-aligned")
     return (
@@ -1055,6 +1068,66 @@ def configured_run(args: argparse.Namespace) -> dict[str, Any]:
     return config
 
 
+def validate_parent_extension(config: Mapping[str, Any]) -> None:
+    if not config.get("parent_output_dir"):
+        return
+    parent_output = REPO / str(config["parent_output_dir"])
+    parent_manifest = json.loads(
+        (parent_output / "manifest.json").read_text(encoding="utf-8")
+    )
+    parent_summary = json.loads(
+        (parent_output / "summary.json").read_text(encoding="utf-8")
+    )
+    if (
+        parent_manifest.get("protocol_fingerprint")
+        != config["parent_protocol_fingerprint"]
+    ):
+        raise RuntimeError("parent adaptive protocol fingerprint mismatch")
+    if int(parent_summary["train_episodes"]) != int(
+        config["parent_completed_episodes"]
+    ):
+        raise RuntimeError("parent adaptive training horizon mismatch")
+    if int(config["train_episodes"]) <= int(config["parent_completed_episodes"]):
+        raise ValueError("extension target must exceed parent training horizon")
+    if not all(parent_summary["integrity_checks"].values()):
+        raise RuntimeError("parent adaptive run failed an integrity check")
+    parent_efficacy = dict(parent_summary["efficacy_checks"])
+    if parent_efficacy.pop("training_converged", None) is not False:
+        raise RuntimeError("parent extension is allowed only for convergence failure")
+    if not all(parent_efficacy.values()):
+        raise RuntimeError("parent adaptive run failed a non-convergence efficacy gate")
+    parent_config = parent_manifest["config"]
+    frozen_keys = (
+        "backend",
+        "abides_source_commit",
+        "docker_image",
+        "n_agents",
+        "training_seeds",
+        "episode_steps",
+        "device",
+        "convergence_window_episodes",
+        "maximum_recent_spread_slope",
+        "maximum_window_spread_shift",
+        "maximum_window_reward_shift_fraction",
+        "methods",
+        "gate_type",
+        "gate_artifact",
+        "gate_artifact_sha256",
+        "max_activation_rate",
+        "maximum_mean_high_risk_activation_rate",
+        "reward_scale",
+        "train_environment_seed_namespace",
+        "train_action_namespace",
+        "minimum_positive_seed_rate",
+        "maximum_reward_degradation_fraction",
+    )
+    for key in frozen_keys:
+        if config.get(key) != parent_config.get(key):
+            raise RuntimeError(f"adaptive extension changed frozen field: {key}")
+    if set(config["evaluation_seeds"]) & set(parent_config["evaluation_seeds"]):
+        raise RuntimeError("adaptive extension must use fresh evaluation seeds")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -1076,6 +1149,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    validate_parent_extension(config)
     output_dir = REPO / str(config["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
     fingerprint = protocol_fingerprint(config)
