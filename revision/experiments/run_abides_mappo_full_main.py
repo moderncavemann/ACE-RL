@@ -96,6 +96,27 @@ def current_git_commit() -> str:
     ).strip()
 
 
+def resolve_docker_image_id(image: str) -> str:
+    result = subprocess.run(
+        ["docker", "images", "--quiet", "--no-trunc", image],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    image_ids = sorted(set(result.stdout.split()))
+    if len(image_ids) != 1:
+        raise RuntimeError(
+            f"expected exactly one local Docker image for {image}, got {image_ids}"
+        )
+    subprocess.run(
+        ["docker", "inspect", "--type", "image", image_ids[0]],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return image_ids[0]
+
+
 def validate_artifacts(config: dict[str, Any]) -> dict[str, str]:
     checks = {}
     for path_key, hash_key in (
@@ -112,13 +133,9 @@ def validate_artifacts(config: dict[str, Any]) -> dict[str, str]:
                 f"artifact hash mismatch for {path}: expected {expected}, got {actual}"
             )
         checks[path_key] = actual
-    subprocess.run(
-        ["docker", "inspect", "--type", "image", str(config["docker_image"])],
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    checks["docker_image"] = str(config["docker_image"])
+    docker_image = str(config["docker_image"])
+    checks["docker_image"] = docker_image
+    checks["docker_image_id"] = resolve_docker_image_id(docker_image)
     return checks
 
 
@@ -661,6 +678,12 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
                 raise RuntimeError(
                     "existing run manifest belongs to a different protocol"
                 )
+            for key, expected in manifest.get("artifact_checks", {}).items():
+                if artifact_checks.get(key) != expected:
+                    raise RuntimeError(
+                        f"resume artifact mismatch for {key}: expected {expected}, "
+                        f"got {artifact_checks.get(key)}"
+                    )
             resume = True
         else:
             manifest = build_manifest(config, fingerprint, artifact_checks)
