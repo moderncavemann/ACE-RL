@@ -81,6 +81,14 @@ The current toy-scale validation notes are under `revision/notes/`.
   but learned timing falls to 3/5 positive policy seeds versus exact-dose
   matched random and training remains nonconverged; adaptive paper main is
   therefore no-go under the frozen protocol.
+- `revision/notes/abides_mappo_adaptive_v3_holdout_v1_summary.md` records the
+  superseding structural redesign and fresh adaptive holdout. Pre-action
+  risk-aware soft-rank routing beats exact-dose random after separate MAPPO
+  adaptation on 5/5 fresh policy seeds; the 95% CI is strictly positive.
+- `revision/notes/abides_mappo_adaptive_v3_readiness_v1.md` records that the
+  repaired method may enter a frozen full-scale package with governance
+  baselines, a routing ablation, and a second market ecology. It is not itself
+  a completed adaptive paper main.
 
 Gate-v2 feature diagnostic and calibration:
 

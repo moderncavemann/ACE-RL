@@ -372,3 +372,26 @@ ticks with 95% CI `[-0.13011, 0.33460]`; only `2/5` seeds satisfy the all-method
 convergence check. Therefore adaptive paper main, governance baselines, and a
 second-environment pilot remain no-go under this protocol. See
 `revision/notes/abides_mappo_adaptive_two_stage_extension_v1_summary.md`.
+
+Adaptive v3 supersedes that no-go for future experiment planning without
+rewriting the old result. It replaces post-action labeling and targeted-fill
+subsidies with a pre-action announced, demand-conserving soft-rank contract;
+uses complete-episode GAE; and removes the lagged spread-severity stage after a
+frozen ablation failed. The final risk-only candidate passed development and a
+fresh holdout after separate MAPPO adaptation:
+
+```bash
+python3 revision/experiments/train_abides_mappo_base_v3.py \
+  --config revision/configs/abides_mappo_adaptive_v3_holdout_base_v1.json
+python3 revision/experiments/run_abides_mappo_adaptive_v3_risk_pair.py \
+  --config revision/configs/abides_mappo_adaptive_v3_risk_pair_holdout_v1.json
+```
+
+On the reserved `480xxx/481xxx` split, exact-dose random minus risk-aware
+low-risk execution half-spread is `0.08786` tick with 95% CI
+`[0.07852, 0.09720]` and 5/5 positive policy seeds. Every integrity,
+convergence, reward, volume, activation, and positive-CI check passes. This
+opens the entry gate for a frozen full-scale adaptive package; the two-arm
+five-seed holdout is not itself the completed paper main. See
+`revision/notes/abides_mappo_adaptive_v3_holdout_v1_summary.md` and
+`revision/notes/abides_mappo_adaptive_v3_readiness_v1.md`.
