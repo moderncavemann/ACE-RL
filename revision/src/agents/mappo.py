@@ -159,6 +159,12 @@ class MAPPOTrainer:
         self.model.actor_trunk.load_state_dict(base.model.actor_trunk.state_dict())
         self.model.actor_heads.load_state_dict(base.model.actor_heads.state_dict())
         self.model.critic.load_state_dict(base.model.critic.state_dict())
+        self.freeze_intervention_base()
+
+    def freeze_intervention_base(self) -> None:
+        """Restore the adapter-only optimizer contract after construction/resume."""
+        if self.config.policy_mode != "intervention_adapter":
+            raise ValueError("freeze_intervention_base requires intervention_adapter")
         for parameter in self.model.actor_trunk.parameters():
             parameter.requires_grad_(False)
         for parameter in self.model.actor_heads.parameters():

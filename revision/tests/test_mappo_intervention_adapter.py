@@ -151,6 +151,29 @@ class InterventionAdapterTest(unittest.TestCase):
         active_logits = adapter.model.distribution(signaled, agent_ids).logits
         self.assertFalse(torch.allclose(active_logits, base_logits))
 
+    def test_adapter_freeze_contract_can_be_restored_after_construction(self) -> None:
+        adapter = MAPPOTrainer(MAPPOConfig(
+            obs_dim=3,
+            critic_obs_dim=4,
+            n_actions=4,
+            n_agents=3,
+            policy_mode="intervention_adapter",
+            adapter_risk_feature_index=None,
+            hidden_dim=8,
+            seed=9,
+        ))
+        adapter.freeze_intervention_base()
+        self.assertTrue(all(
+            not parameter.requires_grad
+            for parameter in list(adapter.model.actor_trunk.parameters())
+            + list(adapter.model.actor_heads.parameters())
+        ))
+        self.assertTrue(all(
+            parameter.requires_grad
+            for parameter in list(adapter.model.intervention_adapter_heads.parameters())
+            + list(adapter.model.critic.parameters())
+        ))
+
 
 if __name__ == "__main__":
     unittest.main()

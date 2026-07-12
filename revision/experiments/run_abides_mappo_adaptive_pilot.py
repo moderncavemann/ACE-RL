@@ -108,6 +108,8 @@ def trainer_from_payload(payload: Mapping[str, Any], device: str) -> MAPPOTraine
     trainer_config["device"] = device
     trainer = MAPPOTrainer(MAPPOConfig(**trainer_config))
     trainer.model.load_state_dict(payload["model_state_dict"])
+    if trainer.config.policy_mode == "intervention_adapter":
+        trainer.freeze_intervention_base()
     trainer.optimizer.load_state_dict(payload["optimizer_state_dict"])
     trainer.np_rng.bit_generator.state = payload["np_rng_state"]
     trainer.action_call_count = int(payload.get("action_call_count", 0))
