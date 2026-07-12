@@ -87,6 +87,7 @@ COPY smoke_multiagent.py /opt/ace-abides/smoke_multiagent.py
 COPY smoke_routing.py /opt/ace-abides/smoke_routing.py
 COPY validate_economics.py /opt/ace-abides/validate_economics.py
 COPY validate_oracle_timing.py /opt/ace-abides/validate_oracle_timing.py
+COPY worker.py /opt/ace-abides/worker.py
 ENV PYTHONPATH=/opt/ace-abides
 
 ENTRYPOINT ["python", "/opt/ace-abides/smoke_multiagent.py"]

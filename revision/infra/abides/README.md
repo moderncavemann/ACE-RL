@@ -92,6 +92,16 @@ same risk regime. The primary endpoint is low-risk customer execution
 half-spread; volume, reward, activation, and no-routing behavior are mandatory
 guardrails.
 
+The host training bridge can be checked without restarting the container per
+episode:
+
+```bash
+python3 revision/experiments/smoke_abides_docker_env.py
+```
+
+The bridge keeps ABIDES on container CPUs and returns ten observations and
+rewards to host PyTorch, where MAPPO can use Apple MPS.
+
 `requirements-gym.lock` records the fully resolved dependency set that passed
 on 2026-07-12. In particular, `setuptools==57.5.0` is needed to build
 `gym==0.18.0`, and `protobuf==3.20.3` is needed by Ray 1.7 generated protocol
