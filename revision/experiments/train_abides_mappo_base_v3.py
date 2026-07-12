@@ -30,6 +30,7 @@ from run_abides_mappo_adaptive_pilot import (  # noqa: E402
 )
 from run_abides_mappo_full_main import (  # noqa: E402
     atomic_write_json,
+    current_git_commit,
     protocol_fingerprint,
     resolve_docker_image_id,
     sha256_file,
@@ -323,6 +324,7 @@ def main() -> None:
         {
             "protocol_version": config["protocol_version"],
             "protocol_fingerprint": fingerprint,
+            "git_commit": current_git_commit(),
             "config": config,
             "artifacts": artifacts,
         },
