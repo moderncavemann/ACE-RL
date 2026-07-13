@@ -1,0 +1,95 @@
+{
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "docker": {
+    "client_version": "28.0.4",
+    "container_numpy": "1.22.0",
+    "container_platform": "Linux-6.10.14-linuxkit-x86_64-with-glibc2.2.5",
+    "container_python": "3.8.20",
+    "image_id": "sha256:38ea9d4ddae027e040ea0386f31d2f49bb14946ddc6ae0332ad384efde981a68",
+    "image_tag": "ace-rl-abides-ace:adaptive-v3",
+    "platform": "linux/amd64",
+    "server_version": "28.0.4",
+    "workers": 8
+  },
+  "formal_git_commit": "c8a3468cef4045fa1f1b831ede08ec49f60b3b04",
+  "host": {
+    "chip": "Apple M3 Ultra",
+    "cpu_cores": 32,
+    "machine": "Mac Studio",
+    "machine_identifier": "Mac15,14",
+    "matplotlib": "3.9.2",
+    "memory_gb": 512,
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.7",
+    "scikit_learn": "1.5.1",
+    "torch": "2.8.0",
+    "training_device": "cpu"
+  },
+  "learner": {
+    "base_actor_frozen_during_response": true,
+    "checkpoint_includes_optimizer_state": true,
+    "description": "MAPPO-style intervention-adapter training with centralized critic",
+    "full_policy_mappo": false
+  },
+  "output_hashes": {
+    "frontier_pdf": "41a13f2fe8eef6ba3af25e2755abcb067790ad7e7dcd4790dfabb54d9484bf46",
+    "frontier_png": "c12d549d1758dde8943976a78df1fa0db69b1ef7c8877aab03e85a297e59c47f",
+    "local_raw_sha256s_file": "6faf7f474b31145ccb3b8e179863654446ac86d4400a319b31404e8da5f04736",
+    "per_seed_csv": "7399aae3aa9a42a4779cde3c1d24db25554c944b988f7bea5d9c72f459a97517",
+    "rows_json": "faa7990f8b53898e66dc0c0590215d7b23064840a541d03b2631896e105127e9",
+    "summary_json": "137bcf38828a90b8cb549e90724f355936146fab1efc3a61def9521b39fc126e"
+  },
+  "protocol": {
+    "evaluation_seeds": [
+      533000,
+      533001,
+      533002,
+      533003,
+      533004,
+      533005,
+      533006,
+      533007,
+      533008,
+      533009
+    ],
+    "fingerprint": "caafc92da2a62bdd2f8fd14189d61a3444f6019372f280b530d6109203ec3c1b",
+    "policy_seeds": [
+      530000,
+      530001,
+      530002,
+      530003,
+      530004,
+      530005,
+      530006,
+      530007,
+      530008,
+      530009,
+      530010,
+      530011,
+      530012,
+      530013,
+      530014,
+      530015,
+      530016,
+      530017,
+      530018,
+      530019
+    ],
+    "response_episodes": 96,
+    "training_label": "simulator_low_risk",
+    "version": "abides_mappo_adaptive_v5_supplement_v1"
+  },
+  "remote_at_formal_run": {
+    "local_commits_ahead": 44,
+    "origin_main": "2904a1d1155eff7afdf640e82720e35976b7bf96",
+    "pushed": false
+  },
+  "run": {
+    "completed_at_utc": "2026-07-13T12:48:29.068176+00:00",
+    "resume_verification_seconds": 1.47,
+    "started_at_utc": "2026-07-13T10:27:15.537955+00:00",
+    "status": "pass",
+    "wall_seconds": 8473.530221
+  }
+}

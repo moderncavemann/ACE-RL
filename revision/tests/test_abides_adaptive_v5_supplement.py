@@ -18,6 +18,10 @@ from experiments.run_abides_mappo_adaptive_v5_supplement import (  # noqa: E402
     circular_shift,
     circular_structure_exact,
 )
+from experiments.export_abides_mappo_adaptive_v5_supplement import (  # noqa: E402
+    METHOD_ORDER,
+    per_seed_rows,
+)
 from src.interventions.abides_gate import (  # noqa: E402
     ABIDESPublicRiskProxyModel,
 )
@@ -161,3 +165,30 @@ def test_supplement_aggregate_accepts_identified_fixture() -> None:
     assert result["paired_contrasts"]["circular_shifted_minus_risk_aware"][
         "positive"
     ] == 2
+
+
+def test_paper_export_is_seed_sorted_and_recomputes_paired_deltas() -> None:
+    def methods(risk_spread: float) -> dict:
+        values = {}
+        for offset, method in enumerate(METHOD_ORDER):
+            values[method] = {
+                "low_execution_half_spread": risk_spread + 0.01 * offset,
+                "mean_reward": 10.0 - 0.01 * offset,
+                "activation_rate": 0.2,
+                "high_risk_activation_rate": 0.05,
+            }
+        values["risk_aware"]["low_execution_half_spread"] = risk_spread
+        return values
+
+    exported = per_seed_rows(
+        [
+            {"seed": 2, "final_evaluation": {"methods": methods(6.2)}},
+            {"seed": 1, "final_evaluation": {"methods": methods(6.1)}},
+        ]
+    )
+    assert [row["policy_seed"] for row in exported] == [1, 2]
+    expected = (
+        exported[0]["matched_random__low_execution_half_spread"]
+        - exported[0]["risk_aware__low_execution_half_spread"]
+    )
+    assert exported[0]["matched_random__minus_risk_aware_spread"] == expected

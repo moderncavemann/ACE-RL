@@ -3,23 +3,25 @@
 Date: 2026-07-13
 
 This note consolidates the experiment program from the first toy assay through
-the completed adaptive ABIDES/MAPPO full main. It separates confirmatory
-evidence from engineering smokes, parameter screens, and recorded negative
-results.
+the completed adaptive ABIDES/MAPPO-style full main and post-main supplement.
+It separates confirmatory evidence from engineering smokes, parameter screens,
+and recorded negative results.
 
 ## Current Decision
 
-The strongest completed result is the adaptive-v5 full main in the controlled
-N=10 ABIDES dealer market. It passes all 23 preregistered checks on 20 fresh
-policy seeds after each intervention arm receives separate MAPPO adaptation.
+The strongest completed result is the adaptive-v5 full main plus its frozen
+post-main supplement in the controlled N=10 ABIDES dealer market. The main
+passes all 23 preregistered checks on 20 fresh policy seeds after each
+intervention arm receives separate adaptation. The supplement passes all 16
+checks and adds temporal-structure and simple-public-proxy controls.
 
 The supported claim is:
 
-> In the controlled N=10 ABIDES dealer market, a passively trained risk model
-> used to announce demand-conserving soft-rank routing before quotes improves
-> low-risk customer execution quality over exact-dose random routing after
-> separate MAPPO adaptation, while conserving volume and limiting high-risk
-> intervention.
+> In the controlled N=10 ABIDES dealer market, a simulator-supervised proxy
+> over public lagged risk signals, announced before quotes through a
+> demand-conserving soft-rank routing contract, improves low-risk customer
+> execution over exact-dose random and temporal-structure-preserving controls
+> after separate MAPPO-style intervention-adapter training.
 
 This is a selective-intervention trade-off result. It is not a lowest-spread,
 real-market, generic collusion-detection, or all-scales claim.
@@ -46,6 +48,7 @@ real-market, generic collusion-detection, or all-scales claim.
 | Adaptive ABIDES v3 full scale | Primary and fast-risk ecologies | Primary 20 seeds; fast-risk 10 seeds | Overall no-go | Primary stopped at 18/20 base convergence; the preregistered fast-risk ecology passed 10/10 and remains secondary generalization evidence. |
 | Adaptive ABIDES v4 | Fixed 384-episode base and six response arms | 20 fresh policy seeds | Formally failed | Primary efficacy passed 20/20, but the preregistered all-arm convergence veto was tripped only by always-on. |
 | Adaptive ABIDES v5 full main | Same v4 method with fresh seeds and an estimand-aligned convergence set | 20 base policies; 384 base + 96 response episodes | Passed | Final adaptive full-main result; all 23 checks passed without changing the method or efficacy endpoint. |
+| Adaptive ABIDES v5 supplement | Same 20 v5 policies; fresh final paths; three separately adapted controls | 20 policy seeds; 96 response episodes | Passed | Circular-shift timing and volatility-only/return-only proxies all lose to the full risk-aware gate on 20/20 seeds. |
 
 ## Key Confirmatory Results
 
@@ -102,6 +105,19 @@ policy. It does not establish adaptation under each intervention arm.
 - Threshold and always-on achieved lower raw spread by intervening more often;
   always-on lost `25.10%` reward and remained non-asymptotic in `8/20` seeds.
 
+### ABIDES Adaptive v5 Supplement
+
+- Circular shifted minus risk-aware spread: `0.05434`, 95% CI
+  `[0.05107, 0.05762]`, positive in `20/20` seeds, with exact continuous-signal
+  dose and cyclic temporal structure.
+- Volatility-only minus risk-aware: `0.03598`, 95% CI
+  `[0.03269, 0.03927]`, positive in `20/20`; return-only minus risk-aware:
+  `0.06781`, 95% CI `[0.06397, 0.07164]`, positive in `20/20`.
+- Risk-aware and matched random both activate `20.30%`; their paired spread
+  difference on the fresh supplement paths is `0.06166`, positive in `20/20`.
+- Relative to random, risk-aware saves `89.66` customer tick-units per episode
+  with `-27.67` aggregate dealer reward units per episode.
+
 ## How The Method Evolved
 
 The original idea remained the same: intervene selectively when high spread is
@@ -127,8 +143,12 @@ The implementation became more defensible in three steps:
   ecology, not the canonical RMSC04 background-agent composition.
 - N=10 is the only completed matching-engine main scale. Toy experiments cover
   N=5 and N=20 stress tests; there is no exhaustive N=2 through N=20 sweep.
-- The final risk model uses public volatility and absolute lagged return in the
-  simulator. It does not prove real-world latent collusion detection.
+- The final risk model uses public volatility and absolute lagged return at
+  runtime, but it is trained against the simulator's latent low-risk regime.
+  It is a simulator-supervised public-signal proxy and does not prove
+  real-world unlabeled collusion detection.
+- The response learner is a compact MAPPO-style intervention adapter with a
+  frozen base actor, not a standard full-policy MAPPO implementation.
 - Larger dealer populations, another matching engine, another MARL learner,
   and real-data external validity remain untested.
 
@@ -155,3 +175,4 @@ Primary source notes:
 - `revision/notes/abides_mappo_adaptive_v3_full_scale_v1_summary.md`
 - `revision/notes/abides_mappo_adaptive_v4_full_main_v1_summary.md`
 - `revision/notes/abides_mappo_adaptive_v5_full_main_v1_summary.md`
+- `revision/notes/abides_mappo_adaptive_v5_supplement_v1_summary.md`

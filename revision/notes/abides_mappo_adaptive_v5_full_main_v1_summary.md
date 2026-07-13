@@ -11,11 +11,11 @@ ABIDES dealer market.
 
 The supported claim is:
 
-> In the controlled N=10 ABIDES dealer market, a passively trained risk model
-> used to announce demand-conserving soft-rank routing before quotes improves
-> low-risk customer execution quality over exact-dose random routing after
-> separate MAPPO adaptation, while conserving volume and limiting high-risk
-> intervention.
+> In the controlled N=10 ABIDES dealer market, a simulator-supervised proxy
+> over public lagged risk signals used to announce demand-conserving soft-rank
+> routing before quotes improves low-risk customer execution quality over
+> exact-dose random routing after separate MAPPO-style intervention-adapter
+> training, while conserving volume and limiting high-risk intervention.
 
 This is a timing and intervention trade-off result. Risk-aware routing does
 not achieve the lowest raw execution spread: threshold and always-on controls
@@ -149,3 +149,12 @@ order-book data without labels.
 Raw outputs remain ignored under
 `revision/experiments/outputs/abides_mappo_adaptive_v5_*`. The frozen configs,
 protocol, v4 failure summary, and this final summary are repo-visible.
+
+## Post-Main Controls
+
+The frozen v5 supplement subsequently passed on all 20 source policies. A
+continuous-signal circular-shift control, volatility-only proxy, and
+return-only proxy were each weaker than the full risk-aware method in 20/20
+paired seeds. The supplement also adds customer-cost, dealer-reward, inventory,
+flow-concentration, and frontier reporting. See
+`revision/notes/abides_mappo_adaptive_v5_supplement_v1_summary.md`.
