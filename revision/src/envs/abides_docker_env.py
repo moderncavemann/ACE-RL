@@ -6,6 +6,7 @@ import json
 import select
 import subprocess
 import tempfile
+import uuid
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -28,6 +29,7 @@ class ABIDESDockerDealerEnv:
     ) -> None:
         self.market_config = dict(market_config)
         self.docker_config = docker_config
+        self._container_name = f"ace-rl-abides-{uuid.uuid4().hex}"
         self._stderr = tempfile.TemporaryFile(mode="w+t", encoding="utf-8")
         self._process = subprocess.Popen(
             [
@@ -35,6 +37,8 @@ class ABIDESDockerDealerEnv:
                 "run",
                 "--rm",
                 "-i",
+                "--name",
+                self._container_name,
                 "--platform",
                 docker_config.platform,
                 "--entrypoint",
@@ -50,6 +54,7 @@ class ABIDESDockerDealerEnv:
         )
         self._closed = False
         self._episode_open = False
+        self._worker_healthy = True
 
     def reset(self, seed: int) -> dict[str, Any]:
         response = self._request(
@@ -92,16 +97,37 @@ class ABIDESDockerDealerEnv:
         if self._closed:
             return
         try:
-            if self._process.poll() is None:
-                self._request({"cmd": "shutdown"})
+            if self._process.poll() is None and self._worker_healthy:
+                try:
+                    self._request({"cmd": "shutdown"})
+                except (OSError, RuntimeError, TimeoutError):
+                    self._worker_healthy = False
         finally:
             if self._process.stdin is not None:
-                self._process.stdin.close()
+                try:
+                    self._process.stdin.close()
+                except OSError:
+                    pass
+            if self._process.poll() is None:
+                try:
+                    self._process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    self._process.terminate()
+                    try:
+                        self._process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        self._process.kill()
+                        self._process.wait(timeout=5)
             try:
-                self._process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                self._process.terminate()
-                self._process.wait(timeout=10)
+                subprocess.run(
+                    ["docker", "rm", "-f", self._container_name],
+                    check=False,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=30,
+                )
+            except (OSError, subprocess.TimeoutExpired):
+                pass
             self._stderr.close()
             self._closed = True
             self._episode_open = False
@@ -122,6 +148,7 @@ class ABIDESDockerDealerEnv:
             self.docker_config.request_timeout_seconds,
         )
         if not ready:
+            self._worker_healthy = False
             raise TimeoutError(
                 self._worker_failure(
                     f"worker response exceeded {self.docker_config.request_timeout_seconds}s"

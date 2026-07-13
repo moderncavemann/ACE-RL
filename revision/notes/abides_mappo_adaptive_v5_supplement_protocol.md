@@ -2,6 +2,12 @@
 
 Date frozen: 2026-07-13
 
+Runtime note: the formal host uses at most 8 concurrent Docker workers. A
+20-worker engineering launch over-subscribed the emulated ABIDES runtime and
+timed out before producing any outcome. Worker count is execution metadata and
+is excluded from the scientific protocol fingerprint; seeds, episodes,
+comparators, thresholds, and pass rules are unchanged.
+
 ## Purpose
 
 Adaptive v5 remains the completed primary experiment. This post-main study

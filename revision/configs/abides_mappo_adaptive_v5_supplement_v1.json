@@ -57,7 +57,7 @@
   "required_policy_seed_count": 20,
   "minimum_positive_seed_rate": 0.70,
   "proxy_activation_tolerance": 0.05,
-  "workers": 20,
+  "workers": 8,
   "device": "cpu",
   "output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_supplement_v1"
 }
