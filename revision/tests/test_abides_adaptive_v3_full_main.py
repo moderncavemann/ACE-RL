@@ -53,6 +53,67 @@ def test_full_main_seed_splits_and_base_fingerprints_are_frozen() -> None:
         assert tuple(response["methods"]) == EVALUATED_METHODS
 
 
+def test_v4_formal_primary_is_fresh_and_keeps_validated_response_protocol() -> None:
+    development = load_config("abides_mappo_adaptive_v4_base_development_v1.json")
+    base = load_config("abides_mappo_adaptive_v4_full_main_primary_base_v1.json")
+    response = load_config("abides_mappo_adaptive_v4_full_main_primary_v1.json")
+    v3_response = load_config("abides_mappo_adaptive_v3_full_main_primary_v1.json")
+
+    assert base["base_training_mode"] == "fixed_horizon"
+    assert base["base_max_episodes"] == 384
+    assert len(base["base_training_seeds"]) == 20
+    assert base["base_training_seeds"] == response["policy_seeds"]
+    assert protocol_fingerprint(base) == response["base_protocol_fingerprint"]
+    assert tuple(response["methods"]) == EVALUATED_METHODS
+
+    development_seeds = set(development["base_training_seeds"]) | set(
+        development["base_fixed_evaluation_seeds"]
+    )
+    formal_seeds = (
+        set(base["base_training_seeds"])
+        | set(base["base_fixed_evaluation_seeds"])
+        | set(response["evaluation_seeds"])
+    )
+    assert development_seeds.isdisjoint(formal_seeds)
+    assert set(base["base_training_seeds"]).isdisjoint(
+        base["base_fixed_evaluation_seeds"]
+    )
+    assert set(base["base_training_seeds"]).isdisjoint(response["evaluation_seeds"])
+    assert set(base["base_fixed_evaluation_seeds"]).isdisjoint(
+        response["evaluation_seeds"]
+    )
+
+    frozen_response_fields = (
+        "docker_image",
+        "episode_steps",
+        "methods",
+        "response_episodes",
+        "response_episodes_per_update",
+        "response_evaluation_start",
+        "response_evaluation_interval",
+        "response_required_stable_evaluations",
+        "response_convergence_path_count",
+        "response_maximum_fixed_panel_spread_range",
+        "learning_rate",
+        "entropy_coefficient",
+        "reward_scale",
+        "max_activation_rate",
+        "routing_allocation_mode",
+        "routing_target_kappa",
+        "routing_routable_fraction",
+        "market",
+        "gate_artifact",
+        "gate_artifact_sha256",
+        "minimum_positive_seed_rate",
+        "minimum_failure_spread",
+        "maximum_reward_degradation_fraction",
+        "maximum_high_risk_activation_rate",
+        "minimum_threshold_high_risk_activation_gap",
+    )
+    for field in frozen_response_fields:
+        assert response[field] == v3_response[field]
+
+
 def test_fast_risk_ecology_preserves_stationary_high_risk_share() -> None:
     base = load_config("abides_mappo_adaptive_v3_full_main_primary_base_v1.json")
     fast = load_config("abides_mappo_adaptive_v3_full_main_fast_risk_base_v1.json")
