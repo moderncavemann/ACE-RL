@@ -14,6 +14,7 @@ sys.path.insert(0, str(REVISION_ROOT / "experiments"))
 from experiments.run_abides_mappo_adaptive_v3_full_main import (  # noqa: E402
     EVALUATED_METHODS,
     aggregate,
+    convergence as response_convergence,
     spread_only_decision,
 )
 from experiments.run_abides_mappo_adaptive_v3_response import (  # noqa: E402
@@ -112,6 +113,76 @@ def test_v4_formal_primary_is_fresh_and_keeps_validated_response_protocol() -> N
     )
     for field in frozen_response_fields:
         assert response[field] == v3_response[field]
+
+
+def test_v5_convergence_veto_is_estimand_aligned_and_fresh() -> None:
+    v4_base = load_config("abides_mappo_adaptive_v4_full_main_primary_base_v1.json")
+    v4_response = load_config("abides_mappo_adaptive_v4_full_main_primary_v1.json")
+    v5_base = load_config("abides_mappo_adaptive_v5_full_main_primary_base_v1.json")
+    v5_response = load_config("abides_mappo_adaptive_v5_full_main_primary_v1.json")
+
+    assert protocol_fingerprint(v5_base) == v5_response["base_protocol_fingerprint"]
+    assert set(v4_base["base_training_seeds"]).isdisjoint(
+        v5_base["base_training_seeds"]
+    )
+    assert set(v4_base["base_fixed_evaluation_seeds"]).isdisjoint(
+        v5_base["base_fixed_evaluation_seeds"]
+    )
+    assert set(v4_response["evaluation_seeds"]).isdisjoint(
+        v5_response["evaluation_seeds"]
+    )
+    assert v5_response["response_convergence_methods"] == [
+        "no_intervention",
+        "risk_aware",
+        "matched_random",
+        "spread_only_threshold",
+        "no_routing",
+    ]
+
+    allowed_changes = {
+        "protocol_version",
+        "policy_seeds",
+        "evaluation_seeds",
+        "base_output_dir",
+        "base_protocol_fingerprint",
+        "response_convergence_methods",
+        "response_environment_seed_namespace",
+        "response_action_namespace",
+        "evaluation_action_namespace",
+        "output_dir",
+    }
+    for field in set(v4_response) | set(v5_response):
+        if field not in allowed_changes:
+            assert v5_response[field] == v4_response[field]
+
+
+def test_v5_convergence_reports_but_does_not_veto_always_on_drift() -> None:
+    v4 = load_config("abides_mappo_adaptive_v4_full_main_primary_v1.json")
+    v5 = load_config("abides_mappo_adaptive_v5_full_main_primary_v1.json")
+    history = []
+    for episode, always_on_spread in ((48, 5.30), (72, 5.20), (96, 5.10)):
+        history.append(
+            {
+                "completed_episodes": episode,
+                "evaluation": {
+                    "methods": {
+                        method: {
+                            "low_execution_half_spread": (
+                                always_on_spread if method == "always_on" else 6.3
+                            )
+                        }
+                        for method in EVALUATED_METHODS
+                    }
+                },
+            }
+        )
+
+    legacy = response_convergence(history, v4)
+    aligned = response_convergence(history, v5)
+    assert not legacy["stable"]
+    assert aligned["stable"]
+    assert not aligned["method_stability"]["always_on"]
+    assert "always_on" not in aligned["required_methods"]
 
 
 def test_fast_risk_ecology_preserves_stationary_high_risk_share() -> None:

@@ -353,11 +353,18 @@ def convergence(
             for row in recent
         ]
         ranges[method] = max(values) - min(values)
+    required_methods = tuple(
+        config.get("response_convergence_methods", EVALUATED_METHODS)
+    )
+    if not required_methods or not set(required_methods).issubset(EVALUATED_METHODS):
+        raise ValueError("response convergence methods must be evaluated methods")
+    maximum_range = float(config["response_maximum_fixed_panel_spread_range"])
     return {
-        "stable": all(
-            value <= float(config["response_maximum_fixed_panel_spread_range"])
-            for value in ranges.values()
-        ),
+        "stable": all(ranges[method] <= maximum_range for method in required_methods),
+        "required_methods": list(required_methods),
+        "method_stability": {
+            method: ranges[method] <= maximum_range for method in EVALUATED_METHODS
+        },
         "spread_ranges": ranges,
         "recent_evaluations": recent,
     }
