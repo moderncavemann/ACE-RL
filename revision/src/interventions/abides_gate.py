@@ -285,6 +285,74 @@ class ABIDESTwoStageGateModel:
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 
+@dataclass(frozen=True)
+class ABIDESPublicRiskProxyModel:
+    """Single-feature, pre-action risk proxy used as a simple comparator."""
+
+    feature_name: str
+    feature_mean: float
+    feature_scale: float
+    coefficient: float
+    intercept: float
+    probability_threshold: float
+    pacing_target_rate: float
+    training_label: str = "simulator_low_risk"
+
+    def __post_init__(self) -> None:
+        if self.feature_name not in RISK_FEATURE_NAMES:
+            raise ValueError("public risk proxy must use a public risk feature")
+        if self.feature_scale <= 0.0:
+            raise ValueError("public risk proxy feature scale must be positive")
+        if not 0.0 <= self.probability_threshold <= 1.0:
+            raise ValueError("public risk proxy threshold outside [0, 1]")
+        if not 0.0 < self.pacing_target_rate <= 1.0:
+            raise ValueError("public risk proxy pacing rate outside (0, 1]")
+        if self.training_label != "simulator_low_risk":
+            raise ValueError("public risk proxy training label is not recognized")
+
+    def probability(self, full_features: Sequence[float]) -> float:
+        values_by_name = dict(zip(FEATURE_NAMES, full_features))
+        standardized = (
+            float(values_by_name[self.feature_name]) - self.feature_mean
+        ) / self.feature_scale
+        logit = self.coefficient * standardized + self.intercept
+        if logit >= 0.0:
+            return float(1.0 / (1.0 + np.exp(-logit)))
+        exp_logit = float(np.exp(logit))
+        return float(exp_logit / (1.0 + exp_logit))
+
+    def announced_strength(self, state: Mapping[str, Any]) -> dict[str, Any]:
+        features = abides_gate_features(state, abides_lagged_actions(state))
+        probability = self.probability(features)
+        proposed = probability >= self.probability_threshold
+        return {
+            "strength": probability if proposed else 0.0,
+            "proposed": proposed,
+            "probability": probability,
+            "features": features.tolist(),
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, values: Mapping[str, Any]) -> "ABIDESPublicRiskProxyModel":
+        return cls(
+            feature_name=str(values["feature_name"]),
+            feature_mean=float(values["feature_mean"]),
+            feature_scale=float(values["feature_scale"]),
+            coefficient=float(values["coefficient"]),
+            intercept=float(values["intercept"]),
+            probability_threshold=float(values["probability_threshold"]),
+            pacing_target_rate=float(values["pacing_target_rate"]),
+            training_label=str(values.get("training_label", "simulator_low_risk")),
+        )
+
+    @classmethod
+    def load(cls, path: str | Path) -> "ABIDESPublicRiskProxyModel":
+        return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
 @dataclass
 class ABIDESGateActivationController:
     """Enforce the preregistered per-episode intervention-rate ceiling."""

@@ -1,0 +1,61 @@
+{
+  "artifacts": {
+    "return_only": {
+      "path": "revision/configs/abides_public_risk_proxies_v1/return_only.json",
+      "sha256": "cea9244aa68bfcc8050e53c684c5d54d9851067bd3a9d6f7ceff7d7309682077"
+    },
+    "volatility_only": {
+      "path": "revision/configs/abides_public_risk_proxies_v1/volatility_only.json",
+      "sha256": "915406c111b5d950a796dd3d74ca99321b74fd407b289aaa6fbcae1b7abcd6fd"
+    }
+  },
+  "calibration": {
+    "return_only": {
+      "activation_difference_from_reference": 0.0050000000000000044,
+      "risk_auc": 0.7976486505275429,
+      "validation_metrics": {
+        "activation_rate": 0.217,
+        "episode_steps": 40.0,
+        "high_risk_activation_rate": 0.1646586345381526,
+        "low_risk_activation_rate": 0.23435419440745672,
+        "proposal_rate": 0.791
+      }
+    },
+    "volatility_only": {
+      "activation_difference_from_reference": 0.0,
+      "risk_auc": 0.7572954935587892,
+      "validation_metrics": {
+        "activation_rate": 0.212,
+        "episode_steps": 40.0,
+        "high_risk_activation_rate": 0.04819277108433735,
+        "low_risk_activation_rate": 0.2663115845539281,
+        "proposal_rate": 0.658
+      }
+    }
+  },
+  "pacing_rule": "match_reference_paced_activation_on_passive_validation",
+  "probability_threshold_rule": "fixed_at_0.5",
+  "protocol_version": "abides_public_risk_proxies_v1",
+  "reference_gate": {
+    "paced_validation_metrics": {
+      "activation_rate": 0.212,
+      "episode_steps": 40.0,
+      "high_risk_activation_rate": 0.04417670682730924,
+      "low_risk_activation_rate": 0.26764314247669774,
+      "proposal_rate": 0.447
+    },
+    "path": "revision/configs/abides_two_stage_gate_v1.json",
+    "sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7"
+  },
+  "train_records": {
+    "count": 1000,
+    "path": "revision/experiments/outputs/abides_learned_gate_v1/train_records.json",
+    "sha256": "2f8ed6644785301cd5e4679d4bf31ea04c44c6f2473a576010322712586d5a0c"
+  },
+  "training_label": "simulator_low_risk",
+  "validation_records": {
+    "count": 1000,
+    "path": "revision/experiments/outputs/abides_learned_gate_v1/validation_records.json",
+    "sha256": "08e3395a9d054dfdd3ff0cd2cc6682665d2f32a76a25fded474630437807433f"
+  }
+}

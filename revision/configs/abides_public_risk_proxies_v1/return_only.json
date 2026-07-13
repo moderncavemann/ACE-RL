@@ -1,0 +1,10 @@
+{
+  "coefficient": -1.3112725276652455,
+  "feature_mean": 0.2475,
+  "feature_name": "absolute_lagged_return",
+  "feature_scale": 0.3887399516386243,
+  "intercept": 0.21322211884446032,
+  "pacing_target_rate": 0.22500000000000003,
+  "probability_threshold": 0.5,
+  "training_label": "simulator_low_risk"
+}

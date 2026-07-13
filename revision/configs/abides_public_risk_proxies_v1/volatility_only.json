@@ -1,0 +1,10 @@
+{
+  "coefficient": -1.1959337624135988,
+  "feature_mean": 0.3243443610130195,
+  "feature_name": "public_volatility",
+  "feature_scale": 0.29649577045872244,
+  "intercept": 0.3126903376727883,
+  "pacing_target_rate": 0.319,
+  "probability_threshold": 0.5,
+  "training_label": "simulator_low_risk"
+}
