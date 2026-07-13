@@ -404,3 +404,28 @@ ecology passes all six-arm checks: exact-dose random minus risk-aware spread is
 seeds. This is valid generalization evidence but does not replace the blocked
 primary cell. Overall adaptive paper-main status remains no-go. See
 `revision/notes/abides_mappo_adaptive_v3_full_scale_v1_summary.md`.
+
+Adaptive v5 supersedes that planning no-go after two transparent protocol
+steps. V4 first replaced per-seed early stopping with a frozen 384-episode
+base horizon; its fresh base passed, but the full package remained formally
+failed because an all-method response convergence veto was tripped only by the
+aggressive always-on control. V5 froze an estimand-aligned convergence set and
+then reran the entire base and six-arm response package on fresh `530xxx`,
+`531xxx`, and `532xxx` seeds:
+
+```bash
+python3 revision/experiments/train_abides_mappo_base_v3.py \
+  --config revision/configs/abides_mappo_adaptive_v5_full_main_primary_base_v1.json
+python3 revision/experiments/run_abides_mappo_adaptive_v3_full_main.py \
+  --config revision/configs/abides_mappo_adaptive_v5_full_main_primary_v1.json
+```
+
+The v5 package passes all 23 registered checks. Exact-dose matched-random
+minus risk-aware low-risk execution half-spread is `0.08423` tick with 95% CI
+`[0.08075, 0.08771]` and 20/20 positive policy seeds. Risk-aware and random
+both activate 20.4% of the time, but high-risk activation is 4.98% versus
+19.94%. The no-routing ablation returns near no intervention. Threshold and
+always-on achieve lower raw spread through much more aggressive intervention;
+always-on remains non-asymptotic in 8/20 seeds and is reported as a fixed-
+budget control. See
+`revision/notes/abides_mappo_adaptive_v5_full_main_v1_summary.md`.
