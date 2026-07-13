@@ -124,9 +124,7 @@ def block_shuffle_within_risk(
     return result.tolist()
 
 
-def exact_signal_dose(
-    left: Sequence[float], right: Sequence[float]
-) -> bool:
+def exact_signal_dose(left: Sequence[float], right: Sequence[float]) -> bool:
     return bool(
         np.allclose(
             np.sort(np.asarray(left, dtype=float)),
@@ -140,9 +138,7 @@ def exact_signal_dose(
 def load_base(config: Mapping[str, Any], seed: int) -> MAPPOTrainer:
     path = base_checkpoint(config, seed)
     payload = torch.load(path, map_location="cpu", weights_only=False)
-    if payload.get("protocol_fingerprint") != str(
-        config["base_protocol_fingerprint"]
-    ):
+    if payload.get("protocol_fingerprint") != str(config["base_protocol_fingerprint"]):
         raise RuntimeError(f"base checkpoint fingerprint mismatch: {path}")
     return trainer_from_payload(payload["trainer"], str(config["device"]))
 
@@ -222,8 +218,7 @@ def save_response_checkpoint(
             "seed": seed,
             "completed_episodes": completed,
             "trainers": {
-                method: trainer_payload(trainer)
-                for method, trainer in trainers.items()
+                method: trainer_payload(trainer) for method, trainer in trainers.items()
             },
             "training_history": list(training_history),
             "evaluation_history": list(evaluation_history),
@@ -235,12 +230,16 @@ def save_response_checkpoint(
 
 
 def market_config(config: Mapping[str, Any]) -> dict[str, Any]:
-    return {
-        "episode_steps": int(config["episode_steps"]),
-        "routing_allocation_mode": str(config["routing_allocation_mode"]),
-        "routing_target_kappa": float(config["routing_target_kappa"]),
-        "routing_routable_fraction": float(config["routing_routable_fraction"]),
-    }
+    market = dict(config.get("market", {}))
+    market.update(
+        {
+            "episode_steps": int(config["episode_steps"]),
+            "routing_allocation_mode": str(config["routing_allocation_mode"]),
+            "routing_target_kappa": float(config["routing_target_kappa"]),
+            "routing_routable_fraction": float(config["routing_routable_fraction"]),
+        }
+    )
+    return market
 
 
 def evaluate_pair(
@@ -337,9 +336,7 @@ def evaluate_pair(
             validate_common_path(oracle, shuffled)
             and validate_common_path(oracle, base_off)
         )
-    methods = {
-        method: summarize({"records": rows}) for method, rows in records.items()
-    }
+    methods = {method: summarize({"records": rows}) for method, rows in records.items()}
     gate_off = {
         method: summarize({"records": rows})
         for method, rows in gate_off_records.items()
@@ -478,7 +475,10 @@ def train_seed(
                         method: {
                             "mean_half_spread": mean(batch_spreads[method]),
                             "mean_reward": mean(batch_rewards[method]),
-                            **{key: float(value) for key, value in updates[method].items()},
+                            **{
+                                key: float(value)
+                                for key, value in updates[method].items()
+                            },
                         }
                         for method in trainers
                     },
@@ -507,9 +507,9 @@ def train_seed(
                         {
                             "seed": seed,
                             "episodes": completed,
-                            "stable": response_convergence(
-                                evaluation_history, config
-                            )["stable"],
+                            "stable": response_convergence(evaluation_history, config)[
+                                "stable"
+                            ],
                         },
                         sort_keys=True,
                     ),
@@ -557,8 +557,16 @@ def aggregate(
     rows: Sequence[Mapping[str, Any]], config: Mapping[str, Any]
 ) -> dict[str, Any]:
     deltas = [
-        float(row["final_evaluation"]["methods"]["block_shuffled"]["low_execution_half_spread"])
-        - float(row["final_evaluation"]["methods"]["oracle_timed"]["low_execution_half_spread"])
+        float(
+            row["final_evaluation"]["methods"]["block_shuffled"][
+                "low_execution_half_spread"
+            ]
+        )
+        - float(
+            row["final_evaluation"]["methods"]["oracle_timed"][
+                "low_execution_half_spread"
+            ]
+        )
         for row in rows
     ]
     paired = paired_summary(deltas)
@@ -625,7 +633,9 @@ def aggregate(
 
 def validate_inputs(config: Mapping[str, Any]) -> dict[str, str]:
     if str(config.get("stage")) != "oracle":
-        raise RuntimeError("this frozen response runner currently requires oracle stage")
+        raise RuntimeError(
+            "this frozen response runner currently requires oracle stage"
+        )
     gate_path = REPO / str(config["gate_artifact"])
     gate_hash = sha256_file(gate_path)
     if gate_hash != str(config["gate_artifact_sha256"]):
@@ -663,9 +673,9 @@ def main() -> None:
         config = copy.deepcopy(config)
         config["protocol_version"] += f"_smoke_{args.smoke_episodes}"
         config["policy_seeds"] = config["policy_seeds"][:1]
-        config["development_evaluation_seeds"] = config[
-            "development_evaluation_seeds"
-        ][:2]
+        config["development_evaluation_seeds"] = config["development_evaluation_seeds"][
+            :2
+        ]
         config["response_episodes"] = int(args.smoke_episodes)
         config["response_evaluation_start"] = int(args.smoke_episodes)
         config["response_evaluation_interval"] = int(args.smoke_episodes)
@@ -690,7 +700,9 @@ def main() -> None:
     )
     seeds = [int(seed) for seed in config["policy_seeds"]]
     rows = []
-    with ProcessPoolExecutor(max_workers=min(int(config["workers"]), len(seeds))) as pool:
+    with ProcessPoolExecutor(
+        max_workers=min(int(config["workers"]), len(seeds))
+    ) as pool:
         futures = {
             pool.submit(train_seed, seed, config, str(output_dir), fingerprint): seed
             for seed in seeds

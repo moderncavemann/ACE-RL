@@ -7,6 +7,7 @@ import argparse
 import copy
 import json
 import math
+import subprocess
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -29,11 +30,15 @@ from run_abides_mappo_adaptive_pilot import (  # noqa: E402
     trainer_payload,
 )
 from run_abides_mappo_full_main import (  # noqa: E402
+    RunLock,
+    append_logbook,
     atomic_write_json,
+    atomic_write_text,
     current_git_commit,
     protocol_fingerprint,
     resolve_docker_image_id,
     sha256_file,
+    utc_now,
 )
 from src.agents.abides_mappo import make_abides_trainer, rollout_episode  # noqa: E402
 from src.envs.abides_docker_env import (  # noqa: E402
@@ -101,9 +106,7 @@ def convergence(
     spreads = [float(row["mean_half_spread"]) for row in recent]
     rewards = [float(row["mean_reward"]) for row in recent]
     spread_range = max(spreads) - min(spreads)
-    reward_range_fraction = (max(rewards) - min(rewards)) / max(
-        1.0, abs(mean(rewards))
-    )
+    reward_range_fraction = (max(rewards) - min(rewards)) / max(1.0, abs(mean(rewards)))
     failure_mode = min(spreads) >= float(config["base_minimum_failure_spread"])
     stable = (
         spread_range <= float(config["base_maximum_fixed_panel_spread_range"])
@@ -200,15 +203,32 @@ def train_seed(
     trainer, completed, training_history, evaluation_history = load_or_initialize(
         config, output_dir, seed, fingerprint
     )
+    initial_convergence = convergence(evaluation_history, config)
+    if bool(initial_convergence.get("stable")):
+        result = {
+            "protocol_fingerprint": fingerprint,
+            "seed": seed,
+            "status": "pass",
+            "completed_episodes": completed,
+            "model_digest": model_digest(trainer),
+            "convergence": initial_convergence,
+            "training_history": training_history,
+            "evaluation_history": evaluation_history,
+        }
+        atomic_write_json(result_path(output_dir, seed), result)
+        return result
     max_episodes = int(config["base_max_episodes"])
     episodes_per_update = int(config["base_episodes_per_update"])
     evaluation_interval = int(config["base_evaluation_interval"])
-    market = {
-        "episode_steps": int(config["episode_steps"]),
-        "routing_allocation_mode": str(config["routing_allocation_mode"]),
-        "routing_target_kappa": float(config["routing_target_kappa"]),
-        "routing_routable_fraction": float(config["routing_routable_fraction"]),
-    }
+    market = dict(config.get("market", {}))
+    market.update(
+        {
+            "episode_steps": int(config["episode_steps"]),
+            "routing_allocation_mode": str(config["routing_allocation_mode"]),
+            "routing_target_kappa": float(config["routing_target_kappa"]),
+            "routing_routable_fraction": float(config["routing_routable_fraction"]),
+        }
+    )
     docker = ABIDESDockerConfig(image=str(config["docker_image"]))
     status = "running"
     with ABIDESDockerDealerEnv(market, docker) as env:
@@ -281,6 +301,7 @@ def train_seed(
     final_convergence = convergence(evaluation_history, config)
     status = "pass" if bool(final_convergence["stable"]) else "fail"
     result = {
+        "protocol_fingerprint": fingerprint,
         "seed": seed,
         "status": status,
         "completed_episodes": completed,
@@ -359,15 +380,17 @@ def main() -> None:
         default="revision/configs/abides_mappo_adaptive_v3_development_v1.json",
     )
     parser.add_argument("--smoke-episodes", type=int, default=0)
+    parser.add_argument("--allow-dirty", action="store_true")
+    parser.add_argument("--force-unlock", action="store_true")
     args = parser.parse_args()
     config = json.loads((REPO / args.config).read_text(encoding="utf-8"))
     if args.smoke_episodes:
         config = copy.deepcopy(config)
         config["protocol_version"] += f"_smoke_{args.smoke_episodes}"
         config["base_training_seeds"] = config["base_training_seeds"][:1]
-        config["base_fixed_evaluation_seeds"] = config[
-            "base_fixed_evaluation_seeds"
-        ][:2]
+        config["base_fixed_evaluation_seeds"] = config["base_fixed_evaluation_seeds"][
+            :2
+        ]
         config["base_max_episodes"] = int(args.smoke_episodes)
         config["base_required_stable_evaluations"] = max(
             1,
@@ -377,40 +400,158 @@ def main() -> None:
             "revision/experiments/outputs/"
             f"abides_mappo_adaptive_v3_base_smoke_{args.smoke_episodes}"
         )
+    dirty = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=REPO, text=True
+    ).strip()
+    if dirty and not args.allow_dirty:
+        raise RuntimeError(
+            "refusing formal base training from a dirty worktree; use "
+            "--allow-dirty only for a smoke test"
+        )
     artifacts = validate_config(config)
     validate_parent_extension(config)
     fingerprint = protocol_fingerprint(config)
     output_dir = REPO / str(config["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
-    atomic_write_json(
-        output_dir / "manifest.json",
-        {
-            "protocol_version": config["protocol_version"],
-            "protocol_fingerprint": fingerprint,
-            "git_commit": current_git_commit(),
-            "config": config,
-            "artifacts": artifacts,
-        },
-    )
-    seeds = [int(seed) for seed in config["base_training_seeds"]]
-    rows = []
-    with ProcessPoolExecutor(max_workers=min(int(config["workers"]), len(seeds))) as pool:
-        futures = {
-            pool.submit(train_seed, seed, config, str(output_dir), fingerprint): seed
-            for seed in seeds
-        }
-        for future in as_completed(futures):
-            row = future.result()
+    with RunLock(output_dir / ".run.lock", fingerprint, args.force_unlock):
+        manifest_path = output_dir / "manifest.json"
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if manifest.get("protocol_fingerprint") != fingerprint:
+                raise RuntimeError("existing base manifest has another protocol")
+            if manifest.get("artifacts") != artifacts:
+                raise RuntimeError("base resume artifact mismatch")
+        else:
+            manifest = {
+                "protocol_version": config["protocol_version"],
+                "protocol_fingerprint": fingerprint,
+                "git_commit": current_git_commit(),
+                "started_at": utc_now(),
+                "config": config,
+                "artifacts": artifacts,
+            }
+            atomic_write_json(manifest_path, manifest)
+
+        seeds = [int(seed) for seed in config["base_training_seeds"]]
+        rows = []
+        for seed in seeds:
+            path = result_path(output_dir, seed)
+            if not path.exists():
+                continue
+            row = json.loads(path.read_text(encoding="utf-8"))
+            row_fingerprint = row.get("protocol_fingerprint")
+            if row_fingerprint is None:
+                checkpoint = torch.load(
+                    checkpoint_path(output_dir, seed),
+                    map_location="cpu",
+                    weights_only=False,
+                )
+                row_fingerprint = checkpoint.get("protocol_fingerprint")
+            if row_fingerprint != fingerprint:
+                raise RuntimeError(f"base result fingerprint mismatch: {path}")
+            row["protocol_fingerprint"] = fingerprint
             rows.append(row)
-            print(json.dumps({"seed": row["seed"], "status": row["status"]}), flush=True)
-    rows.sort(key=lambda row: int(row["seed"]))
-    summary = {
-        "status": "pass" if all(row["status"] == "pass" for row in rows) else "fail",
-        "rows": rows,
-    }
-    atomic_write_json(output_dir / "base_summary.json", summary)
-    print(json.dumps({"status": summary["status"], "seeds": len(rows)}))
-    raise SystemExit(0 if summary["status"] == "pass" else 2)
+        completed = {int(row["seed"]) for row in rows if row["status"] == "pass"}
+        pending = [seed for seed in seeds if seed not in completed]
+        if pending and manifest.get("git_commit") != current_git_commit():
+            raise RuntimeError(
+                "cannot resume pending base seeds from a different git commit"
+            )
+
+        def persist(status: str) -> None:
+            complete = sorted(int(row["seed"]) for row in rows)
+            state = {
+                "status": status,
+                "updated_at": utc_now(),
+                "completed_seeds": complete,
+                "pending_seeds": [seed for seed in seeds if seed not in complete],
+            }
+            atomic_write_json(output_dir / "run_state.json", state)
+            lines = [
+                "# ABIDES/MAPPO Adaptive-v3 Base Logbook",
+                "",
+                f"- Status: `{status}`",
+                f"- Protocol: `{config['protocol_version']}`",
+                f"- Fingerprint: `{fingerprint}`",
+                f"- Completed: `{len(complete)}/{len(seeds)}`",
+                "",
+                "| Seed | Status | Episodes |",
+                "| ---: | --- | ---: |",
+            ]
+            by_seed = {int(row["seed"]): row for row in rows}
+            for seed in seeds:
+                row = by_seed.get(seed)
+                lines.append(
+                    f"| {seed} | {'complete' if row else 'pending'} | "
+                    f"{int(row['completed_episodes']) if row else ''} |"
+                )
+            atomic_write_text(output_dir / "LOGBOOK.md", "\n".join(lines) + "\n")
+
+        append_logbook(
+            output_dir / "logbook.jsonl",
+            {
+                "event": "run_resumed" if rows else "run_started",
+                "completed_seeds": sorted(completed),
+                "pending_seeds": pending,
+            },
+        )
+        persist("running")
+        failures = []
+        if pending:
+            with ProcessPoolExecutor(
+                max_workers=min(int(config["workers"]), len(pending))
+            ) as pool:
+                futures = {
+                    pool.submit(
+                        train_seed, seed, config, str(output_dir), fingerprint
+                    ): seed
+                    for seed in pending
+                }
+                for future in as_completed(futures):
+                    seed = futures[future]
+                    try:
+                        row = future.result()
+                    except BaseException as exc:
+                        failures.append(
+                            {"seed": seed, "error": f"{type(exc).__name__}: {exc}"}
+                        )
+                        append_logbook(
+                            output_dir / "logbook.jsonl",
+                            {"event": "seed_failed", **failures[-1]},
+                        )
+                    else:
+                        rows.append(row)
+                        rows.sort(key=lambda item: int(item["seed"]))
+                        append_logbook(
+                            output_dir / "logbook.jsonl",
+                            {
+                                "event": "seed_completed",
+                                "seed": seed,
+                                "episodes": int(row["completed_episodes"]),
+                            },
+                        )
+                        print(
+                            json.dumps({"seed": row["seed"], "status": row["status"]}),
+                            flush=True,
+                        )
+                    persist("failed" if failures else "running")
+        rows.sort(key=lambda row: int(row["seed"]))
+        status = (
+            "pass"
+            if len(rows) == len(seeds)
+            and not failures
+            and all(row["status"] == "pass" for row in rows)
+            else "fail"
+        )
+        summary = {"status": status, "failures": failures, "rows": rows}
+        atomic_write_json(output_dir / "base_summary.json", summary)
+        persist(status)
+        append_logbook(
+            output_dir / "logbook.jsonl",
+            {"event": "run_finished", "status": status},
+        )
+        print(json.dumps({"status": status, "seeds": len(rows)}))
+        raise SystemExit(0 if status == "pass" else 2)
 
 
 if __name__ == "__main__":
