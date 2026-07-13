@@ -123,6 +123,114 @@ def convergence(
     }
 
 
+def fixed_horizon_diagnostic(
+    evaluation_history: Sequence[Mapping[str, Any]],
+    config: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = int(config["base_fixed_horizon_window_evaluations"])
+    if len(evaluation_history) < required:
+        return {"stable": False, "reason": "insufficient fixed-horizon panels"}
+    recent = list(evaluation_history[-required:])
+    spreads = [float(row["mean_half_spread"]) for row in recent]
+    rewards = [float(row["mean_reward"]) for row in recent]
+    spread_range = max(spreads) - min(spreads)
+    reward_range_fraction = (max(rewards) - min(rewards)) / max(1.0, abs(mean(rewards)))
+    failure_mode = min(spreads) >= float(config["base_minimum_failure_spread"])
+    spread_stable = spread_range <= float(
+        config["base_fixed_horizon_maximum_spread_range"]
+    )
+    reward_stable = reward_range_fraction <= float(
+        config["base_fixed_horizon_maximum_reward_range_fraction"]
+    )
+    return {
+        "stable": spread_stable and reward_stable and failure_mode,
+        "spread_stable": spread_stable,
+        "reward_stable": reward_stable,
+        "failure_mode": failure_mode,
+        "spread_range": spread_range,
+        "reward_range_fraction": reward_range_fraction,
+        "recent_evaluations": recent,
+    }
+
+
+def summarize_base_rows(
+    rows: Sequence[Mapping[str, Any]], config: Mapping[str, Any]
+) -> dict[str, Any]:
+    mode = str(config.get("base_training_mode", "convergence"))
+    expected = len(config["base_training_seeds"])
+    if mode == "convergence":
+        checks = {
+            "required_seed_count": len(rows) == expected,
+            "all_seeds_converged": all(row["status"] == "pass" for row in rows),
+        }
+        return {
+            "status": "pass" if all(checks.values()) else "fail",
+            "checks": checks,
+            "rows": list(rows),
+        }
+    if mode != "fixed_horizon":
+        raise ValueError(f"unknown base training mode: {mode}")
+
+    required_spread_stable = math.ceil(
+        float(config["base_fixed_horizon_minimum_spread_stable_rate"]) * expected
+        - 1e-12
+    )
+    required_reward_stable = math.ceil(
+        float(config["base_fixed_horizon_minimum_reward_stable_rate"]) * expected
+        - 1e-12
+    )
+    panel_count = int(config["base_fixed_horizon_window_evaluations"])
+    population_panel_means = (
+        [
+            mean(
+                float(
+                    row["fixed_horizon"]["recent_evaluations"][panel_index][
+                        "mean_half_spread"
+                    ]
+                )
+                for row in rows
+            )
+            for panel_index in range(panel_count)
+        ]
+        if len(rows) == expected
+        else []
+    )
+    population_spread_range = (
+        max(population_panel_means) - min(population_panel_means)
+        if population_panel_means
+        else math.inf
+    )
+    checks = {
+        "required_seed_count": len(rows) == expected,
+        "all_reached_fixed_horizon": len(rows) == expected
+        and all(
+            int(row["completed_episodes"]) == int(config["base_max_episodes"])
+            for row in rows
+        ),
+        "all_failure_modes_present": len(rows) == expected
+        and all(bool(row["fixed_horizon"]["failure_mode"]) for row in rows),
+        "spread_stable_seed_rate": sum(
+            bool(row["fixed_horizon"]["spread_stable"]) for row in rows
+        )
+        >= required_spread_stable,
+        "reward_stable_seed_rate": sum(
+            bool(row["fixed_horizon"]["reward_stable"]) for row in rows
+        )
+        >= required_reward_stable,
+        "population_mean_spread_stable": population_spread_range
+        <= float(config["base_population_maximum_mean_spread_range"]),
+    }
+    return {
+        "status": "pass" if all(checks.values()) else "fail",
+        "checks": checks,
+        "population_panel_mean_spreads": population_panel_means,
+        "population_mean_spread_range": population_spread_range,
+        "required_spread_stable_seed_count": required_spread_stable,
+        "required_reward_stable_seed_count": required_reward_stable,
+        "rows": list(rows),
+    }
+
+
 def save_checkpoint(
     output_dir: Path,
     seed: int,
@@ -203,21 +311,32 @@ def train_seed(
     trainer, completed, training_history, evaluation_history = load_or_initialize(
         config, output_dir, seed, fingerprint
     )
+    mode = str(config.get("base_training_mode", "convergence"))
+    if mode not in {"convergence", "fixed_horizon"}:
+        raise ValueError(f"unknown base training mode: {mode}")
+    max_episodes = int(config["base_max_episodes"])
     initial_convergence = convergence(evaluation_history, config)
-    if bool(initial_convergence.get("stable")):
+    initial_fixed = (
+        fixed_horizon_diagnostic(evaluation_history, config)
+        if mode == "fixed_horizon"
+        else None
+    )
+    if (mode == "convergence" and bool(initial_convergence.get("stable"))) or (
+        mode == "fixed_horizon" and completed == max_episodes
+    ):
         result = {
             "protocol_fingerprint": fingerprint,
             "seed": seed,
-            "status": "pass",
+            "status": "pass" if mode == "convergence" else "complete",
             "completed_episodes": completed,
             "model_digest": model_digest(trainer),
             "convergence": initial_convergence,
+            "fixed_horizon": initial_fixed,
             "training_history": training_history,
             "evaluation_history": evaluation_history,
         }
         atomic_write_json(result_path(output_dir, seed), result)
         return result
-    max_episodes = int(config["base_max_episodes"])
     episodes_per_update = int(config["base_episodes_per_update"])
     evaluation_interval = int(config["base_evaluation_interval"])
     market = dict(config.get("market", {}))
@@ -284,7 +403,7 @@ def train_seed(
                     ),
                     flush=True,
                 )
-                if bool(current["stable"]):
+                if mode == "convergence" and bool(current["stable"]):
                     status = "pass"
             save_checkpoint(
                 output_dir,
@@ -295,11 +414,20 @@ def train_seed(
                 training_history,
                 evaluation_history,
             )
-            if status == "pass":
+            if mode == "convergence" and status == "pass":
                 break
 
     final_convergence = convergence(evaluation_history, config)
-    status = "pass" if bool(final_convergence["stable"]) else "fail"
+    final_fixed = (
+        fixed_horizon_diagnostic(evaluation_history, config)
+        if mode == "fixed_horizon"
+        else None
+    )
+    status = (
+        "complete"
+        if mode == "fixed_horizon" and completed == max_episodes
+        else "pass" if bool(final_convergence["stable"]) else "fail"
+    )
     result = {
         "protocol_fingerprint": fingerprint,
         "seed": seed,
@@ -307,6 +435,7 @@ def train_seed(
         "completed_episodes": completed,
         "model_digest": model_digest(trainer),
         "convergence": final_convergence,
+        "fixed_horizon": final_fixed,
         "training_history": training_history,
         "evaluation_history": evaluation_history,
     }
@@ -396,6 +525,18 @@ def main() -> None:
             1,
             math.floor(args.smoke_episodes / int(config["base_evaluation_interval"])),
         )
+        if str(config.get("base_training_mode")) == "fixed_horizon":
+            config["base_fixed_horizon_window_evaluations"] = max(
+                1,
+                math.floor(
+                    args.smoke_episodes / int(config["base_evaluation_interval"])
+                ),
+            )
+            config["base_fixed_horizon_maximum_spread_range"] = 999.0
+            config["base_fixed_horizon_maximum_reward_range_fraction"] = 999.0
+            config["base_fixed_horizon_minimum_spread_stable_rate"] = 0.0
+            config["base_fixed_horizon_minimum_reward_stable_rate"] = 0.0
+            config["base_population_maximum_mean_spread_range"] = 999.0
         config["output_dir"] = (
             "revision/experiments/outputs/"
             f"abides_mappo_adaptive_v3_base_smoke_{args.smoke_episodes}"
@@ -451,7 +592,9 @@ def main() -> None:
                 raise RuntimeError(f"base result fingerprint mismatch: {path}")
             row["protocol_fingerprint"] = fingerprint
             rows.append(row)
-        completed = {int(row["seed"]) for row in rows if row["status"] == "pass"}
+        completed = {
+            int(row["seed"]) for row in rows if row["status"] in {"pass", "complete"}
+        }
         pending = [seed for seed in seeds if seed not in completed]
         if pending and manifest.get("git_commit") != current_git_commit():
             raise RuntimeError(
@@ -536,14 +679,11 @@ def main() -> None:
                         )
                     persist("failed" if failures else "running")
         rows.sort(key=lambda row: int(row["seed"]))
-        status = (
-            "pass"
-            if len(rows) == len(seeds)
-            and not failures
-            and all(row["status"] == "pass" for row in rows)
-            else "fail"
-        )
-        summary = {"status": status, "failures": failures, "rows": rows}
+        summary = summarize_base_rows(rows, config)
+        if failures:
+            summary["status"] = "fail"
+        summary["failures"] = failures
+        status = str(summary["status"])
         atomic_write_json(output_dir / "base_summary.json", summary)
         persist(status)
         append_logbook(

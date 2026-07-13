@@ -20,6 +20,10 @@ from experiments.run_abides_mappo_adaptive_v3_response import (  # noqa: E402
     market_config,
 )
 from experiments.run_abides_mappo_full_main import protocol_fingerprint  # noqa: E402
+from experiments.train_abides_mappo_base_v3 import (  # noqa: E402
+    fixed_horizon_diagnostic,
+    summarize_base_rows,
+)
 from src.interventions.abides_gate import ABIDESPacedSignalController  # noqa: E402
 
 
@@ -132,3 +136,66 @@ def test_full_main_aggregate_accepts_mechanism_valid_fixture() -> None:
     result = aggregate(rows, config)
     assert result["status"] == "pass"
     assert all(result["checks"].values())
+
+
+def test_v4_fixed_horizon_population_gate_keeps_all_policies() -> None:
+    config = load_config("abides_mappo_adaptive_v4_base_development_v1.json")
+    history = [
+        {
+            "completed_episodes": episode,
+            "mean_half_spread": spread,
+            "mean_reward": reward,
+        }
+        for episode, spread, reward in (
+            (336, 6.30, 10.00),
+            (360, 6.34, 10.05),
+            (384, 6.36, 10.08),
+        )
+    ]
+    diagnostic = fixed_horizon_diagnostic(history, config)
+    assert diagnostic["stable"]
+    rows = [
+        {
+            "seed": seed,
+            "status": "complete",
+            "completed_episodes": 384,
+            "fixed_horizon": diagnostic,
+        }
+        for seed in config["base_training_seeds"]
+    ]
+    summary = summarize_base_rows(rows, config)
+    assert summary["status"] == "pass"
+    assert all(summary["checks"].values())
+
+
+def test_v4_population_gate_fails_when_more_than_two_spreads_drift() -> None:
+    config = load_config("abides_mappo_adaptive_v4_base_development_v1.json")
+    stable = fixed_horizon_diagnostic(
+        [
+            {"mean_half_spread": 6.30, "mean_reward": 10.0},
+            {"mean_half_spread": 6.34, "mean_reward": 10.0},
+            {"mean_half_spread": 6.36, "mean_reward": 10.0},
+        ],
+        config,
+    )
+    drifting = fixed_horizon_diagnostic(
+        [
+            {"mean_half_spread": 6.00, "mean_reward": 10.0},
+            {"mean_half_spread": 6.15, "mean_reward": 10.0},
+            {"mean_half_spread": 6.25, "mean_reward": 10.0},
+        ],
+        config,
+    )
+    rows = []
+    for index, seed in enumerate(config["base_training_seeds"]):
+        rows.append(
+            {
+                "seed": seed,
+                "status": "complete",
+                "completed_episodes": 384,
+                "fixed_horizon": drifting if index < 3 else stable,
+            }
+        )
+    summary = summarize_base_rows(rows, config)
+    assert summary["status"] == "fail"
+    assert not summary["checks"]["spread_stable_seed_rate"]
