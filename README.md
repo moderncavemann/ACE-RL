@@ -89,6 +89,11 @@ The current toy-scale validation notes are under `revision/notes/`.
   repaired method may enter a frozen full-scale package with governance
   baselines, a routing ablation, and a second market ecology. It is not itself
   a completed adaptive paper main.
+- `revision/notes/abides_mappo_adaptive_v3_full_scale_v1_summary.md` records
+  the resulting frozen package. The primary base gate fails at 18/20 converged
+  policies, so primary efficacy is not run; the independently preregistered
+  fast-risk ecology passes all six-arm checks on 10/10 policy seeds. The
+  overall adaptive paper main remains no-go.
 
 Gate-v2 feature diagnostic and calibration:
 

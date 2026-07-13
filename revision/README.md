@@ -395,3 +395,12 @@ opens the entry gate for a frozen full-scale adaptive package; the two-arm
 five-seed holdout is not itself the completed paper main. See
 `revision/notes/abides_mappo_adaptive_v3_holdout_v1_summary.md` and
 `revision/notes/abides_mappo_adaptive_v3_readiness_v1.md`.
+
+The frozen full-scale package has now run. Its primary no-intervention base
+gate stops at `18/20` converged policy seeds, so the primary adaptive efficacy
+comparison is correctly not launched. The separately preregistered fast-risk
+ecology passes all six-arm checks: exact-dose random minus risk-aware spread is
+`0.03642` tick with 95% CI `[0.03228, 0.04056]` and 10/10 positive policy
+seeds. This is valid generalization evidence but does not replace the blocked
+primary cell. Overall adaptive paper-main status remains no-go. See
+`revision/notes/abides_mappo_adaptive_v3_full_scale_v1_summary.md`.
