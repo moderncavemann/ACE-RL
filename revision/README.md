@@ -2,6 +2,10 @@
 
 This directory is the clean work area for the revised ACE-RL project.
 
+The consolidated status of the toy, local LOB/MAPPO, and ABIDES/MAPPO
+experiment program is recorded in
+`revision/notes/experiment_program_overview_v1.md`.
+
 Use the local-only `archive/v1_rejected_submission/` as a source archive, not as
 active code. Migrate files here only after deciding they support the revised
 claim.
