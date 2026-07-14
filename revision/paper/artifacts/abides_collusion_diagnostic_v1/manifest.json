@@ -178,7 +178,7 @@
   "protocol_fingerprint": "a1623a3712c301bc08752311b49304308764a7c604f4c8b88483a5a5a8ed2a52",
   "protocol_version": "abides_collusion_diagnostic_v1",
   "required_wording": "high-spread coordination",
-  "result_archival_commit": null,
+  "result_archival_commit": "3363c6b4026e50cf6894af6e2ec160e3782b85d7",
   "scientific_result": "high_spread_coordination_only",
   "source_base_manifest_sha256": "a83caf63dd9d7d2d8d7c21c8b743c22b386e046f3518b85bceb20480433f15ec",
   "source_policy_artifacts": {
