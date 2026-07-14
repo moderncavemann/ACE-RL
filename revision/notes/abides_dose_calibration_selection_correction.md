@@ -38,3 +38,14 @@ calibration grid was therefore interpolated between `0.50` and `0.75` with
 scales `0.55`, `0.60`, `0.65`, and `0.70`. This is a budget-feasibility repair,
 not an efficacy search: no spread, reward, or formal evaluation outcome was
 available, and all matching tolerances remain unchanged.
+
+## Realized-activation Definition Correction
+
+While wiring the formal runner, the passive calibration implementation was
+found to count `signal_strength > 0` as activation. That is not the directive's
+realized routing dose: when all dealers quote identically, a positive signal
+can still produce zero routing total variation. Before any response training,
+the calibration endpoint was corrected to
+`routing_total_variation > 1e-12`; signal activation remains reported as a
+separate diagnostic. All candidate grids, matching tolerances, paths, and
+scientific outcomes remain unchanged.

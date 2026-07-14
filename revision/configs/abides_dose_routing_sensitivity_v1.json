@@ -22,6 +22,7 @@
   "routing_allocation_mode": "soft_rank",
   "routing_target_kappa": 4.0,
   "routing_routable_fraction": 0.5,
+  "active_routing_tv_epsilon": 1e-12,
   "market": {
     "n_agents": 10,
     "half_spread_levels": [1, 2, 3, 4, 5, 6, 7],
@@ -55,6 +56,7 @@
     "minimum_tv_ratio": 0.9,
     "maximum_tv_ratio": 1.1,
     "selection_order": "within_activation_tolerance_then_highest_observable_cutoff_then_activation_error;spread_activation_error_then_tv_ratio_error",
+    "realized_activation_definition": "routing_total_variation_gt_active_routing_tv_epsilon",
     "artifact": "revision/configs/abides_dose_routing_sensitivity_v1_calibration.json"
   },
   "response_environment_seed_namespace": 630000000,

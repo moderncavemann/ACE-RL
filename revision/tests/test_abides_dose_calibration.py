@@ -31,20 +31,20 @@ def _episodes() -> list[list[dict]]:
 
 
 def test_risk_candidate_applies_cutoff_before_pacing() -> None:
-    result = risk_candidate(_episodes(), 1.0, 0.5, 4.0, 0.5)
+    result = risk_candidate(_episodes(), 1.0, 0.5, 4.0, 0.5, 1e-12)
     assert result["activation_rate"] == 0.5
     assert result["high_risk_activation_rate"] == 0.0
 
 
 def test_spread_candidate_reports_budget_metrics() -> None:
-    result = spread_candidate(_episodes(), 0.5, 0.0, 0.75, 4.0, 0.5)
+    result = spread_candidate(_episodes(), 0.5, 0.0, 0.75, 4.0, 0.5, 1e-12)
     assert result["activation_rate"] == 0.5
     assert 0.0 < result["mean_routing_total_variation"] < 1.0
 
 
 def test_budget_metrics_rejects_misaligned_records() -> None:
     try:
-        budget_metrics(_episodes(), [[0.2]], 4.0, 0.5)
+        budget_metrics(_episodes(), [[0.2]], 4.0, 0.5, 1e-12)
     except RuntimeError as exc:
         assert "counts differ" in str(exc)
     else:

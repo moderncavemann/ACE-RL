@@ -153,6 +153,7 @@ def budget_metrics(
     strengths: Sequence[Sequence[float]],
     kappa: float,
     routable_fraction: float,
+    active_epsilon: float,
 ) -> dict[str, float | int]:
     flat_strengths = [float(value) for episode in strengths for value in episode]
     flat_rows = [row for episode in episode_rows for row in episode]
@@ -167,12 +168,14 @@ def budget_metrics(
         )
         tv.append(routing_total_variation(weights))
         if row["risk_state"] == "high":
-            high_active.append(strength > 0.0)
-    active = [value > 0.0 for value in flat_strengths]
+            high_active.append(tv[-1] > active_epsilon)
+    active = [value > active_epsilon for value in tv]
+    signal_active = [value > 0.0 for value in flat_strengths]
     active_strengths = [value for value in flat_strengths if value > 0.0]
     return {
         "record_count": len(flat_rows),
         "activation_rate": float(np.mean(active)),
+        "signal_activation_rate": float(np.mean(signal_active)),
         "high_risk_activation_rate": (
             float(np.mean(high_active)) if high_active else 0.0
         ),
@@ -190,6 +193,7 @@ def risk_candidate(
     cutoff: float,
     kappa: float,
     routable_fraction: float,
+    active_epsilon: float,
 ) -> dict[str, Any]:
     strengths = []
     for episode in episode_rows:
@@ -203,7 +207,9 @@ def risk_candidate(
     return {
         "probability_cutoff": float(cutoff),
         "controller_target_rate": float(target),
-        **budget_metrics(episode_rows, strengths, kappa, routable_fraction),
+        **budget_metrics(
+            episode_rows, strengths, kappa, routable_fraction, active_epsilon
+        ),
     }
 
 
@@ -214,6 +220,7 @@ def spread_candidate(
     signal_scale: float,
     kappa: float,
     routable_fraction: float,
+    active_epsilon: float,
 ) -> dict[str, Any]:
     strengths = []
     for episode in episode_rows:
@@ -228,7 +235,9 @@ def spread_candidate(
         "severity_threshold": float(threshold),
         "signal_scale": float(signal_scale),
         "controller_target_rate": float(target),
-        **budget_metrics(episode_rows, strengths, kappa, routable_fraction),
+        **budget_metrics(
+            episode_rows, strengths, kappa, routable_fraction, active_epsilon
+        ),
     }
 
 
@@ -237,13 +246,16 @@ def calibrate(config: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> d
     calibration = config["calibration"]
     kappa = float(config["routing_target_kappa"])
     fraction = float(config["routing_routable_fraction"])
+    active_epsilon = float(config["active_routing_tv_epsilon"])
     selections = {}
     all_candidates = {}
     calibration_pass = True
     for target_value in config["dose_targets"]:
         target = float(target_value)
         risk_candidates = [
-            risk_candidate(grouped, target, float(cutoff), kappa, fraction)
+            risk_candidate(
+                grouped, target, float(cutoff), kappa, fraction, active_epsilon
+            )
             for cutoff in calibration["risk_probability_cutoff_grid"]
         ]
         risk_candidates.sort(
@@ -280,6 +292,7 @@ def calibrate(config: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> d
                     float(scale),
                     kappa,
                     fraction,
+                    active_epsilon,
                 )
                 candidate["tv_ratio_to_risk"] = (
                     float(candidate["mean_routing_total_variation"]) / risk_tv
