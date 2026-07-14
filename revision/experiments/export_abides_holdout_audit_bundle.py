@@ -609,7 +609,7 @@ verify source correspondence, hashes, grids, statistics, and paper exports.
                 "pending": [],
                 "failures": json.loads(
                     (OFFICIAL_OUTPUT / "failures.json").read_text(encoding="utf-8")
-                ),
+                )["failures"],
                 "completed_resume": official_resume,
             },
             "ecology_audit": {
