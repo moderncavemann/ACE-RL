@@ -13,6 +13,7 @@ from experiments.run_abides_domain_benchmark import (  # noqa: E402
     NEW_METHODS,
     action_uniforms_equal,
     load_mechanism_parameters,
+    spread_budget_decision,
 )
 
 
@@ -103,3 +104,19 @@ def test_action_uniform_comparator_requires_exact_step_digests() -> None:
     assert action_uniforms_equal(matching)
     matching["right"]["records"][1]["action_uniform_digest"] = "changed"
     assert not action_uniforms_equal(matching)
+
+
+def test_spread_only_budget_rule_cannot_read_latent_risk() -> None:
+    observations = [[0.0] * 6 for _ in range(10)]
+    for observation in observations:
+        observation[1] = 4.0 / 6.0
+    parameters = {
+        "activation_target": 0.2,
+        "severity_threshold": 0.0,
+        "signal_scale": 0.75,
+    }
+    low = spread_budget_decision(parameters, 100)
+    high = spread_budget_decision(parameters, 100)
+    assert low({"observations": observations, "latent_risk_state": "low"}, 0) == high(
+        {"observations": observations, "latent_risk_state": "high"}, 0
+    )

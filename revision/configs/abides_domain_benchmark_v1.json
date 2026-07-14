@@ -169,6 +169,7 @@
     "mechanism_parameters",
     "eligible_dealers",
     "routing_weights",
+    "realized_flow_quantity",
     "latent_risk_state",
     "execution_half_spread",
     "rewards",

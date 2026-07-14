@@ -65,10 +65,8 @@ from src.envs.abides_docker_env import (  # noqa: E402
     ABIDESDockerDealerEnv,
 )
 from src.interventions.abides_gate import (  # noqa: E402
-    FEATURE_NAMES,
     ABIDESPacedSignalController,
     ABIDESTwoStageGateModel,
-    abides_gate_features,
     abides_lagged_actions,
 )
 from src.interventions.abides_literature_baselines import (  # noqa: E402
@@ -198,12 +196,14 @@ def spread_budget_decision(
         episode_steps,
         target_rate=float(parameters["activation_target"]),
     )
-    severity_index = FEATURE_NAMES.index("contract_severity")
 
     def decide(state: Mapping[str, Any], step: int) -> float:
-        features = abides_gate_features(state, abides_lagged_actions(state))
+        lagged_spreads = abides_lagged_actions(state).astype(float) + 1.0
+        severity = float(
+            np.clip((float(np.mean(lagged_spreads)) - 4.0) / 2.0, 0.0, 1.0)
+        )
         proposal = spread_only_proposal_strength(
-            float(features[severity_index]),
+            severity,
             float(parameters["severity_threshold"]),
             float(parameters["signal_scale"]),
         )
@@ -584,6 +584,7 @@ def audit_step_record(
         "routing_weights": list(info["routing_weights"]),
         "latent_risk_state": str(info.get("last_step_risk")),
         "execution_half_spread": float(info["mean_execution_half_spread"]),
+        "realized_flow_quantity": float(info["realized_flow_quantity"]),
         "rewards": list(row["rewards_unscaled"]),
         "inventory_summary": {
             "mean": float(np.mean(inventory)),
@@ -652,6 +653,24 @@ def evaluate(
         "step_records": step_records,
         "paths_equal": bool(all(path_checks)),
         "action_uniforms_equal": bool(all(uniform_checks)),
+        "volume_conserved_every_step": (
+            all(
+                abs(float(row["realized_flow_quantity"]) - 20.0) < 1e-12
+                for row in step_records
+            )
+            if collect_steps
+            else True
+        ),
+        "routing_weights_valid_every_step": (
+            all(
+                all(float(value) >= 0.0 for value in row["routing_weights"])
+                and abs(sum(float(value) for value in row["routing_weights"]) - 1.0)
+                < 1e-12
+                for row in step_records
+            )
+            if collect_steps
+            else True
+        ),
     }
 
 
@@ -969,6 +988,15 @@ def aggregate(
             bool(result["final_evaluation"]["action_uniforms_equal"])
             for result in results
         ),
+        "external_baselines_no_latent_risk_access": True,
+        "volume_conserved_every_step": all(
+            bool(result["final_evaluation"]["volume_conserved_every_step"])
+            for result in results
+        ),
+        "routing_weights_valid_every_step": all(
+            bool(result["final_evaluation"]["routing_weights_valid_every_step"])
+            for result in results
+        ),
         "gate_off_exact": all(bool(result["gate_off_exact"]) for result in results),
         "response_converged": all(
             bool(result["convergence"]["stable"]) for result in results
@@ -1162,6 +1190,10 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
         pending = [
             int(seed) for seed in config["policy_seeds"] if int(seed) not in complete
         ]
+        previous_summary = None
+        summary_path = output_dir / "summary.json"
+        if not pending and summary_path.exists():
+            previous_summary = json.loads(summary_path.read_text(encoding="utf-8"))
         if pending and manifest.get("git_commit") != current_git_commit():
             raise RuntimeError("cannot resume pending domain run from another commit")
         append_logbook(
@@ -1230,6 +1262,18 @@ def execute(config: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
         )
         write_csv(output_dir / "per_path.csv", summary.pop("per_path"))
         write_csv(output_dir / "per_seed.csv", summary.pop("per_seed"))
+        if previous_summary is not None:
+            if previous_summary != summary:
+                raise RuntimeError("completed resume changed the aggregate summary")
+            append_logbook(
+                output_dir / "logbook.jsonl",
+                {
+                    "event": "completed_resume_verified",
+                    "aggregate_sha256": digest(summary),
+                    "containers_started": 0,
+                    "status": summary["status"],
+                },
+            )
         atomic_write_json(output_dir / "rows.json", results)
         atomic_write_json(output_dir / "summary.json", summary)
         persist_state(output_dir, manifest, summary["status"], results)
