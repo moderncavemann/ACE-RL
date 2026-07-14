@@ -46,8 +46,8 @@
       552009
     ]
   },
-  "exported_at_utc": "2026-07-14T15:09:34.655525+00:00",
-  "git_dirty_status_at_export": "?? revision/paper/artifacts/abides_holdout_audit_bundle_v1/",
+  "exported_at_utc": "2026-07-14T15:11:13.528324+00:00",
+  "git_dirty_status_at_export": "",
   "groups": [
     "official_full_policy_MAPPO",
     "official_IPPO",
@@ -106,7 +106,7 @@
     "official_selection": "cf83d38c0da22d42f32314d01d561a44681e66ed"
   },
   "protocol_version": "abides_holdout_audit_bundle_v1",
-  "result_archival_commit": null,
+  "result_archival_commit": "2c4b3d5fba87933eb977016c5d36dc5f8fc7cb27",
   "software": {
     "numpy": "1.26.4",
     "platform": "macOS-26.5.1-arm64-arm-64bit",
