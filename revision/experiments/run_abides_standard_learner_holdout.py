@@ -95,6 +95,12 @@ def digest(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
 
 
+def stage_manifest_path(output: Path, stage: str) -> Path:
+    if stage not in {"validation", "formal"}:
+        raise ValueError(f"unknown official learner stage: {stage}")
+    return output / stage / "manifest.json"
+
+
 def source_root(config: Mapping[str, Any]) -> str:
     return str(Path(str(config["official_source_root"])).expanduser().resolve())
 
@@ -1075,7 +1081,8 @@ def main() -> None:
     output = REPO / str(config["output_dir"])
     output.mkdir(parents=True, exist_ok=True)
     with RunLock(output / ".run.lock", fingerprint, args.force_unlock):
-        manifest_path = output / "manifest.json"
+        manifest_path = stage_manifest_path(output, args.stage)
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
         if manifest_path.exists():
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             if manifest["protocol_fingerprint"] != fingerprint:

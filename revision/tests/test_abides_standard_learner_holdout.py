@@ -1,10 +1,17 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
+import pytest
 
 REVISION_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REVISION_ROOT / "experiments"))
+
+from run_abides_standard_learner_holdout import (  # noqa: E402
+    stage_manifest_path,
+)
 
 
 def load_config() -> dict:
@@ -63,3 +70,13 @@ def test_standard_learner_selection_cannot_read_intervention_outcomes() -> None:
     assert "no_intervention_dealer_reward" in rule
     assert "risk_aware" not in rule
     assert "matched_random" not in rule
+
+
+def test_standard_learner_stage_manifests_are_isolated(tmp_path: Path) -> None:
+    validation = stage_manifest_path(tmp_path, "validation")
+    formal = stage_manifest_path(tmp_path, "formal")
+    assert validation == tmp_path / "validation" / "manifest.json"
+    assert formal == tmp_path / "formal" / "manifest.json"
+    assert validation != formal
+    with pytest.raises(ValueError, match="unknown official learner stage"):
+        stage_manifest_path(tmp_path, "unknown")
