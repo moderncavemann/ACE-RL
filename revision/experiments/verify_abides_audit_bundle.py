@@ -306,8 +306,9 @@ def verify_execution_and_budget(
         raise RuntimeError("training action uniforms were not paired")
     if any(not record["gate_off_exact"] for record in records.values()):
         raise RuntimeError("gate-off actions did not reproduce the base policy")
-    if any(not record["convergence"]["stable"] for record in records.values()):
-        raise RuntimeError("a response arm failed the frozen convergence rule")
+    convergence_passed = all(
+        bool(record["convergence"]["stable"]) for record in records.values()
+    )
     if any(not record["initial_adapter_digest"] for record in records.values()):
         raise RuntimeError("initial adapter digest is missing")
 
@@ -345,8 +346,8 @@ def verify_execution_and_budget(
         raise RuntimeError("historical failure-event ledger is missing")
     if not manifest["completed_resume_verified"]:
         raise RuntimeError("no-container completed resume was not verified")
-    if manifest["implementation_status"] != "pass":
-        raise RuntimeError("runner implementation status is not pass")
+    if manifest["implementation_status"] not in {"pass", "fail"}:
+        raise RuntimeError("runner implementation status is invalid")
     return {
         "new_adapter_initialization_recorded": True,
         "training_paths_equal": True,
@@ -355,7 +356,7 @@ def verify_execution_and_budget(
         "budget_status_valid": True,
         "gate_off_exact": True,
         "response_episodes_complete": True,
-        "frozen_convergence_passed": True,
+        "frozen_convergence_passed": convergence_passed,
         "failures_and_pending_retained": True,
         "completed_resume_verified": True,
     }
@@ -464,19 +465,27 @@ def verify_bundle(
     assert_nested_close(
         checks["statistics"], recomputed_statistics, "checks.statistics"
     )
-    all_checks = {
+    audit_checks = {
         **path_checks,
         **step_checks,
-        **execution_checks,
+        **{
+            key: value
+            for key, value in execution_checks.items()
+            if key != "frozen_convergence_passed"
+        },
         **provenance_checks,
         "statistics_recomputed": True,
         "implementation_science_separated": (
-            checks["implementation_status"] == "pass"
+            checks["implementation_status"] == manifest["implementation_status"]
             and checks["scientific_result"] == manifest["scientific_result"]
+            and (
+                manifest["implementation_status"] == "pass"
+                or manifest["scientific_result"] == "not_evaluated_integrity_fail"
+            )
         ),
     }
-    if not all(all_checks.values()):
-        failed = sorted(name for name, passed in all_checks.items() if not passed)
+    if not all(audit_checks.values()):
+        failed = sorted(name for name, passed in audit_checks.items() if not passed)
         raise RuntimeError(f"audit integrity checks failed: {failed}")
     directive_checks = {
         "01_source_policy_seeds_complete": path_checks["source_seed_grid_complete"],
@@ -518,15 +527,19 @@ def verify_bundle(
             "paper_exports_audit_derived"
         ],
     }
-    if len(directive_checks) != 20 or not all(directive_checks.values()):
-        raise RuntimeError("one or more directive integrity checks failed")
+    if len(directive_checks) != 20:
+        raise RuntimeError("directive integrity check count changed")
+    directive_status = "pass" if all(directive_checks.values()) else "fail"
+    if directive_status != manifest["implementation_status"]:
+        raise RuntimeError("declared implementation status differs from recomputation")
     return {
-        "status": "pass",
+        "audit_verification_status": "pass",
+        "directive_integrity_status": directive_status,
         "protocol_version": str(config["protocol_version"]),
         "protocol_fingerprint": str(manifest["protocol_fingerprint"]),
         "implementation_status": str(manifest["implementation_status"]),
         "scientific_result": str(manifest["scientific_result"]),
-        "integrity_checks": all_checks,
+        "audit_checks": audit_checks,
         "directive_integrity_checks": directive_checks,
     }
 

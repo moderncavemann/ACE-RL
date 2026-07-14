@@ -132,6 +132,16 @@ def validate_archival_commit(commit: str | None) -> str | None:
     return resolved
 
 
+def scientific_result_for_integrity(
+    implementation_status: str, runner_scientific_result: str
+) -> str:
+    if implementation_status == "fail":
+        return "not_evaluated_integrity_fail"
+    if implementation_status != "pass":
+        raise ValueError(f"unknown implementation status: {implementation_status}")
+    return runner_scientific_result
+
+
 def export_bundle(
     domain_summary: Path,
     bundle: Path,
@@ -146,8 +156,10 @@ def export_bundle(
     methods = list(config["methods"])
     if bool(config.get("engineering_smoke")):
         raise RuntimeError("engineering smoke cannot be exported as audit evidence")
-    if summary.get("implementation_status") != "pass":
-        raise RuntimeError("domain runner implementation status is not pass")
+    implementation_status = str(summary.get("implementation_status"))
+    scientific_result = scientific_result_for_integrity(
+        implementation_status, str(summary.get("scientific_result"))
+    )
     if set(methods) != {
         "no_intervention",
         "risk_aware",
@@ -204,8 +216,9 @@ def export_bundle(
         },
         "budget_calibration": budget,
         "statistics": statistics,
-        "implementation_status": summary["implementation_status"],
-        "scientific_result": summary["scientific_result"],
+        "implementation_status": implementation_status,
+        "runner_scientific_result": str(summary["scientific_result"]),
+        "scientific_result": scientific_result,
     }
 
     bundle.mkdir(parents=True, exist_ok=True)
@@ -218,7 +231,13 @@ def export_bundle(
         "pass": step_count == expected_paths * int(config["episode_steps"]),
     }
     atomic_write_json(bundle / "checks.json", checks)
-    readme = """# ACE-RL ABIDES Audit Bundle v1
+    result_boundary = (
+        "The frozen convergence integrity check failed. Efficacy statistics are "
+        "recomputed for auditability but are not confirmatory evidence."
+        if implementation_status == "fail"
+        else "The frozen implementation integrity checks passed."
+    )
+    readme = f"""# ACE-RL ABIDES Audit Bundle v1
 
 This bundle is the committed source for the domain-benchmark tables and
 inference. `per_path.csv` is the primitive result table; `per_seed.csv` is
@@ -229,6 +248,8 @@ recompute statistics, and rerun integrity checks.
 
 The Brero threshold adaptation is calibration-unmatched and is therefore an
 operating-point comparison, not a same-budget superiority test.
+
+{result_boundary}
 """
     atomic_write_text(bundle / "README.md", readme)
 
@@ -315,8 +336,9 @@ operating-point comparison, not a same-budget superiority test.
         ),
         "git_dirty_status_at_export": git_output("status", "--porcelain"),
         "completed_resume_verified": resume_verified(output_dir / "logbook.jsonl"),
-        "implementation_status": str(summary["implementation_status"]),
-        "scientific_result": str(summary["scientific_result"]),
+        "implementation_status": implementation_status,
+        "runner_scientific_result": str(summary["scientific_result"]),
+        "scientific_result": scientific_result,
         "output_file_sha256": {
             name: sha256_file(bundle / name) for name in source_files
         },

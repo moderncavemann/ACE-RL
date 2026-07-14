@@ -20,7 +20,10 @@ from src.utils.abides_audit import (  # noqa: E402
     holm_adjust,
     two_way_paired_bootstrap,
 )
-from export_abides_audit_bundle import resume_verified  # noqa: E402
+from export_abides_audit_bundle import (  # noqa: E402
+    resume_verified,
+    scientific_result_for_integrity,
+)
 from verify_abides_audit_bundle import parse_checksums  # noqa: E402
 
 
@@ -213,3 +216,14 @@ def test_completed_resume_requires_aggregate_hash_and_zero_containers(
             + "\n"
         )
     assert resume_verified(logbook)
+
+
+def test_failed_integrity_cannot_be_mislabeled_as_scientific_result() -> None:
+    assert (
+        scientific_result_for_integrity("fail", "not_evaluated_engineering_smoke")
+        == "not_evaluated_integrity_fail"
+    )
+    assert (
+        scientific_result_for_integrity("pass", "tradeoff_unmatched_external_budget")
+        == "tradeoff_unmatched_external_budget"
+    )

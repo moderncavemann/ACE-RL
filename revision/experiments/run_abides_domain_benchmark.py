@@ -1011,7 +1011,11 @@ def aggregate(
         ),
     }
     implementation_status = "pass" if all(checks.values()) else "fail"
-    scientific_result = "not_evaluated_engineering_smoke"
+    scientific_result = (
+        "not_evaluated_engineering_smoke"
+        if bool(config.get("engineering_smoke"))
+        else "not_evaluated_integrity_fail"
+    )
     if not bool(config.get("engineering_smoke")) and implementation_status == "pass":
         primary = contrasts["brero_threshold_buybox_budget_matched_minus_risk_aware"]
         selected = config["mechanism_parameters"][
