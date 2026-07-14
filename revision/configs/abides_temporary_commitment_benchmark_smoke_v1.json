@@ -1,0 +1,79 @@
+{
+  "protocol_version": "abides_temporary_commitment_benchmark_smoke_v1",
+  "freeze_status": "engineering_smoke",
+  "formal_execution_allowed": true,
+  "engineering_smoke": true,
+  "backend": "abides",
+  "docker_image": "ace-rl-abides-ace:temporary-commitment-v1",
+  "episode_steps": 100,
+  "policy_seeds": [530000],
+  "evaluation_seeds": [539900, 539901],
+  "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_base_manifest_sha256": "a83caf63dd9d7d2d8d7c21c8b743c22b386e046f3518b85bceb20480433f15ec",
+  "source_v5_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_v1",
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "source_v5_manifest_sha256": "15750a0866fae0dfcdcfc2e8e4c84eab5913e95cdf4e3777f20a5bfee135cddc",
+  "source_v5_response_episodes": 96,
+  "gate_artifact": "revision/configs/abides_two_stage_gate_v1.json",
+  "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
+  "methods": [
+    "no_intervention",
+    "risk_aware",
+    "matched_random",
+    "banerjee_temporary_commitment",
+    "banerjee_temporary_commitment_budget_matched"
+  ],
+  "new_adapter_methods": [
+    "banerjee_temporary_commitment",
+    "banerjee_temporary_commitment_budget_matched"
+  ],
+  "contrast_methods": [
+    "matched_random",
+    "banerjee_temporary_commitment",
+    "banerjee_temporary_commitment_budget_matched"
+  ],
+  "primary_external_comparator": "banerjee_temporary_commitment_budget_matched",
+  "response_episodes": 4,
+  "response_episodes_per_update": 2,
+  "learning_rate": 0.0003,
+  "entropy_coefficient": 0.02,
+  "reward_scale": 100.0,
+  "max_activation_rate": 0.35,
+  "routing_allocation_mode": "soft_rank",
+  "routing_target_kappa": 4.0,
+  "routing_routable_fraction": 0.5,
+  "smoke_mechanism_parameters": {
+    "banerjee_temporary_commitment": {
+      "reference_window": 10,
+      "qualification_steps": 3,
+      "protected_fraction": 0.5,
+      "duration": 5
+    },
+    "banerjee_temporary_commitment_budget_matched": {
+      "reference_window": 10,
+      "qualification_steps": 3,
+      "protected_fraction": 0.25,
+      "duration": 1
+    }
+  },
+  "market": {
+    "n_agents": 10,
+    "half_spread_levels": [1, 2, 3, 4, 5, 6, 7],
+    "flow_events_per_step": 20,
+    "flow_quantity": 1,
+    "informed_flow_probability": 0.8,
+    "low_sigma_ticks": 0.75,
+    "high_sigma_ticks": 4.0,
+    "p_low_to_high": 0.04,
+    "p_high_to_low": 0.1,
+    "initial_high_probability": 0.3,
+    "inventory_penalty": 0.002
+  },
+  "response_environment_seed_namespace": 629800000,
+  "response_action_namespace": 549317,
+  "evaluation_action_namespace": 549417,
+  "workers": 1,
+  "device": "cpu",
+  "output_dir": "revision/experiments/outputs/abides_temporary_commitment_benchmark_smoke_v1"
+}

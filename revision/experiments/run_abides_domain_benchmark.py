@@ -94,6 +94,27 @@ EVALUATED_METHODS = (
 SignalDecision = Callable[[Mapping[str, Any], int], float]
 
 
+def configured_new_methods(config: Mapping[str, Any]) -> tuple[str, ...]:
+    return tuple(config.get("new_adapter_methods", NEW_METHODS))
+
+
+def configured_methods(config: Mapping[str, Any]) -> tuple[str, ...]:
+    return tuple(config.get("methods", EVALUATED_METHODS))
+
+
+def configured_contrasts(config: Mapping[str, Any]) -> tuple[str, ...]:
+    return tuple(
+        config.get(
+            "contrast_methods",
+            (
+                "brero_threshold_buybox_budget_matched",
+                "spread_only_budget_matched",
+                "matched_random",
+            ),
+        )
+    )
+
+
 def normalized_config(config: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(config)
     result["base_output_dir"] = str(config["source_base_output_dir"])
@@ -221,6 +242,18 @@ def brero_mechanism(parameters: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def temporary_commitment_mechanism(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "kind": "banerjee_temporary_commitment",
+        "reference_window": int(parameters["reference_window"]),
+        "qualification_steps": int(parameters["qualification_steps"]),
+        "protected_fraction": float(parameters["protected_fraction"]),
+        "duration": int(parameters["duration"]),
+    }
+
+
 def initial_state(
     config: Mapping[str, Any], output_dir: Path, policy_seed: int, fingerprint: str
 ) -> tuple[
@@ -256,7 +289,7 @@ def initial_state(
     base = load_base(normalized_config(config), policy_seed)
     trainers = {
         method: make_adapter(base, normalized_config(config), policy_seed)
-        for method in NEW_METHODS
+        for method in configured_new_methods(config)
     }
     initial_digests = {model_digest(trainer) for trainer in trainers.values()}
     if len(initial_digests) != 1:
@@ -341,37 +374,46 @@ def rollout_new_methods(
         "reward_scale": float(config["reward_scale"]),
         "action_namespace": namespace,
     }
-    spread = rollout_episode(
-        env,
-        trainers["spread_only_budget_matched"],
-        announced_signal_decision=spread_budget_decision(
-            parameters["spread_only_budget_matched"], episode_steps
-        ),
-        **common,
-    )
-    literature = rollout_episode(
-        env,
-        trainers["brero_threshold_buybox"],
-        announced_signal_schedule=[1.0] * episode_steps,
-        routing_mechanism=brero_mechanism(parameters["brero_threshold_buybox"]),
-        **common,
-    )
-    matched = rollout_episode(
-        env,
-        trainers["brero_threshold_buybox_budget_matched"],
-        announced_signal_schedule=[1.0] * episode_steps,
-        routing_mechanism=brero_mechanism(
-            parameters["brero_threshold_buybox_budget_matched"]
-        ),
-        **common,
-    )
-    rollouts = {
-        "spread_only_budget_matched": spread,
-        "brero_threshold_buybox": literature,
-        "brero_threshold_buybox_budget_matched": matched,
-    }
+    rollouts = {}
+    for method in configured_new_methods(config):
+        if method == "spread_only_budget_matched":
+            rollouts[method] = rollout_episode(
+                env,
+                trainers[method],
+                announced_signal_decision=spread_budget_decision(
+                    parameters[method], episode_steps
+                ),
+                **common,
+            )
+        elif method in {
+            "brero_threshold_buybox",
+            "brero_threshold_buybox_budget_matched",
+        }:
+            rollouts[method] = rollout_episode(
+                env,
+                trainers[method],
+                announced_signal_schedule=[1.0] * episode_steps,
+                routing_mechanism=brero_mechanism(parameters[method]),
+                **common,
+            )
+        elif method in {
+            "banerjee_temporary_commitment",
+            "banerjee_temporary_commitment_budget_matched",
+        }:
+            rollouts[method] = rollout_episode(
+                env,
+                trainers[method],
+                announced_signal_schedule=[1.0] * episode_steps,
+                routing_mechanism=temporary_commitment_mechanism(
+                    parameters[method]
+                ),
+                **common,
+            )
+        else:
+            raise ValueError(f"unsupported new domain method: {method}")
+    reference = next(iter(rollouts.values()))
     paths_equal = all(
-        validate_common_path(spread, rollout) for rollout in rollouts.values()
+        validate_common_path(reference, rollout) for rollout in rollouts.values()
     )
     return rollouts, paths_equal, action_uniforms_equal(rollouts)
 
@@ -424,15 +466,19 @@ def rollout_all_methods(
         "reward_scale": float(config["reward_scale"]),
         "action_namespace": int(config["evaluation_action_namespace"]),
     }
-    rollouts = {
-        "risk_aware": risk,
-        "matched_random": rollout_episode(
+    methods = set(configured_methods(config))
+    if "risk_aware" not in methods or "no_intervention" not in methods:
+        raise ValueError("domain methods require risk-aware and no-intervention")
+    rollouts = {"risk_aware": risk}
+    if "matched_random" in methods:
+        rollouts["matched_random"] = rollout_episode(
             env,
             v5_trainers["matched_random"],
             announced_signal_schedule=random_strengths,
             **common,
-        ),
-        "spread_only_threshold": rollout_episode(
+        )
+    if "spread_only_threshold" in methods:
+        rollouts["spread_only_threshold"] = rollout_episode(
             env,
             v5_trainers["spread_only_threshold"],
             announced_signal_decision=spread_only_decision(
@@ -442,21 +488,22 @@ def rollout_all_methods(
                 )
             ),
             **common,
-        ),
-        "always_on": rollout_episode(
+        )
+    if "always_on" in methods:
+        rollouts["always_on"] = rollout_episode(
             env,
             v5_trainers["always_on"],
             announced_signal_schedule=[1.0] * episode_steps,
             **common,
-        ),
-        "no_routing": rollout_episode(
+        )
+    if "no_routing" in methods:
+        rollouts["no_routing"] = rollout_episode(
             env,
             v5_trainers["no_routing"],
             announced_signal_schedule=strengths,
             routing_enabled=False,
             **common,
-        ),
-    }
+        )
     new_rollouts, _, _ = rollout_new_methods(
         env,
         config,
@@ -476,6 +523,10 @@ def rollout_all_methods(
     paths_equal = all(
         validate_common_path(risk, rollout) for rollout in rollouts.values()
     )
+    if set(rollouts) != methods:
+        raise RuntimeError(
+            f"configured and generated method sets differ: {methods} != {set(rollouts)}"
+        )
     return rollouts, paths_equal, action_uniforms_equal(rollouts)
 
 
@@ -582,6 +633,19 @@ def audit_step_record(
         "routing_threshold": info.get("routing_threshold"),
         "eligible_dealers": list(info.get("eligible_agent_indices", [])),
         "routing_weights": list(info["routing_weights"]),
+        "targeted_event_count": int(info.get("targeted_event_count", 0)),
+        "protected_execution_quantity": float(
+            info.get("protected_execution_quantity", 0.0)
+        ),
+        "protected_execution_prices": list(
+            info.get("protected_execution_prices", [])
+        ),
+        "protected_matched_order_tags": list(
+            info.get("protected_matched_order_tags", [])
+        ),
+        "protected_routing_fallback_count": int(
+            info.get("protected_routing_fallback_count", 0)
+        ),
         "latent_risk_state": str(info.get("last_step_risk")),
         "execution_half_spread": float(info["mean_execution_half_spread"]),
         "realized_flow_quantity": float(info["realized_flow_quantity"]),
@@ -594,6 +658,64 @@ def audit_step_record(
         "action_uniform_digest": str(row["action_uniform_digest"]),
         "path_digest": str(info["path_digest"]),
     }
+
+
+def temporary_commitment_integrity(
+    records: Sequence[Mapping[str, Any]], parameters: Mapping[str, Any]
+) -> tuple[bool, int]:
+    duration = int(parameters["duration"])
+    protected_fraction = float(parameters["protected_fraction"])
+    expected_events = int(round(20 * protected_fraction))
+    expected_remaining = 0
+    takeups = 0
+    valid = True
+    for record in records:
+        info = record["info"]
+        mechanism = dict(info.get("routing_mechanism_parameters", {}))
+        takeup = bool(mechanism.get("takeup", False))
+        active = bool(info.get("active_routing", False))
+        if takeup:
+            valid &= expected_remaining == 0
+            expected_remaining = duration
+            takeups += 1
+        if expected_remaining > 0:
+            valid &= active
+            valid &= int(
+                mechanism.get("remaining_periods_including_current", -1)
+            ) == expected_remaining
+            valid &= int(info.get("targeted_event_count", -1)) == expected_events
+            valid &= math.isclose(
+                float(info.get("protected_execution_quantity", -1.0)),
+                float(expected_events),
+                abs_tol=1e-12,
+            )
+            valid &= int(info.get("protected_routing_fallback_count", -1)) == 0
+            prefix = mechanism.get("protected_order_tag_prefix")
+            tags = list(info.get("protected_matched_order_tags", []))
+            prices = [int(value) for value in info.get("protected_execution_prices", [])]
+            frozen_reference = mechanism.get("frozen_reference_price")
+            frozen_spread = mechanism.get("frozen_half_spread")
+            valid &= prefix is not None and len(tags) == expected_events
+            valid &= all(str(tag).startswith(str(prefix)) for tag in tags)
+            valid &= (
+                frozen_reference is not None
+                and frozen_spread is not None
+                and len(prices) == expected_events
+                and all(
+                    abs(price - int(frozen_reference)) == int(frozen_spread)
+                    for price in prices
+                )
+            )
+            expected_remaining -= 1
+        else:
+            valid &= not active
+            valid &= int(info.get("targeted_event_count", 0)) == 0
+            valid &= math.isclose(
+                float(info.get("protected_execution_quantity", 0.0)),
+                0.0,
+                abs_tol=1e-12,
+            )
+    return bool(valid), takeups
 
 
 def evaluate(
@@ -611,6 +733,8 @@ def evaluate(
     step_records = []
     path_checks = []
     uniform_checks = []
+    commitment_checks = []
+    commitment_takeups = 0
     digests = {
         "no_intervention": model_digest(
             load_base(normalized_config(config), policy_seed)
@@ -631,8 +755,17 @@ def evaluate(
         )
         path_checks.append(paths_equal)
         uniform_checks.append(uniforms_equal)
-        for method in EVALUATED_METHODS:
+        for method in configured_methods(config):
             records = rollouts[method]["records"]
+            if method in {
+                "banerjee_temporary_commitment",
+                "banerjee_temporary_commitment_budget_matched",
+            }:
+                valid, takeups = temporary_commitment_integrity(
+                    records, parameters[method]
+                )
+                commitment_checks.append(valid)
+                commitment_takeups += takeups
             per_path.append(
                 path_metrics(
                     str(config["protocol_version"]),
@@ -653,6 +786,8 @@ def evaluate(
         "step_records": step_records,
         "paths_equal": bool(all(path_checks)),
         "action_uniforms_equal": bool(all(uniform_checks)),
+        "temporary_commitment_integrity": bool(all(commitment_checks)),
+        "temporary_commitment_takeups": int(commitment_takeups),
         "volume_conserved_every_step": (
             all(
                 abs(float(row["realized_flow_quantity"]) - 20.0) < 1e-12
@@ -684,7 +819,7 @@ def convergence(
         return {"stable": False, "status": "insufficient_evaluations"}
     recent = list(history[-required:])
     ranges = {}
-    for method in NEW_METHODS:
+    for method in configured_new_methods(config):
         values = [
             mean(
                 float(row["low_execution_half_spread"])
@@ -756,14 +891,15 @@ def train_seed(
     if checkpoint_v5_digests != loaded_v5_digests:
         raise RuntimeError("v5 model digests changed across resume")
     docker = ABIDESDockerConfig(image=str(config["docker_image"]))
+    new_methods = configured_new_methods(config)
     with ABIDESDockerDealerEnv(market_config(normalized_config(config)), docker) as env:
         while completed < int(config["response_episodes"]):
             batch = min(
                 int(config["response_episodes_per_update"]),
                 int(config["response_episodes"]) - completed,
             )
-            trajectories = {method: [] for method in NEW_METHODS}
-            training_metrics = {method: [] for method in NEW_METHODS}
+            trajectories = {method: [] for method in new_methods}
+            training_metrics = {method: [] for method in new_methods}
             for offset in range(batch):
                 environment_seed = response_environment_seed(
                     normalized_config(config), policy_seed, completed + offset
@@ -778,7 +914,7 @@ def train_seed(
                 )
                 training_paths_equal = training_paths_equal and paths_equal
                 training_uniforms_equal = training_uniforms_equal and uniforms_equal
-                for method in NEW_METHODS:
+                for method in new_methods:
                     trajectories[method].append(rollouts[method]["trajectory"])
                     training_metrics[method].append(
                         {
@@ -793,7 +929,7 @@ def train_seed(
                     )
             updates = {
                 method: trainers[method].update_episodes(trajectories[method])
-                for method in NEW_METHODS
+                for method in new_methods
             }
             completed += batch
             training_history.append(
@@ -807,7 +943,7 @@ def train_seed(
                             for key in training_metrics[method][0]
                         }
                         | {key: float(value) for key, value in updates[method].items()}
-                        for method in NEW_METHODS
+                        for method in new_methods
                     },
                 }
             )
@@ -883,7 +1019,9 @@ def train_seed(
     return result
 
 
-def per_seed_rows(per_path: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def per_seed_rows(
+    per_path: Sequence[Mapping[str, Any]], config: Mapping[str, Any]
+) -> list[dict[str, Any]]:
     grouped: dict[int, dict[str, list[Mapping[str, Any]]]] = {}
     for row in per_path:
         grouped.setdefault(int(row["policy_seed"]), {}).setdefault(
@@ -904,17 +1042,13 @@ def per_seed_rows(per_path: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]
     )
     for policy_seed in sorted(grouped):
         row: dict[str, Any] = {"policy_seed": policy_seed}
-        for method in EVALUATED_METHODS:
+        for method in configured_methods(config):
             method_rows = grouped[policy_seed][method]
             for metric in metrics:
                 row[f"{method}__{metric}"] = float(
                     mean(float(value[metric]) for value in method_rows)
                 )
-        for comparator in (
-            "brero_threshold_buybox_budget_matched",
-            "spread_only_budget_matched",
-            "matched_random",
-        ):
+        for comparator in configured_contrasts(config):
             row[f"{comparator}__minus_risk_aware_spread"] = (
                 row[f"{comparator}__low_execution_half_spread"]
                 - row["risk_aware__low_execution_half_spread"]
@@ -929,9 +1063,9 @@ def aggregate(
     per_path = [
         row for result in results for row in result["final_evaluation"]["per_path"]
     ]
-    seed_rows = per_seed_rows(per_path)
+    seed_rows = per_seed_rows(per_path, config)
     method_summary = {}
-    for method in EVALUATED_METHODS:
+    for method in configured_methods(config):
         method_rows = [row for row in per_path if row["method"] == method]
         method_summary[method] = {
             metric: float(mean(float(row[metric]) for row in method_rows))
@@ -949,18 +1083,14 @@ def aggregate(
             )
         }
     contrasts = {}
-    for comparator in (
-        "brero_threshold_buybox_budget_matched",
-        "spread_only_budget_matched",
-        "matched_random",
-    ):
+    for comparator in configured_contrasts(config):
         contrasts[f"{comparator}_minus_risk_aware"] = paired_summary(
             [float(row[f"{comparator}__minus_risk_aware_spread"]) for row in seed_rows]
         )
     expected_path_rows = (
         len(config["policy_seeds"])
         * len(config["evaluation_seeds"])
-        * len(EVALUATED_METHODS)
+        * len(configured_methods(config))
     )
     checks = {
         "required_policy_seed_count": len(results) == len(config["policy_seeds"]),
@@ -1003,13 +1133,25 @@ def aggregate(
         ),
         "volume_conserved": all(
             abs(method_summary[method]["mean_volume"] - 20.0) < 1e-9
-            for method in EVALUATED_METHODS
+            for method in configured_methods(config)
         ),
         "per_path_row_count": len(per_path) == expected_path_rows,
         "step_record_hashes_present": all(
             bool(result["step_records_sha256"]) for result in results
         ),
     }
+    if any(
+        method.startswith("banerjee_temporary_commitment")
+        for method in configured_new_methods(config)
+    ):
+        checks["temporary_commitment_integrity"] = all(
+            bool(result["final_evaluation"]["temporary_commitment_integrity"])
+            for result in results
+        )
+        checks["temporary_commitment_exercised"] = sum(
+            int(result["final_evaluation"]["temporary_commitment_takeups"])
+            for result in results
+        ) > 0
     implementation_status = "pass" if all(checks.values()) else "fail"
     scientific_result = (
         "not_evaluated_engineering_smoke"
@@ -1017,10 +1159,14 @@ def aggregate(
         else "not_evaluated_integrity_fail"
     )
     if not bool(config.get("engineering_smoke")) and implementation_status == "pass":
-        primary = contrasts["brero_threshold_buybox_budget_matched_minus_risk_aware"]
-        selected = config["mechanism_parameters"][
-            "brero_threshold_buybox_budget_matched"
-        ]
+        comparator = str(
+            config.get(
+                "primary_external_comparator",
+                "brero_threshold_buybox_budget_matched",
+            )
+        )
+        primary = contrasts[f"{comparator}_minus_risk_aware"]
+        selected = config["mechanism_parameters"][comparator]
         matched = selected.get("budget_match_status") == "matched"
         favorable = (
             matched
@@ -1054,8 +1200,15 @@ def validate_inputs(
         raise ValueError("CLI smoke mode and config engineering_smoke disagree")
     if not engineering_smoke and not bool(config.get("formal_execution_allowed")):
         raise RuntimeError("formal execution is blocked until calibration freeze")
-    if tuple(config["new_adapter_methods"]) != NEW_METHODS:
-        raise ValueError(f"new adapter methods must be {NEW_METHODS}")
+    new_methods = configured_new_methods(config)
+    supported_new = set(NEW_METHODS) | {
+        "banerjee_temporary_commitment",
+        "banerjee_temporary_commitment_budget_matched",
+    }
+    if not new_methods or not set(new_methods).issubset(supported_new):
+        raise ValueError(f"unsupported new adapter methods: {new_methods}")
+    if not set(new_methods).issubset(configured_methods(config)):
+        raise ValueError("new adapter methods must be in the evaluation method set")
     if int(config["response_episodes"]) != 96 and not engineering_smoke:
         raise ValueError("formal response budget must remain 96 episodes")
     gate_path = REPO / str(config["gate_artifact"])
@@ -1070,6 +1223,20 @@ def validate_inputs(
     if calibration & evaluation:
         raise RuntimeError("calibration and evaluation paths overlap")
     source_output = REPO / str(config["source_v5_output_dir"])
+    source_manifest_path = source_output / "manifest.json"
+    expected_source_manifest = config.get("source_v5_manifest_sha256")
+    if expected_source_manifest is not None and sha256_file(
+        source_manifest_path
+    ) != str(expected_source_manifest):
+        raise RuntimeError("source v5 manifest hash mismatch")
+    base_manifest_path = (
+        REPO / str(config["source_base_output_dir"]) / "manifest.json"
+    )
+    expected_base_manifest = config.get("source_base_manifest_sha256")
+    if expected_base_manifest is not None and sha256_file(
+        base_manifest_path
+    ) != str(expected_base_manifest):
+        raise RuntimeError("source base manifest hash mismatch")
     source_summary = json.loads(
         (source_output / "summary.json").read_text(encoding="utf-8")
     )

@@ -12,8 +12,12 @@ sys.path.insert(0, str(REVISION_ROOT / "experiments"))
 from experiments.run_abides_domain_benchmark import (  # noqa: E402
     NEW_METHODS,
     action_uniforms_equal,
+    configured_contrasts,
+    configured_methods,
+    configured_new_methods,
     load_mechanism_parameters,
     spread_budget_decision,
+    temporary_commitment_integrity,
 )
 
 
@@ -120,3 +124,91 @@ def test_spread_only_budget_rule_cannot_read_latent_risk() -> None:
     assert low({"observations": observations, "latent_risk_state": "low"}, 0) == high(
         {"observations": observations, "latent_risk_state": "high"}, 0
     )
+
+
+def test_temporary_commitment_formal_cell_is_frozen_without_same_budget_claim() -> None:
+    config = load_config("abides_temporary_commitment_benchmark_v1.json")
+    assert config["freeze_status"] == "frozen_after_passive_calibration"
+    assert config["formal_execution_allowed"] is True
+    assert configured_new_methods(config) == (
+        "banerjee_temporary_commitment",
+        "banerjee_temporary_commitment_budget_matched",
+    )
+    assert set(configured_new_methods(config)).issubset(configured_methods(config))
+    assert configured_contrasts(config) == (
+        "matched_random",
+        "banerjee_temporary_commitment",
+        "banerjee_temporary_commitment_budget_matched",
+    )
+    assert config["primary_external_comparator"] == (
+        "banerjee_temporary_commitment_budget_matched"
+    )
+    selected = config["mechanism_parameters"][
+        "banerjee_temporary_commitment_budget_matched"
+    ]
+    assert selected["budget_match_status"] == "unmatched"
+    assert selected["reference_window"] == 10
+    assert selected["qualification_steps"] == 3
+    assert selected["protected_fraction"] == 0.25
+    assert selected["duration"] == 1
+
+
+def test_temporary_commitment_smoke_is_separate_from_formal_paths() -> None:
+    smoke = load_config("abides_temporary_commitment_benchmark_smoke_v1.json")
+    formal = load_config("abides_temporary_commitment_benchmark_v1.json")
+    assert smoke["engineering_smoke"] is True
+    assert smoke["output_dir"] != formal["output_dir"]
+    assert set(smoke["evaluation_seeds"]).isdisjoint(formal["evaluation_seeds"])
+    assert smoke["response_episodes"] < formal["response_episodes"]
+    assert set(load_mechanism_parameters(smoke)) == set(
+        configured_new_methods(smoke)
+    )
+
+
+def test_temporary_commitment_integrity_requires_exact_protected_execution() -> None:
+    parameters = {
+        "reference_window": 10,
+        "qualification_steps": 3,
+        "protected_fraction": 0.5,
+        "duration": 2,
+    }
+
+    def record(takeup: bool, remaining: int, active: bool) -> dict:
+        return {
+            "info": {
+                "active_routing": active,
+                "routing_mechanism_parameters": {
+                    "takeup": takeup,
+                    "remaining_periods_including_current": remaining,
+                    "protected_order_tag_prefix": "ace_protected_c10",
+                    "frozen_reference_price": 100_000,
+                    "frozen_half_spread": 2,
+                },
+                "targeted_event_count": 10 if active else 0,
+                "protected_execution_quantity": 10.0 if active else 0.0,
+                "protected_execution_prices": (
+                    [99_998, 100_002] * 5 if active else []
+                ),
+                "protected_matched_order_tags": (
+                    [f"ace_protected_c10_{index}" for index in range(10)]
+                    if active
+                    else []
+                ),
+                "protected_routing_fallback_count": 0,
+            }
+        }
+
+    records = [
+        record(False, 0, False),
+        record(True, 2, True),
+        record(False, 1, True),
+        record(False, 0, False),
+    ]
+    valid, takeups = temporary_commitment_integrity(records, parameters)
+    assert valid
+    assert takeups == 1
+
+    records[2]["info"]["protected_execution_prices"][0] = 100_000
+    valid, takeups = temporary_commitment_integrity(records, parameters)
+    assert not valid
+    assert takeups == 1
