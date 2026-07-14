@@ -1,7 +1,7 @@
 {
   "protocol_version": "abides_temporary_commitment_benchmark_v1",
-  "freeze_status": "awaiting_passive_calibration",
-  "formal_execution_allowed": false,
+  "freeze_status": "frozen_after_passive_calibration",
+  "formal_execution_allowed": true,
   "backend": "abides",
   "docker_image": "ace-rl-abides-ace:temporary-commitment-v1",
   "episode_steps": 100,
@@ -45,10 +45,20 @@
     "duration": 5,
     "budget_match_status": "not_applicable_literature_form"
   },
-  "budget_matched_parameters": null,
+  "budget_matched_parameters": {
+    "reference_window": 10,
+    "qualification_steps": 3,
+    "protected_fraction": 0.25,
+    "duration": 1,
+    "budget_match_status": "unmatched",
+    "calibration_active_routing_rate": 0.22835,
+    "calibration_mean_routing_total_variation": 0.051378749999999994,
+    "calibration_mean_tv_ratio": 0.9119098157289097
+  },
   "calibration_config": "revision/configs/abides_temporary_commitment_calibration_v1.json",
+  "calibration_config_sha256": "579394890f730d2e0c2388295465380a67cee462d115306a9706cc11811ac5ec",
   "calibration_artifact": "revision/configs/abides_temporary_commitment_calibration_v1_artifact.json",
-  "calibration_artifact_sha256": null,
+  "calibration_artifact_sha256": "24825a4cba4e001f79f57e5c29d8a65e6cde8cf405a21a819a0e5152f897bd83",
   "response_environment_seed_namespace": 620000000,
   "response_action_namespace": 511117,
   "evaluation_action_namespace": 591117,

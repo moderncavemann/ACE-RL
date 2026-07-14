@@ -1,0 +1,405 @@
+{
+  "calibration_status": "pass",
+  "config_sha256": "579394890f730d2e0c2388295465380a67cee462d115306a9706cc11811ac5ec",
+  "passive_records_sha256": "6ba0def94d27f88dde2b916ce9c8d431e3dd3687258da2f4e7acd8e332156728",
+  "protocol_version": "abides_temporary_commitment_calibration_v1",
+  "selection": {
+    "budget_matched": {
+      "candidates": [
+        {
+          "budget_distance": 3.365901842710903,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.9119098157289097,
+          "metrics": {
+            "active_routing_rate": 0.22835,
+            "mean_flow_hhi": 0.11284468750000005,
+            "mean_routing_total_variation": 0.051378749999999994,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 1,
+            "protected_fraction": 0.25,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 4567
+        },
+        {
+          "budget_distance": 8.83736073708436,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.36476392629156396,
+          "metrics": {
+            "active_routing_rate": 0.22835,
+            "mean_flow_hhi": 0.10205515000000007,
+            "mean_routing_total_variation": 0.0205515,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 1,
+            "protected_fraction": 0.1,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 4567
+        },
+        {
+          "budget_distance": 10.723196314578201,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.8238196314578201,
+          "metrics": {
+            "active_routing_rate": 0.22835,
+            "mean_flow_hhi": 0.1513787500000001,
+            "mean_routing_total_variation": 0.10275750000000003,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 1,
+            "protected_fraction": 0.5,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 4567
+        },
+        {
+          "budget_distance": 16.513649689509286,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7251350310490712,
+          "metrics": {
+            "active_routing_rate": 0.45395,
+            "mean_flow_hhi": 0.10408555000000004,
+            "mean_routing_total_variation": 0.04085549999999999,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 3,
+            "protected_fraction": 0.1,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 3066
+        },
+        {
+          "budget_distance": 19.718908640388847,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.8756091359611156,
+          "metrics": {
+            "active_routing_rate": 0.54815,
+            "mean_flow_hhi": 0.10493335000000002,
+            "mean_routing_total_variation": 0.049333499999999995,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 5,
+            "protected_fraction": 0.1,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 2239
+        },
+        {
+          "budget_distance": 19.842294471867298,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 2.73572944718673,
+          "metrics": {
+            "active_routing_rate": 0.22835,
+            "mean_flow_hhi": 0.21560218750000004,
+            "mean_routing_total_variation": 0.15413625000000003,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 1,
+            "protected_fraction": 0.75,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 4567
+        },
+        {
+          "budget_distance": 21.89337577622679,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.8128375776226788,
+          "metrics": {
+            "active_routing_rate": 0.45395,
+            "mean_flow_hhi": 0.12553468750000005,
+            "mean_routing_total_variation": 0.10213875000000003,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 3,
+            "protected_fraction": 0.25,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 3066
+        },
+        {
+          "budget_distance": 25.675750110008362,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.080075011000836,
+          "metrics": {
+            "active_routing_rate": 0.67615,
+            "mean_flow_hhi": 0.10608535000000002,
+            "mean_routing_total_variation": 0.060853499999999984,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 10,
+            "protected_fraction": 0.1,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 1423
+        },
+        {
+          "budget_distance": 30.3652283990279,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 2.18902283990279,
+          "metrics": {
+            "active_routing_rate": 0.54815,
+            "mean_flow_hhi": 0.13083343750000004,
+            "mean_routing_total_variation": 0.12333375000000003,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 5,
+            "protected_fraction": 0.25,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 2239
+        },
+        {
+          "budget_distance": 31.346206513107106,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2173706513107108,
+          "metrics": {
+            "active_routing_rate": 0.7621,
+            "mean_flow_hhi": 0.10685890000000002,
+            "mean_routing_total_variation": 0.06858899999999998,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 20,
+            "protected_fraction": 0.1,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 860
+        },
+        {
+          "budget_distance": 40.02175155245357,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 3.6256751552453577,
+          "metrics": {
+            "active_routing_rate": 0.45395,
+            "mean_flow_hhi": 0.20213875000000012,
+            "mean_routing_total_variation": 0.20427750000000006,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 3,
+            "protected_fraction": 0.5,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 3066
+        },
+        {
+          "budget_distance": 41.87687527502092,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 2.700187527502092,
+          "metrics": {
+            "active_routing_rate": 0.67615,
+            "mean_flow_hhi": 0.13803343750000005,
+            "mean_routing_total_variation": 0.15213375000000007,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 10,
+            "protected_fraction": 0.25,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 1423
+        },
+        {
+          "budget_distance": 49.60676628276778,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 3.0434266282767783,
+          "metrics": {
+            "active_routing_rate": 0.7621,
+            "mean_flow_hhi": 0.14286812500000004,
+            "mean_routing_total_variation": 0.17147250000000003,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 20,
+            "protected_fraction": 0.25,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 860
+        },
+        {
+          "budget_distance": 52.255456798055796,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 4.37804567980558,
+          "metrics": {
+            "active_routing_rate": 0.54815,
+            "mean_flow_hhi": 0.2233337500000001,
+            "mean_routing_total_variation": 0.24666750000000007,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 5,
+            "protected_fraction": 0.5,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 2239
+        },
+        {
+          "budget_distance": 58.15012732868034,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 5.438512732868034,
+          "metrics": {
+            "active_routing_rate": 0.45395,
+            "mean_flow_hhi": 0.32981218749999996,
+            "mean_routing_total_variation": 0.30641624999999995,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 3,
+            "protected_fraction": 0.75,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 3066
+        },
+        {
+          "budget_distance": 68.87875055004184,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 5.400375055004184,
+          "metrics": {
+            "active_routing_rate": 0.67615,
+            "mean_flow_hhi": 0.25213375000000016,
+            "mean_routing_total_variation": 0.30426750000000014,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 10,
+            "protected_fraction": 0.5,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 1423
+        },
+        {
+          "budget_distance": 74.14568519708368,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 6.567068519708368,
+          "metrics": {
+            "active_routing_rate": 0.54815,
+            "mean_flow_hhi": 0.3775009375,
+            "mean_routing_total_variation": 0.37000125,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 5,
+            "protected_fraction": 0.75,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 2239
+        },
+        {
+          "budget_distance": 80.04103256553556,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 6.086853256553557,
+          "metrics": {
+            "active_routing_rate": 0.7621,
+            "mean_flow_hhi": 0.27147250000000006,
+            "mean_routing_total_variation": 0.34294500000000006,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 20,
+            "protected_fraction": 0.5,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 860
+        },
+        {
+          "budget_distance": 95.8806258250627,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 8.100562582506269,
+          "metrics": {
+            "active_routing_rate": 0.67615,
+            "mean_flow_hhi": 0.44230093750000005,
+            "mean_routing_total_variation": 0.45640124999999987,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 10,
+            "protected_fraction": 0.75,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 1423
+        },
+        {
+          "budget_distance": 110.47529884830332,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 9.130279884830333,
+          "metrics": {
+            "active_routing_rate": 0.7621,
+            "mean_flow_hhi": 0.485813125,
+            "mean_routing_total_variation": 0.5144175,
+            "record_count": 20000
+          },
+          "parameters": {
+            "duration": 20,
+            "protected_fraction": 0.75,
+            "qualification_steps": 3,
+            "reference_window": 10
+          },
+          "takeup_count": 860
+        }
+      ],
+      "selected": {
+        "budget_distance": 3.365901842710903,
+        "budget_match_status": "unmatched",
+        "mean_tv_ratio": 0.9119098157289097,
+        "metrics": {
+          "active_routing_rate": 0.22835,
+          "mean_flow_hhi": 0.11284468750000005,
+          "mean_routing_total_variation": 0.051378749999999994,
+          "record_count": 20000
+        },
+        "parameters": {
+          "duration": 1,
+          "protected_fraction": 0.25,
+          "qualification_steps": 3,
+          "reference_window": 10
+        },
+        "takeup_count": 4567
+      }
+    },
+    "episode_count": 200,
+    "literature_form": {
+      "duration": 5,
+      "protected_fraction": 0.5,
+      "qualification_steps": 3,
+      "reference_window": 10
+    },
+    "record_count": 20000,
+    "reference_budget": {
+      "active_routing_rate": 0.17865,
+      "mean_flow_hhi": 0.11795744473391205,
+      "mean_routing_total_variation": 0.05634192012609473,
+      "record_count": 20000
+    },
+    "selection_uses_efficacy_outcomes": false
+  }
+}

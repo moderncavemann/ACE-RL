@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -222,8 +223,8 @@ def test_temporary_commitment_calibration_grid_is_frozen_and_budget_only() -> No
     assert mechanism["protected_fraction_candidates"] == [0.1, 0.25, 0.5, 0.75]
     assert mechanism["duration_candidates"] == [1, 3, 5, 10, 20]
     formal = load_config("abides_temporary_commitment_benchmark_v1.json")
-    assert not formal["formal_execution_allowed"]
-    assert formal["budget_matched_parameters"] is None
+    assert formal["freeze_status"] == "frozen_after_passive_calibration"
+    assert formal["budget_matched_parameters"]["budget_match_status"] == "unmatched"
 
 
 def test_temporary_commitment_calibration_is_deterministic() -> None:
@@ -249,3 +250,20 @@ def test_temporary_commitment_calibration_is_deterministic() -> None:
     assert first["selection_uses_efficacy_outcomes"] is False
     assert len(first["budget_matched"]["candidates"]) == 20
     assert first["record_count"] == 60
+
+
+def test_frozen_temporary_commitment_selection_matches_passive_artifact() -> None:
+    artifact_path = (
+        REVISION_ROOT
+        / "configs"
+        / "abides_temporary_commitment_calibration_v1_artifact.json"
+    )
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    formal = load_config("abides_temporary_commitment_benchmark_v1.json")
+    digest = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+    assert formal["formal_execution_allowed"]
+    assert formal["calibration_artifact_sha256"] == digest
+    selected = artifact["selection"]["budget_matched"]["selected"]
+    assert selected["budget_match_status"] == "unmatched"
+    for key, value in selected["parameters"].items():
+        assert formal["budget_matched_parameters"][key] == value
