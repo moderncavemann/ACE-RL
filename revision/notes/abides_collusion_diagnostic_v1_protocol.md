@@ -22,6 +22,16 @@ deviator. Its definitions are independent of domain-benchmark outcomes.
 - Dealer choice: deterministic hash of policy seed, path seed, and event step.
 - No future outcome is used to select an event.
 
+The "current mean half-spread" is the mean of the sham frozen policy's joint
+proposal at that decision state, not the lagged quote in the observation. The
+continuation estimands use `t1..tH`, excluding the mechanically altered `t0`.
+Recovery is the first `t1..tH` at which the realized joint mean half-spread is
+at least the pre-event sham proposal mean. Its policy-seed 95% CI lower bound
+must exceed `0.5`. Continuation loss requires both flow-share and reward-loss
+95% CI lower bounds above zero; upward asymmetry requires both corresponding
+undercut-minus-upward loss CI lower bounds above zero. Every policy seed must
+contribute at least one feasible event to every required estimand.
+
 If too few eligible events exist, the diagnostic reports its realized sample
 and remains inconclusive; the threshold, paths, or cap are not changed.
 
