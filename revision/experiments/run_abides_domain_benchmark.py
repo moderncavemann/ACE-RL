@@ -996,7 +996,14 @@ def aggregate(
             and float(primary["ci_low"]) > 0.0
             and int(primary["positive"]) >= int(config["minimum_positive_policy_seeds"])
         )
-        scientific_result = "risk_aware_better" if favorable else "inconclusive"
+        if not matched:
+            scientific_result = "tradeoff_unmatched_external_budget"
+        elif favorable:
+            scientific_result = "risk_aware_better"
+        elif float(primary["ci_high"]) < 0.0:
+            scientific_result = "external_better"
+        else:
+            scientific_result = "inconclusive"
     return {
         "implementation_status": implementation_status,
         "scientific_result": scientific_result,

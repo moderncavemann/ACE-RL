@@ -20,12 +20,25 @@ def load_config(name: str) -> dict:
     return json.loads((REVISION_ROOT / "configs" / name).read_text(encoding="utf-8"))
 
 
-def test_formal_domain_cell_is_blocked_until_calibration_freeze() -> None:
+def test_formal_domain_cell_is_frozen_from_passive_calibration() -> None:
     config = load_config("abides_domain_benchmark_v1.json")
-    assert config["freeze_status"] == "calibration_pending"
-    assert config["formal_execution_allowed"] is False
-    assert config["calibration_artifact"] is None
-    assert config["calibration_artifact_sha256"] is None
+    assert config["freeze_status"] == "frozen_after_passive_calibration"
+    assert config["formal_execution_allowed"] is True
+    assert config["calibration_artifact"].endswith("_artifact.json")
+    assert len(config["calibration_artifact_sha256"]) == 64
+    assert (
+        config["mechanism_parameters"]["spread_only_budget_matched"][
+            "budget_match_status"
+        ]
+        == "matched"
+    )
+    assert (
+        config["mechanism_parameters"]["brero_threshold_buybox_budget_matched"][
+            "budget_match_status"
+        ]
+        == "unmatched"
+    )
+    assert config["external_same_budget_superiority_claim_allowed"] is False
 
 
 def test_domain_benchmark_uses_frozen_sources_and_fresh_paths() -> None:

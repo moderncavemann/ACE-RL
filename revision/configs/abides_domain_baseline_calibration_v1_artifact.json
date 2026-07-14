@@ -1,0 +1,2808 @@
+{
+  "calibration_environment_seeds": [
+    535000,
+    535001,
+    535002,
+    535003,
+    535004,
+    535005,
+    535006,
+    535007,
+    535008,
+    535009
+  ],
+  "config_sha256": "9379bec1482b08df20643bd7c5ef22ff2f0410f2067239dedb35ea85d23c6939",
+  "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
+  "docker_image_id": "sha256:2b72c2a8f0215d59e8cbf6b6e992ef2e7d3745d5cb5e8e764f2c249cd51a8c23",
+  "execution_commit": "ecff33d7887496edf9296ded2856a21e5a949ed0",
+  "forbidden_formal_evaluation_seeds": [
+    534000,
+    534001,
+    534002,
+    534003,
+    534004,
+    534005,
+    534006,
+    534007,
+    534008,
+    534009
+  ],
+  "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
+  "protocol_fingerprint": "441932634881e4d491413e2dc4009c3235af89c6b35695cd6db51dbd35187b1e",
+  "protocol_version": "abides_domain_baseline_calibration_v1",
+  "records_sha256": "6ba0def94d27f88dde2b916ce9c8d431e3dd3687258da2f4e7acd8e332156728",
+  "selection": {
+    "brero_threshold_buybox_budget_matched": {
+      "candidates": [
+        {
+          "budget_distance": 5.550529191542765,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2153029191542766,
+          "metrics": {
+            "active_routing_rate": 0.2466,
+            "mean_flow_hhi": 0.10798499007936511,
+            "mean_routing_total_variation": 0.0684725,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 4
+          }
+        },
+        {
+          "budget_distance": 9.450579827631525,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.4774420172368474,
+          "metrics": {
+            "active_routing_rate": 0.09415,
+            "mean_flow_hhi": 0.10348496031746038,
+            "mean_routing_total_variation": 0.0269,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 3
+          }
+        },
+        {
+          "budget_distance": 10.047078085155501,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.4025421914844499,
+          "metrics": {
+            "active_routing_rate": 0.0972,
+            "mean_flow_hhi": 0.10217482638888895,
+            "mean_routing_total_variation": 0.022680000000000006,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 5
+          }
+        },
+        {
+          "budget_distance": 14.38925749973142,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.8166757499731423,
+          "metrics": {
+            "active_routing_rate": 0.3031,
+            "mean_flow_hhi": 0.11861086309523815,
+            "mean_routing_total_variation": 0.10235500000000002,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 2
+          }
+        },
+        {
+          "budget_distance": 16.52668529793569,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.09633147020643082,
+          "metrics": {
+            "active_routing_rate": 0.02885,
+            "mean_flow_hhi": 0.10044129960317467,
+            "mean_routing_total_variation": 0.005427499999999999,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 6
+          }
+        },
+        {
+          "budget_distance": 17.099151837673023,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.08408481623269758,
+          "metrics": {
+            "active_routing_rate": 0.01985,
+            "mean_flow_hhi": 0.10048843750000008,
+            "mean_routing_total_variation": 0.0047375,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 4
+          }
+        },
+        {
+          "budget_distance": 18.436992683615852,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.016550731638414876,
+          "metrics": {
+            "active_routing_rate": 0.0066,
+            "mean_flow_hhi": 0.10006567956349213,
+            "mean_routing_total_variation": 0.0009325,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 7
+          }
+        },
+        {
+          "budget_distance": 18.609102792672054,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.013089720732794609,
+          "metrics": {
+            "active_routing_rate": 0.00385,
+            "mean_flow_hhi": 0.10006371031746039,
+            "mean_routing_total_variation": 0.0007375,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 5
+          }
+        },
+        {
+          "budget_distance": 18.862251226125025,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.0017748773874975742,
+          "metrics": {
+            "active_routing_rate": 0.00105,
+            "mean_flow_hhi": 0.10000621527777785,
+            "mean_routing_total_variation": 0.0001,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 8
+          }
+        },
+        {
+          "budget_distance": 18.863982874615658,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.002351712538434285,
+          "metrics": {
+            "active_routing_rate": 0.0009,
+            "mean_flow_hhi": 0.10000991567460325,
+            "mean_routing_total_variation": 0.00013249999999999997,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 6
+          }
+        },
+        {
+          "budget_distance": 18.92661256130625,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 8.874386937487866e-05,
+          "metrics": {
+            "active_routing_rate": 0.0001,
+            "mean_flow_hhi": 0.10000027777777787,
+            "mean_routing_total_variation": 4.999999999999998e-06,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 9
+          }
+        },
+        {
+          "budget_distance": 18.92866884195938,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.00013311580406231803,
+          "metrics": {
+            "active_routing_rate": 5e-05,
+            "mean_flow_hhi": 0.10000053571428578,
+            "mean_routing_total_variation": 7.4999999999999985e-06,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 7
+          }
+        },
+        {
+          "budget_distance": 18.932499999999997,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.0,
+          "metrics": {
+            "active_routing_rate": 0.0,
+            "mean_flow_hhi": 0.10000000000000007,
+            "mean_routing_total_variation": 0.0,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 8
+          }
+        },
+        {
+          "budget_distance": 18.932499999999997,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.0,
+          "metrics": {
+            "active_routing_rate": 0.0,
+            "mean_flow_hhi": 0.10000000000000007,
+            "mean_routing_total_variation": 0.0,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 9
+          }
+        },
+        {
+          "budget_distance": 18.932499999999997,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.0,
+          "metrics": {
+            "active_routing_rate": 0.0,
+            "mean_flow_hhi": 0.10000000000000007,
+            "mean_routing_total_variation": 0.0,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 10
+          }
+        },
+        {
+          "budget_distance": 18.932499999999997,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.0,
+          "metrics": {
+            "active_routing_rate": 0.0,
+            "mean_flow_hhi": 0.10000000000000007,
+            "mean_routing_total_variation": 0.0,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 10
+          }
+        },
+        {
+          "budget_distance": 34.278990066564226,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 2.8461490066564226,
+          "metrics": {
+            "active_routing_rate": 0.495,
+            "mean_flow_hhi": 0.12415816964285718,
+            "mean_routing_total_variation": 0.16035750000000001,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 3
+          }
+        },
+        {
+          "budget_distance": 64.42506693066407,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 4.915256693066407,
+          "metrics": {
+            "active_routing_rate": 0.6841,
+            "mean_flow_hhi": 0.20068328869047627,
+            "mean_routing_total_variation": 0.27693500000000004,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 1,
+            "order_statistic_k": 1
+          }
+        },
+        {
+          "budget_distance": 70.47189211113661,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 5.095939211113661,
+          "metrics": {
+            "active_routing_rate": 0.7689,
+            "mean_flow_hhi": 0.16263209821428576,
+            "mean_routing_total_variation": 0.28711500000000006,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 2
+          }
+        },
+        {
+          "budget_distance": 101.60812132085351,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 7.288312132085353,
+          "metrics": {
+            "active_routing_rate": 0.95315,
+            "mean_flow_hhi": 0.27863502976190485,
+            "mean_routing_total_variation": 0.4106375000000001,
+            "record_count": 20000
+          },
+          "parameters": {
+            "margin_ticks": 0,
+            "order_statistic_k": 1
+          }
+        }
+      ],
+      "selected": {
+        "budget_distance": 5.550529191542765,
+        "budget_match_status": "unmatched",
+        "mean_tv_ratio": 1.2153029191542766,
+        "metrics": {
+          "active_routing_rate": 0.2466,
+          "mean_flow_hhi": 0.10798499007936511,
+          "mean_routing_total_variation": 0.0684725,
+          "record_count": 20000
+        },
+        "parameters": {
+          "margin_ticks": 0,
+          "order_statistic_k": 4
+        }
+      }
+    },
+    "episode_count": 200,
+    "record_count": 20000,
+    "reference_budget": {
+      "active_routing_rate": 0.17865,
+      "mean_flow_hhi": 0.11795744473391205,
+      "mean_routing_total_variation": 0.05634192012609473,
+      "record_count": 20000
+    },
+    "selection_uses_efficacy_outcomes": false,
+    "spread_only_budget_matched": {
+      "candidates": [
+        {
+          "budget_distance": 0.21985346466712785,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9925146535332872,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.1175521303875543,
+            "mean_routing_total_variation": 0.05592018133335105,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.22855178645018587,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9916448213549813,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.11753049001278124,
+            "mean_routing_total_variation": 0.055871173318237835,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.2394246886790093,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.990557531132099,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.11750469929346893,
+            "mean_routing_total_variation": 0.055809913299346314,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.25340413440178283,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9891595865598216,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.11747359653052306,
+            "mean_routing_total_variation": 0.055731150417914356,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.26576518755413936,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.981673481244586,
+          "metrics": {
+            "active_routing_rate": 0.1803,
+            "mean_flow_hhi": 0.11735387295869398,
+            "mean_routing_total_variation": 0.055309368870187815,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.26729443013527154,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9877705569864728,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.1174418551420473,
+            "mean_routing_total_variation": 0.05565288982463995,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.27914819188803786,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9865851808111962,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.11740379205368422,
+            "mean_routing_total_variation": 0.05558610345485314,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.29362565846838745,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9843874341531612,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.117356465819713,
+            "mean_routing_total_variation": 0.055462278188188746,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.31315053709293506,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9809349462907065,
+          "metrics": {
+            "active_routing_rate": 0.1811,
+            "mean_flow_hhi": 0.11728781484830801,
+            "mean_routing_total_variation": 0.05526775839280601,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.3429148282598077,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9794585171740192,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.11726824848193791,
+            "mean_routing_total_variation": 0.055184573541441774,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.7563285545829055,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0221328554582907,
+          "metrics": {
+            "active_routing_rate": 0.18935,
+            "mean_flow_hhi": 0.11806831642591864,
+            "mean_routing_total_variation": 0.05758892770048814,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.830911228059898,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0268411228059897,
+          "metrics": {
+            "active_routing_rate": 0.1899,
+            "mean_flow_hhi": 0.1181434101921747,
+            "mean_routing_total_variation": 0.0578542005233245,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.834561466793015,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0322061466793016,
+          "metrics": {
+            "active_routing_rate": 0.1889,
+            "mean_flow_hhi": 0.1183259333910744,
+            "mean_routing_total_variation": 0.05815647626986922,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.8619271252378427,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0291927125237843,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11820641508498526,
+            "mean_routing_total_variation": 0.05798669360337383,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.8833399674500042,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0313339967450004,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11823289716010472,
+            "mean_routing_total_variation": 0.05810733766793286,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.9107865367857453,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0340786536785747,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11829537862079753,
+            "mean_routing_total_variation": 0.05826197690965782,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.9325305902610386,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0362530590261039,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11834913480736971,
+            "mean_routing_total_variation": 0.05838448708207007,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.9488386303675052,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0378838630367506,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11839197111752112,
+            "mean_routing_total_variation": 0.05847636971137924,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.9615226615614263,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0391522661561428,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.11842678108925211,
+            "mean_routing_total_variation": 0.05854783397861972,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 0.9716698865165644,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 1.0401669886516565,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.1184555695568532,
+            "mean_routing_total_variation": 0.05860500539241211,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.4419315184623187,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9110568481537682,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11598069946332225,
+            "mean_routing_total_variation": 0.05133069216901122,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.4481109131515957,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9104389086848405,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11596346549552225,
+            "mean_routing_total_variation": 0.05129587627281013,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.455835156513193,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9096664843486807,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11594240042289478,
+            "mean_routing_total_variation": 0.05125235640255877,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.4657663265495304,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.908673367345047,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11591609616563503,
+            "mean_routing_total_variation": 0.05119640228366417,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.479007886597981,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.907349211340202,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11588238778582925,
+            "mean_routing_total_variation": 0.0511217967918047,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.4975460706658132,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9054953929334187,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11583781486345904,
+            "mean_routing_total_variation": 0.05101734910320144,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.5253533467675606,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.902714665323244,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11577668412537409,
+            "mean_routing_total_variation": 0.050860677570296546,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.5783949628056742,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.8974105037194327,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.11568042360598316,
+            "mean_routing_total_variation": 0.05056183092087871,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.5832944211550204,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.8984205578844979,
+          "metrics": {
+            "active_routing_rate": 0.1673,
+            "mean_flow_hhi": 0.115695999564552,
+            "mean_routing_total_variation": 0.05061873931196985,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 1.5989590729537224,
+          "budget_match_status": "matched",
+          "mean_tv_ratio": 0.9001040927046278,
+          "metrics": {
+            "active_routing_rate": 0.16665,
+            "mean_flow_hhi": 0.11578012527801863,
+            "mean_routing_total_variation": 0.050713592896335105,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.146292335046614,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1041292335046613,
+          "metrics": {
+            "active_routing_rate": 0.20075,
+            "mean_flow_hhi": 0.11982271392187527,
+            "mean_routing_total_variation": 0.062208761083005826,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.1718416802998126,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1009341680299813,
+          "metrics": {
+            "active_routing_rate": 0.2019,
+            "mean_flow_hhi": 0.1196633407768473,
+            "mean_routing_total_variation": 0.06202874495923376,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.215665025328587,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1033165025328586,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.11972431724575124,
+            "mean_routing_total_variation": 0.06216297025950852,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.244818547997723,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1062318547997723,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.1197622511624659,
+            "mean_routing_total_variation": 0.06232722680407039,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.2835047129940014,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1098504712994002,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.11984402963421571,
+            "mean_routing_total_variation": 0.0625311066058594,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.3076288229915236,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1122628822991523,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.11990484890750785,
+            "mean_routing_total_variation": 0.06266702647371875,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.3248603301326076,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1139860330132607,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.11995137710294129,
+            "mean_routing_total_variation": 0.06276411209361826,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.337783960488423,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1152783960488424,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.1199879608277643,
+            "mean_routing_total_variation": 0.06283692630854291,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.3478356729873866,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1162835672987386,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.12001741488232913,
+            "mean_routing_total_variation": 0.06289355958681762,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.355877042986563,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1170877042986562,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.12004160815519353,
+            "mean_routing_total_variation": 0.06293886620943742,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.4939094531592705,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.104140945315927,
+          "metrics": {
+            "active_routing_rate": 0.2077,
+            "mean_flow_hhi": 0.11910427380943861,
+            "mean_routing_total_variation": 0.06220942094894069,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.5175413243556672,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1045041324355667,
+          "metrics": {
+            "active_routing_rate": 0.2081,
+            "mean_flow_hhi": 0.11916080974728159,
+            "mean_routing_total_variation": 0.06222988360862625,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.5179733829257676,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1965473382925766,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12787630863285895,
+            "mean_routing_total_variation": 0.0674157745611716,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.8,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.546440771793305,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1978940771793305,
+          "metrics": {
+            "active_routing_rate": 0.1673,
+            "mean_flow_hhi": 0.1279039992258702,
+            "mean_routing_total_variation": 0.0674916524159598,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.7,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.5614872948540035,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1156487294854005,
+          "metrics": {
+            "active_routing_rate": 0.20675,
+            "mean_flow_hhi": 0.11951287018190579,
+            "mean_routing_total_variation": 0.0628577916054455,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.588695537643254,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2036195537643253,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.1280474384451095,
+            "mean_routing_total_variation": 0.0678142367603954,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.6,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.6013879027283706,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.200138790272837,
+          "metrics": {
+            "active_routing_rate": 0.16665,
+            "mean_flow_hhi": 0.12805355604981086,
+            "mean_routing_total_variation": 0.06761812386178014,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.9,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.608253631426183,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1130753631426182,
+          "metrics": {
+            "active_routing_rate": 0.2082,
+            "mean_flow_hhi": 0.11927681295509879,
+            "mean_routing_total_variation": 0.06271280320450529,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.625771905778916,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2073271905778915,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12815611531281607,
+            "mean_routing_total_variation": 0.06802313213760192,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.5,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.650489484536024,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2097989484536025,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.1282353560636964,
+            "mean_routing_total_variation": 0.06816239572240626,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.4,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.6675752463150895,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.118757524631509,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.11940511276528075,
+            "mean_routing_total_variation": 0.06303294709325594,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.668144897933959,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.211564489793396,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12829528207224003,
+            "mean_routing_total_variation": 0.06826186971155222,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.3,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.6813864579824105,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.212888645798241,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12834204519625733,
+            "mean_routing_total_variation": 0.0683364752034117,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.2,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.6916854491312043,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.2139185449131205,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12837949421426173,
+            "mean_routing_total_variation": 0.06839450169708017,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.1,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.6999246420502407,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.214742464205024,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.12841013237923948,
+            "mean_routing_total_variation": 0.06844092289201495,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.0,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 2.707702464263547,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1227702464263547,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.1195046753582927,
+            "mean_routing_total_variation": 0.06325903154410938,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.73636476279816,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1256364762798161,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.11958062894354066,
+            "mean_routing_total_variation": 0.06342052043757612,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.757861486699121,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.1277861486699121,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.1196402396115138,
+            "mean_routing_total_variation": 0.06354163710767619,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.7745811608443107,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.129458116084431,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.1196881711556631,
+            "mean_routing_total_variation": 0.06363583896219845,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 2.78795690016046,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.130795690016046,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.11972750403648974,
+            "mean_routing_total_variation": 0.06371120044581624,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.75
+          }
+        },
+        {
+          "budget_distance": 3.1714797499278107,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3088979749927812,
+          "metrics": {
+            "active_routing_rate": 0.1803,
+            "mean_flow_hhi": 0.1308513297043448,
+            "mean_routing_total_variation": 0.07374582516025041,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.9,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.1969468956535882,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3059446895653588,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.130699108412334,
+            "mean_routing_total_variation": 0.07357943138858902,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.8,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.201632617209421,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3079132617209421,
+          "metrics": {
+            "active_routing_rate": 0.1811,
+            "mean_flow_hhi": 0.13073389306365865,
+            "mean_routing_total_variation": 0.07369034452374135,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.7,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.262665788708818,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3125165788708817,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.1308559392350453,
+            "mean_routing_total_variation": 0.07394970425091833,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.6,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.2994690774826143,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3154469077482616,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.13094007476210526,
+            "mean_routing_total_variation": 0.07411480460647085,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.5,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.3152740931529667,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3170274093152967,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.13100774247475075,
+            "mean_routing_total_variation": 0.07420385309951992,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.4,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.333794487464287,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3188794487464288,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.13106417160981873,
+            "mean_routing_total_variation": 0.07430820055721914,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.3,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.352433748427985,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3207433748427986,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.1311194654106114,
+            "mean_routing_total_variation": 0.07441321773246175,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.2,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.36693095139975,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3221930951399752,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.1311653155782777,
+            "mean_routing_total_variation": 0.07449489775765045,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.1,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.3785287137771625,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3233528713777163,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.13120378735565208,
+            "mean_routing_total_variation": 0.0745602417778014,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.0,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 3.528235643111417,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6616764356888581,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10780094683891307,
+            "mean_routing_total_variation": 0.0372801208889007,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.5340345243001248,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6610965475699875,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10779132889456947,
+            "mean_routing_total_variation": 0.037247448878825216,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.5380101250360947,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6544489874963905,
+          "metrics": {
+            "active_routing_rate": 0.1803,
+            "mean_flow_hhi": 0.10771283242608624,
+            "mean_routing_total_variation": 0.0368729125801252,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.541283125786006,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6603716874213993,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10777986635265291,
+            "mean_routing_total_variation": 0.037206608866230874,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.550602756267855,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6594397243732144,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10776604290245473,
+            "mean_routing_total_variation": 0.03715410027860957,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.5598629534235173,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6585137046576481,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10775193561868773,
+            "mean_routing_total_variation": 0.037101926549759946,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.567765461258694,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6577234538741306,
+          "metrics": {
+            "active_routing_rate": 0.18155,
+            "mean_flow_hhi": 0.10773501869052635,
+            "mean_routing_total_variation": 0.03705740230323541,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.574917105645591,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6562582894354408,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.10771398480876138,
+            "mean_routing_total_variation": 0.036974852125459166,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.58293369139529,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6539566308604711,
+          "metrics": {
+            "active_routing_rate": 0.1811,
+            "mean_flow_hhi": 0.1076834732659147,
+            "mean_routing_total_variation": 0.03684517226187067,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.607776552173206,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6529723447826794,
+          "metrics": {
+            "active_routing_rate": 0.1814,
+            "mean_flow_hhi": 0.10767477710308355,
+            "mean_routing_total_variation": 0.03678971569429451,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.19,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.6311256888046595,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6881374311195341,
+          "metrics": {
+            "active_routing_rate": 0.1889,
+            "mean_flow_hhi": 0.108144859284922,
+            "mean_routing_total_variation": 0.0387709841799128,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.635553408988957,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6934446591011042,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10820247535860145,
+            "mean_routing_total_variation": 0.0390700035949414,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.642318225625714,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6927681774374286,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10818968048411207,
+            "mean_routing_total_variation": 0.03903188931907982,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.650774246421662,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6919225753578337,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10817420938556498,
+            "mean_routing_total_variation": 0.03898424647425283,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.6616462731593087,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.690835372684069,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10815517102549765,
+            "mean_routing_total_variation": 0.0389229913880467,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.6761423088095038,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6893857691190496,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10813127938702116,
+            "mean_routing_total_variation": 0.03884131793977187,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.6944400216999966,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6875559978300003,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10810350984893546,
+            "mean_routing_total_variation": 0.03873822511195524,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.708715249841438,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6861284750158562,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.10809174003777128,
+            "mean_routing_total_variation": 0.03865779573558255,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7168925146267364,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6845607485373264,
+          "metrics": {
+            "active_routing_rate": 0.1899,
+            "mean_flow_hhi": 0.10806373786318878,
+            "mean_routing_total_variation": 0.03856946701554966,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.720780963611396,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6814219036388603,
+          "metrics": {
+            "active_routing_rate": 0.18935,
+            "mean_flow_hhi": 0.10803036285596389,
+            "mean_routing_total_variation": 0.03839261846699209,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7377486380089593,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.744725136199104,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.10890738140230825,
+            "mean_routing_total_variation": 0.041959244139624936,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7431095513417416,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7441890448658258,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.10889662883659075,
+            "mean_routing_total_variation": 0.041929039724545085,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.744138443302259,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7360861556697742,
+          "metrics": {
+            "active_routing_rate": 0.20075,
+            "mean_flow_hhi": 0.10881009507638906,
+            "mean_routing_total_variation": 0.041472507388670546,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7498106930077206,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7435189306992279,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.10888353814567303,
+            "mean_routing_total_variation": 0.04189128420569526,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7584264465782624,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7426573553421737,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.1088672787124184,
+            "mean_routing_total_variation": 0.0418427413957455,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7699141180056523,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7415085881994348,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.10884659951444796,
+            "mean_routing_total_variation": 0.04177801764914582,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.7859968580039993,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7399003141996,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.10881956872631814,
+            "mean_routing_total_variation": 0.04168740440390626,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.8076209680015194,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7374879031998481,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.10878322273887377,
+            "mean_routing_total_variation": 0.04155148453604692,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.8229388798001254,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7339561120199874,
+          "metrics": {
+            "active_routing_rate": 0.2019,
+            "mean_flow_hhi": 0.10873926256748773,
+            "mean_routing_total_variation": 0.041352496639489165,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.8270566497809426,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7355443350219057,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.10876636322033391,
+            "mean_routing_total_variation": 0.041441980173005676,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.941362066559691,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7538637933440309,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10876777957177323,
+            "mean_routing_total_variation": 0.04247413363054417,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.9502792261037936,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7529720773896206,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10875029829140585,
+            "mean_routing_total_variation": 0.04242389264146562,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.9614256755339206,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7518574324466079,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10872899538289504,
+            "mean_routing_total_variation": 0.04236109140511744,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.9673418034306644,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7437658196569334,
+          "metrics": {
+            "active_routing_rate": 0.20675,
+            "mean_flow_hhi": 0.1086723867475137,
+            "mean_routing_total_variation": 0.04190519440363032,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.975756824801227,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7504243175198771,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10870250175268477,
+            "mean_routing_total_variation": 0.04228034695838407,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 3.9948650238243024,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7485134976175697,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10866874460368567,
+            "mean_routing_total_variation": 0.04217268769607291,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.021616502456607,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7458383497543393,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.10862449456234703,
+            "mean_routing_total_variation": 0.042021964728837284,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.056997579049213,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7420502420950786,
+          "metrics": {
+            "active_routing_rate": 0.2082,
+            "mean_flow_hhi": 0.10856747242448839,
+            "mean_routing_total_variation": 0.04180853546967018,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.091560364560487,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7360939635439513,
+          "metrics": {
+            "active_routing_rate": 0.2077,
+            "mean_flow_hhi": 0.10849078835975051,
+            "mean_routing_total_variation": 0.04147294729929379,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.1091391170962215,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.7363360882903779,
+          "metrics": {
+            "active_routing_rate": 0.2081,
+            "mean_flow_hhi": 0.10851591544323629,
+            "mean_routing_total_variation": 0.04148658907241751,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.163438072777211,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3628438072777211,
+          "metrics": {
+            "active_routing_rate": 0.18935,
+            "mean_flow_hhi": 0.13212145142385534,
+            "mean_routing_total_variation": 0.0767852369339842,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.7,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.253714970746528,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3691214970746528,
+          "metrics": {
+            "active_routing_rate": 0.1899,
+            "mean_flow_hhi": 0.13225495145275495,
+            "mean_routing_total_variation": 0.07713893403109932,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.6,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.275248622390687,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3762748622390686,
+          "metrics": {
+            "active_routing_rate": 0.1889,
+            "mean_flow_hhi": 0.1325794371396878,
+            "mean_routing_total_variation": 0.07754196835982563,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.9,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.292569500317124,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3722569500317126,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.1323669601510849,
+            "mean_routing_total_variation": 0.07731559147116511,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.8,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.321119956600006,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3751119956600006,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.1324140393957417,
+            "mean_routing_total_variation": 0.07747645022391048,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.5,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.357715382380993,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3787715382380994,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.13252511754808446,
+            "mean_routing_total_variation": 0.07768263587954376,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.4,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.386707453681385,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3816707453681385,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.13262068410199057,
+            "mean_routing_total_variation": 0.07784598277609343,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.3,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.408451507156678,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3838451507156677,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.13269683754225975,
+            "mean_routing_total_variation": 0.07796849294850568,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.2,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.42536354874857,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3855363548748572,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.1327587219364481,
+            "mean_routing_total_variation": 0.07806377863815964,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.1,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.438893182022086,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.3868893182022086,
+          "metrics": {
+            "active_routing_rate": 0.19005,
+            "mean_flow_hhi": 0.13280990143440566,
+            "mean_routing_total_variation": 0.07814000718988282,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.2,
+            "severity_threshold": 0.0,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 4.47878767897488,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.607371232102512,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10710253309480992,
+            "mean_routing_total_variation": 0.034220461446007475,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.0,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.482907275434398,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6069592724565602,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10709487355356548,
+            "mean_routing_total_variation": 0.034197250848540084,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.1,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.488056771008795,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6064443228991205,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10708551129906439,
+            "mean_routing_total_variation": 0.03416823760170585,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.2,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.494677551033022,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6057822448966979,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10707382051806005,
+            "mean_routing_total_variation": 0.034130934855776104,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.3,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.503505257731988,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6048994742268012,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10705883901592415,
+            "mean_routing_total_variation": 0.03408119786120313,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.4,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.515864047110544,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6036635952889456,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10703902882820406,
+            "mean_routing_total_variation": 0.03401156606880095,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.5,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.534402231178374,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6018097768821625,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10701185961127742,
+            "mean_routing_total_variation": 0.03390711838019769,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.6,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.569763308537118,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.5982736691462882,
+          "metrics": {
+            "active_routing_rate": 0.1676,
+            "mean_flow_hhi": 0.10696907715821478,
+            "mean_routing_total_variation": 0.033707887280585797,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.8,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.5780296141033485,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.5989470385896651,
+          "metrics": {
+            "active_routing_rate": 0.1673,
+            "mean_flow_hhi": 0.1069759998064676,
+            "mean_routing_total_variation": 0.03374582620797989,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.7,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 4.599306048635817,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 0.6000693951364183,
+          "metrics": {
+            "active_routing_rate": 0.16665,
+            "mean_flow_hhi": 0.10701338901245276,
+            "mean_routing_total_variation": 0.03380906193089006,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.18,
+            "severity_threshold": 0.9,
+            "signal_scale": 0.5
+          }
+        },
+        {
+          "budget_distance": 5.826723113395486,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4721723113395486,
+          "metrics": {
+            "active_routing_rate": 0.20075,
+            "mean_flow_hhi": 0.135240380305556,
+            "mean_routing_total_variation": 0.0829450147773411,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.9,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 5.84162224039975,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4679122240399751,
+          "metrics": {
+            "active_routing_rate": 0.2019,
+            "mean_flow_hhi": 0.13495705026995072,
+            "mean_routing_total_variation": 0.08270499327897834,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.7,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 5.893386700438118,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4710886700438117,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.1350654528813355,
+            "mean_routing_total_variation": 0.08288396034601136,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.8,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 5.932258063996964,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4749758063996965,
+          "metrics": {
+            "active_routing_rate": 0.2023,
+            "mean_flow_hhi": 0.13513289095549488,
+            "mean_routing_total_variation": 0.08310296907209386,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.6,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 5.9830062839920055,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4798006283992007,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.1352782749052724,
+            "mean_routing_total_variation": 0.08337480880781255,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.5,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.015171763988697,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4830171763988698,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.13538639805779173,
+            "mean_routing_total_variation": 0.08355603529829166,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.4,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.038147106843476,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4853147106843476,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.1354691148496734,
+            "mean_routing_total_variation": 0.08368548279149102,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.3,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.055378613984562,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4870378613984563,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.13553415258269208,
+            "mean_routing_total_variation": 0.08378256841139055,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.2,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.068780897316518,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4883780897316519,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.13558651534636285,
+            "mean_routing_total_variation": 0.08385807944909018,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.1,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.079502723982082,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4894502723982084,
+          "metrics": {
+            "active_routing_rate": 0.20235,
+            "mean_flow_hhi": 0.13562952560923291,
+            "mean_routing_total_variation": 0.08391848827924989,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.21,
+            "severity_threshold": 0.0,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.1743792708790295,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.472187927087903,
+          "metrics": {
+            "active_routing_rate": 0.2077,
+            "mean_flow_hhi": 0.13396315343900192,
+            "mean_routing_total_variation": 0.0829458945985876,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.7,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.19922176580756,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.472672176580756,
+          "metrics": {
+            "active_routing_rate": 0.2081,
+            "mean_flow_hhi": 0.134063661772945,
+            "mean_routing_total_variation": 0.08297317814483503,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.8,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.280316393138672,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4875316393138673,
+          "metrics": {
+            "active_routing_rate": 0.20675,
+            "mean_flow_hhi": 0.13468954699005467,
+            "mean_routing_total_variation": 0.08381038880726066,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.9,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.318504841901575,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4841004841901575,
+          "metrics": {
+            "active_routing_rate": 0.2082,
+            "mean_flow_hhi": 0.13426988969795334,
+            "mean_routing_total_variation": 0.08361707093934037,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.6,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.396766995086784,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4916766995086785,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.13449797824938797,
+            "mean_routing_total_variation": 0.08404392945767457,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.5,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.450269952351398,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.4970269952351398,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.13467497841474252,
+            "mean_routing_total_variation": 0.08434537539214584,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.4,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.488486350397548,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.500848635039755,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.1348100070107389,
+            "mean_routing_total_variation": 0.08456069391676817,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.3,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.517148648932159,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.503714864893216,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.13491598153158008,
+            "mean_routing_total_variation": 0.0847221828102349,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.2,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.539441547792416,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.5059441547792416,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.13500119316562326,
+            "mean_routing_total_variation": 0.08484778528293127,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.1,
+            "signal_scale": 1.0
+          }
+        },
+        {
+          "budget_distance": 6.557275866880617,
+          "budget_match_status": "unmatched",
+          "mean_tv_ratio": 1.5077275866880617,
+          "metrics": {
+            "active_routing_rate": 0.20825,
+            "mean_flow_hhi": 0.13507111828709284,
+            "mean_routing_total_variation": 0.08494826726108834,
+            "record_count": 20000
+          },
+          "parameters": {
+            "activation_target": 0.22,
+            "severity_threshold": 0.0,
+            "signal_scale": 1.0
+          }
+        }
+      ],
+      "selected": {
+        "budget_distance": 0.21985346466712785,
+        "budget_match_status": "matched",
+        "mean_tv_ratio": 0.9925146535332872,
+        "metrics": {
+          "active_routing_rate": 0.18155,
+          "mean_flow_hhi": 0.1175521303875543,
+          "mean_routing_total_variation": 0.05592018133335105,
+          "record_count": 20000
+        },
+        "parameters": {
+          "activation_target": 0.19,
+          "severity_threshold": 0.0,
+          "signal_scale": 0.75
+        }
+      }
+    }
+  },
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_model_digests": {
+    "530000": "56acb05fe9a8f3041ae4057727ccbb9bc65ccc64533c4b822042fde7dabfcce7",
+    "530001": "0dfe6ed10b8c95b8abc410240d5aa60a6897e6368efeb14203a66e6c768f5872",
+    "530002": "2e344c95877d7f579ef83b20ae2224d55770ccf17c86b99a8213847867127f83",
+    "530003": "640b9a29b9efd7a6cc4bd46e7a59259da5ff11fc550a13f3a7a2e5074b407a1b",
+    "530004": "582ddb6459b876d2683d678d8d1fc3c0640ddd29c5988beba216b7b6677db7d3",
+    "530005": "16a03e411f2b972a948b33499dc1a6c0d7a3d5e66e47b105306e23aacc3603b5",
+    "530006": "4bfa8bc6b8c6ae2aa4198c9f9d996189206f8354a806578fa020933d42bbc1d9",
+    "530007": "efdf7b19694132654f6ffd0f2c2195af6b52793834525ac2535fb66aaa30c8d3",
+    "530008": "5865e4759064449e4c0fd13d544f29688d3f4be671526a3619ab79e7184686b2",
+    "530009": "d5965a545567cc48fcce808fd52d81290b1192f4bff2a6632995351f7926bf2e",
+    "530010": "97b2788bf2d1bed5659219a90dc857231a2b9c6e07a19fb5cc5e63fb78979da5",
+    "530011": "c8eea239629e1c3f0f83032082b8ee13274c5fb08b18db56e066771612bd3e3d",
+    "530012": "6ab2005c36c425396eeaf4ef3d7ee3c7076e2932d6efacc66224e1984bda91a7",
+    "530013": "9d3a5f5ad95d52d5861eb89935d708f0e3325cfc0a85abde82164299f50042d7",
+    "530014": "9c3a453f50f99cc19dacafd810d79e3c0c773fd938e00f7fe19f5ba6215f9c03",
+    "530015": "c4f56e13e6c2760c0729b3be80bb1c991ea316ee7903f89e20f9180e20b74012",
+    "530016": "af9dacd484b203e4518e956479a8c4e94d0f0e4d8674c38219b1b82bfe9949e5",
+    "530017": "ab653bc738a77ba6f4cc93f99018c3e214ec1c2addffc0fb393643716ef37b46",
+    "530018": "6318e10613d613e032c653d2b72848dae90d239d56e44b94cf1745fb3727147d",
+    "530019": "ea722485cb4d2649023655c7e9d774d43f59f1e4b8c07d625f9f0a6239bd5301"
+  },
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c"
+}

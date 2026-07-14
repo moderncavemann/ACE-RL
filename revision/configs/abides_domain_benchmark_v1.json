@@ -1,7 +1,7 @@
 {
   "protocol_version": "abides_domain_benchmark_v1",
-  "freeze_status": "calibration_pending",
-  "formal_execution_allowed": false,
+  "freeze_status": "frozen_after_passive_calibration",
+  "formal_execution_allowed": true,
   "engineering_smoke": false,
   "backend": "abides",
   "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
@@ -35,8 +35,40 @@
   "source_v5_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_v1",
   "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
   "source_v5_response_episodes": 96,
-  "calibration_artifact": null,
-  "calibration_artifact_sha256": null,
+  "calibration_artifact": "revision/configs/abides_domain_baseline_calibration_v1_artifact.json",
+  "calibration_artifact_sha256": "6f6405f5f9f6dfc226756ebabe60ef071785d4ef3930c5d58a2d9f241506d96e",
+  "calibration_reference_budget": {
+    "active_routing_rate": 0.17865,
+    "mean_routing_total_variation": 0.05634192012609473
+  },
+  "mechanism_parameters": {
+    "brero_threshold_buybox": {
+      "order_statistic_k": 1,
+      "margin_ticks": 0,
+      "routable_fraction": 0.5,
+      "budget_match_status": "not_applicable_literature_form"
+    },
+    "brero_threshold_buybox_budget_matched": {
+      "order_statistic_k": 4,
+      "margin_ticks": 0,
+      "routable_fraction": 0.5,
+      "budget_match_status": "unmatched",
+      "calibration_active_routing_rate": 0.2466,
+      "calibration_mean_routing_total_variation": 0.0684725,
+      "calibration_mean_tv_ratio": 1.2153029191542766
+    },
+    "spread_only_budget_matched": {
+      "activation_target": 0.19,
+      "severity_threshold": 0.0,
+      "signal_scale": 0.75,
+      "budget_match_status": "matched",
+      "calibration_active_routing_rate": 0.18155,
+      "calibration_mean_routing_total_variation": 0.05592018133335105,
+      "calibration_mean_tv_ratio": 0.9925146535332872
+    }
+  },
+  "primary_contrast_budget_status": "unavailable_brero_unmatched",
+  "external_same_budget_superiority_claim_allowed": false,
   "methods": [
     "no_intervention",
     "risk_aware",

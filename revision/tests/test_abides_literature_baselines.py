@@ -149,3 +149,21 @@ def test_budget_match_tolerance_does_not_promote_unmatched_candidate() -> None:
     status, ratio = budget_match_status(candidate, reference, 0.02, 0.9, 1.1)
     assert status == "unmatched"
     assert ratio == pytest.approx(2.0)
+
+
+def test_frozen_passive_calibration_preserves_unmatched_external_result() -> None:
+    artifact = load_config("abides_domain_baseline_calibration_v1_artifact.json")
+    selection = artifact["selection"]
+    assert selection["record_count"] == 20000
+    assert selection["episode_count"] == 200
+    assert selection["selection_uses_efficacy_outcomes"] is False
+    assert (
+        selection["spread_only_budget_matched"]["selected"]["budget_match_status"]
+        == "matched"
+    )
+    assert (
+        selection["brero_threshold_buybox_budget_matched"]["selected"][
+            "budget_match_status"
+        ]
+        == "unmatched"
+    )
