@@ -10,6 +10,7 @@ REVISION_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REVISION_ROOT / "experiments"))
 
 from run_abides_standard_learner_holdout import (  # noqa: E402
+    formal_result_paths,
     stage_manifest_path,
 )
 
@@ -80,3 +81,16 @@ def test_standard_learner_stage_manifests_are_isolated(tmp_path: Path) -> None:
     assert validation != formal
     with pytest.raises(ValueError, match="unknown official learner stage"):
         stage_manifest_path(tmp_path, "unknown")
+
+
+def test_standard_learner_formal_result_grid_is_exact() -> None:
+    paths = formal_result_paths(load_config())
+    assert len(paths) == 20
+    assert len(set(paths)) == 20
+    assert {path.parent.parent.name for path in paths} == {
+        "official_full_policy_MAPPO",
+        "official_IPPO",
+    }
+    assert {path.parent.name for path in paths} == {
+        f"seed_{seed}" for seed in range(550000, 550010)
+    }

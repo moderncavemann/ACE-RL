@@ -101,6 +101,15 @@ def stage_manifest_path(output: Path, stage: str) -> Path:
     return output / stage / "manifest.json"
 
 
+def formal_result_paths(config: Mapping[str, Any]) -> list[Path]:
+    output = REPO / str(config["output_dir"]) / "formal"
+    return [
+        output / learner / f"seed_{int(seed)}" / "result.json"
+        for learner in config["learners"]
+        for seed in config["policy_seeds"]
+    ]
+
+
 def source_root(config: Mapping[str, Any]) -> str:
     return str(Path(str(config["official_source_root"])).expanduser().resolve())
 
@@ -1102,6 +1111,10 @@ def main() -> None:
         append_logbook(
             output / "logbook.jsonl", {"event": f"{args.stage}_started"}
         )
+        completed_formal_before = (
+            args.stage == "formal"
+            and all(path.exists() for path in formal_result_paths(config))
+        )
         summary = (
             run_validation(config)
             if args.stage == "validation"
@@ -1111,6 +1124,17 @@ def main() -> None:
             output / "logbook.jsonl",
             {"event": f"{args.stage}_finished", "status": summary["status"] if "status" in summary else summary["implementation_status"]},
         )
+        if completed_formal_before:
+            append_logbook(
+                output / "logbook.jsonl",
+                {
+                    "event": "completed_resume_verified",
+                    "stage": "formal",
+                    "containers_started": 0,
+                    "result_count": len(formal_result_paths(config)),
+                    "summary_sha256": sha256_file(output / "summary.json"),
+                },
+            )
         print(canonical_json(summary))
 
 
