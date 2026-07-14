@@ -1,0 +1,40 @@
+{
+  "protocol_version": "abides_ecology_holdout_v1",
+  "freeze_status": "preregistered",
+  "formal_execution_allowed": true,
+  "backend": "abides",
+  "episode_steps": 100,
+  "base_episodes": 384,
+  "response_episodes": 96,
+  "methods": ["no_intervention", "risk_aware", "matched_random", "no_routing"],
+  "common_market": {
+    "n_agents": 10,
+    "half_spread_levels": [1, 2, 3, 4, 5, 6, 7],
+    "flow_events_per_step": 20,
+    "flow_quantity": 1,
+    "low_sigma_ticks": 0.75,
+    "high_sigma_ticks": 4.0,
+    "initial_high_probability": 0.3,
+    "inventory_penalty": 0.002
+  },
+  "cells": {
+    "E1_fast_transition": {
+      "policy_seeds": [560000, 560001, 560002, 560003, 560004, 560005, 560006, 560007, 560008, 560009],
+      "base_evaluation_seeds": [561000, 561001, 561002, 561003, 561004],
+      "response_evaluation_seeds": [562000, 562001, 562002, 562003, 562004, 562005, 562006, 562007, 562008, 562009],
+      "market_overrides": {"p_low_to_high": 0.08, "p_high_to_low": 0.2, "informed_flow_probability": 0.8}
+    },
+    "E2_weaker_informed_flow": {
+      "policy_seeds": [570000, 570001, 570002, 570003, 570004, 570005, 570006, 570007, 570008, 570009],
+      "base_evaluation_seeds": [571000, 571001, 571002, 571003, 571004],
+      "response_evaluation_seeds": [572000, 572001, 572002, 572003, 572004, 572005, 572006, 572007, 572008, 572009],
+      "market_overrides": {"p_low_to_high": 0.04, "p_high_to_low": 0.1, "informed_flow_probability": 0.6}
+    }
+  },
+  "routing_allocation_mode": "soft_rank",
+  "routing_target_kappa": 4.0,
+  "routing_routable_fraction": 0.5,
+  "workers": 8,
+  "device": "cpu",
+  "output_dir": "revision/experiments/outputs/abides_ecology_holdout_v1"
+}

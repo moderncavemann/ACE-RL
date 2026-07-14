@@ -1,0 +1,61 @@
+{
+  "protocol_version": "abides_domain_benchmark_smoke_v1",
+  "freeze_status": "engineering_smoke",
+  "formal_execution_allowed": true,
+  "engineering_smoke": true,
+  "backend": "abides",
+  "docker_image": "ace-rl-abides-ace:adaptive-v3",
+  "episode_steps": 100,
+  "policy_seeds": [530000, 530001],
+  "evaluation_seeds": [539900, 539901],
+  "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_v5_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_v1",
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "methods": [
+    "no_intervention",
+    "risk_aware",
+    "matched_random",
+    "spread_only_budget_matched",
+    "brero_threshold_buybox",
+    "brero_threshold_buybox_budget_matched"
+  ],
+  "new_adapter_methods": [
+    "spread_only_budget_matched",
+    "brero_threshold_buybox",
+    "brero_threshold_buybox_budget_matched"
+  ],
+  "response_episodes": 4,
+  "response_episodes_per_update": 2,
+  "learning_rate": 0.0003,
+  "entropy_coefficient": 0.02,
+  "reward_scale": 100.0,
+  "routing_allocation_mode": "soft_rank",
+  "routing_target_kappa": 4.0,
+  "routing_routable_fraction": 0.5,
+  "smoke_mechanism_parameters": {
+    "brero_threshold_buybox": {"order_statistic_k": 1, "margin_ticks": 0},
+    "brero_threshold_buybox_budget_matched": {"order_statistic_k": 2, "margin_ticks": 0},
+    "spread_only_budget_matched": {"activation_target": 0.2, "severity_threshold": 0.4, "signal_scale": 0.75}
+  },
+  "market": {
+    "n_agents": 10,
+    "half_spread_levels": [1, 2, 3, 4, 5, 6, 7],
+    "flow_events_per_step": 20,
+    "flow_quantity": 1,
+    "informed_flow_probability": 0.8,
+    "low_sigma_ticks": 0.75,
+    "high_sigma_ticks": 4.0,
+    "p_low_to_high": 0.04,
+    "p_high_to_low": 0.1,
+    "initial_high_probability": 0.3,
+    "inventory_penalty": 0.002
+  },
+  "gate_artifact": "revision/configs/abides_two_stage_gate_v1.json",
+  "response_environment_seed_namespace": 629900000,
+  "response_action_namespace": 549117,
+  "evaluation_action_namespace": 549217,
+  "workers": 2,
+  "device": "cpu",
+  "output_dir": "revision/experiments/outputs/abides_domain_benchmark_smoke_v1"
+}

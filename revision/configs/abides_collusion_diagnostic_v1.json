@@ -1,0 +1,31 @@
+{
+  "protocol_version": "abides_collusion_diagnostic_v1",
+  "freeze_status": "preregistered",
+  "backend": "abides",
+  "source_policy_seeds": [530000, 530001, 530002, 530003, 530004, 530005, 530006, 530007, 530008, 530009, 530010, 530011, 530012, 530013, 530014, 530015, 530016, 530017, 530018, 530019],
+  "evaluation_seeds": [536000, 536001, 536002, 536003, 536004, 536005, 536006, 536007, 536008, 536009, 536010, 536011, 536012, 536013, 536014, 536015, 536016, 536017, 536018, 536019],
+  "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "episode_steps": 100,
+  "event_horizon": 10,
+  "minimum_remaining_steps": 11,
+  "maximum_events_per_episode": 1,
+  "event_risk_state": "low",
+  "minimum_mean_half_spread": 6.0,
+  "event_selection": "first_eligible_state",
+  "dealer_selection": "sha256_policy_path_step_mod_n_agents",
+  "arms": ["sham", "forced_undercut", "upward_deviation"],
+  "action_namespace": 561117,
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260714,
+  "strong_collusion_requirements": [
+    "rival_spread_compression_after_undercut",
+    "deviator_continuation_loss",
+    "high_spread_state_recovery",
+    "upward_deviation_asymmetry",
+    "policy_seed_ci_support"
+  ],
+  "fallback_wording": "high-spread coordination",
+  "workers": 8,
+  "output_dir": "revision/experiments/outputs/abides_collusion_diagnostic_v1"
+}

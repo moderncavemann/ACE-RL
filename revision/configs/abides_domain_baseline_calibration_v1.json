@@ -1,0 +1,73 @@
+{
+  "protocol_version": "abides_domain_baseline_calibration_v1",
+  "freeze_status": "preregistered",
+  "backend": "abides",
+  "source_policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "calibration_environment_seeds": [535000, 535001, 535002, 535003, 535004, 535005, 535006, 535007, 535008, 535009],
+  "forbidden_formal_evaluation_seeds": [534000, 534001, 534002, 534003, 534004, 534005, 534006, 534007, 534008, 534009],
+  "evaluation_action_namespace": 551117,
+  "episode_steps": 100,
+  "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_v5_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_v1",
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "gate_artifact": "revision/configs/abides_two_stage_gate_v1.json",
+  "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
+  "reference_method": "risk_aware",
+  "routing_allocation_mode": "soft_rank",
+  "routing_target_kappa": 4.0,
+  "routing_routable_fraction": 0.5,
+  "active_routing_tv_epsilon": 1e-12,
+  "budget_tolerances": {
+    "maximum_active_rate_difference": 0.02,
+    "minimum_mean_tv_ratio": 0.9,
+    "maximum_mean_tv_ratio": 1.1
+  },
+  "brero_threshold_buybox": {
+    "literature_form": {"order_statistic_k": 1, "margin_ticks": 0},
+    "order_statistic_k_candidates": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "margin_tick_candidates": [0, 1],
+    "tie_rule": "include_all_at_or_below_threshold",
+    "empty_rule": "include_all_narrowest_ties"
+  },
+  "spread_only_budget_matched": {
+    "severity_source": "lagged_contract_severity",
+    "activation_target_candidates": [0.18, 0.19, 0.2, 0.21, 0.22],
+    "severity_threshold_candidates": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "signal_scale_candidates": [0.5, 0.75, 1.0],
+    "strength_transform": "scale_times_clipped_linear_excess"
+  },
+  "forbidden_calibration_fields": [
+    "low_execution_half_spread",
+    "high_execution_half_spread",
+    "all_state_execution_half_spread",
+    "mean_reward",
+    "dealer_reward_units_per_episode",
+    "customer_cost",
+    "method_rank"
+  ],
+  "selection_rule": "minimum_normalized_budget_distance_then_lexicographic_parameters",
+  "output_artifact": "revision/configs/abides_domain_baseline_calibration_v1_artifact.json",
+  "output_dir": "revision/experiments/outputs/abides_domain_baseline_calibration_v1"
+}

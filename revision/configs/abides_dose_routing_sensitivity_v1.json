@@ -1,0 +1,33 @@
+{
+  "protocol_version": "abides_dose_routing_sensitivity_v1",
+  "freeze_status": "calibration_pending",
+  "formal_execution_allowed": false,
+  "backend": "abides",
+  "source_policy_seeds": [530000, 530001, 530002, 530003, 530004, 530005, 530006, 530007, 530008, 530009],
+  "passive_calibration_seeds": [537000, 537001, 537002, 537003, 537004, 537005, 537006, 537007, 537008, 537009],
+  "evaluation_seeds": [538000, 538001, 538002, 538003, 538004, 538005, 538006, 538007, 538008, 538009],
+  "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "episode_steps": 100,
+  "response_episodes": 96,
+  "response_episodes_per_update": 8,
+  "dose_targets": [0.1, 0.2, 0.3],
+  "dose_methods": ["risk_aware", "matched_random", "spread_only_budget_matched"],
+  "routing_settings": [
+    {"routing_target_kappa": 2.0, "routing_routable_fraction": 0.5},
+    {"routing_target_kappa": 4.0, "routing_routable_fraction": 0.5},
+    {"routing_target_kappa": 8.0, "routing_routable_fraction": 0.5},
+    {"routing_target_kappa": 4.0, "routing_routable_fraction": 0.25},
+    {"routing_target_kappa": 4.0, "routing_routable_fraction": 0.75}
+  ],
+  "routing_methods": ["risk_aware", "matched_random"],
+  "routing_activation_target": 0.2,
+  "response_environment_seed_namespace": 630000000,
+  "response_action_namespace": 571117,
+  "evaluation_action_namespace": 581117,
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260714,
+  "workers": 8,
+  "device": "cpu",
+  "output_dir": "revision/experiments/outputs/abides_dose_routing_sensitivity_v1"
+}
