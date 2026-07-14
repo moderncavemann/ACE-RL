@@ -1,0 +1,272 @@
+{
+  "checks": {
+    "evaluation_action_uniforms_equal": true,
+    "evaluation_paths_equal": true,
+    "evaluation_random_dose_exact": true,
+    "evaluation_step_count_exact": true,
+    "fixed_response_budget_complete": true,
+    "no_worker_failures": true,
+    "required_task_count": true,
+    "routing_weights_valid_every_step": true,
+    "same_initial_adapter_within_policy_seed": true,
+    "training_action_uniforms_equal": true,
+    "training_paths_equal": true,
+    "training_random_dose_exact": true,
+    "volume_conserved_every_step": true
+  },
+  "claim_boundary": "secondary sensitivity only; no setting replaces v5 and nonsignificance is not equivalence",
+  "contrast_statistics": {
+    "dose_010": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 9,
+          "non_ties": 10,
+          "p_value_two_sided": 0.021484375,
+          "positive": 1,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": -0.0016896908374424814,
+          "ci_low": -0.0075699878808223485,
+          "mean": -0.004629839359132415,
+          "n": 10,
+          "negative": 9,
+          "p_value_two_sided": 0.00609814970709893,
+          "positive": 1,
+          "se": 0.001299710104129296,
+          "ties": 0
+        }
+      },
+      "spread_only_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.010673795358485082,
+          "ci_low": 0.006193233390100527,
+          "mean": 0.008433514374292805,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 1.339041868239837e-05,
+          "positive": 10,
+          "se": 0.0009903295053849308,
+          "ties": 0
+        }
+      }
+    },
+    "dose_020": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.012873667577259051,
+          "ci_low": 0.006060179663808472,
+          "mean": 0.009466923620533762,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 0.00014330600158839023,
+          "positive": 10,
+          "se": 0.0015059713854837114,
+          "ties": 0
+        }
+      },
+      "spread_only_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.026609562406035948,
+          "ci_low": 0.02023372035778456,
+          "mean": 0.023421641381910253,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 4.6153118878108867e-08,
+          "positive": 10,
+          "se": 0.001409239409389039,
+          "ties": 0
+        }
+      }
+    },
+    "dose_030": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 1,
+          "non_ties": 10,
+          "p_value_two_sided": 0.021484375,
+          "positive": 9,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.009367831112529906,
+          "ci_low": 8.170466496212371e-06,
+          "mean": 0.0046880007895130586,
+          "n": 10,
+          "negative": 1,
+          "p_value_two_sided": 0.04967825452526767,
+          "positive": 9,
+          "se": 0.00206874676961544,
+          "ties": 0
+        }
+      },
+      "spread_only_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.06361333905771183,
+          "ci_low": 0.05628822079416692,
+          "mean": 0.059950779925939376,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 3.7883448355107644e-11,
+          "positive": 10,
+          "se": 0.001619056001905504,
+          "ties": 0
+        }
+      }
+    },
+    "routing_k2_f050": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 3,
+          "non_ties": 10,
+          "p_value_two_sided": 0.34375,
+          "positive": 7,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.007978615127165665,
+          "ci_low": 0.000691359596814347,
+          "mean": 0.004334987361990006,
+          "n": 10,
+          "negative": 3,
+          "p_value_two_sided": 0.024740131841688676,
+          "positive": 7,
+          "se": 0.0016106872789415738,
+          "ties": 0
+        }
+      }
+    },
+    "routing_k4_f025": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 5,
+          "non_ties": 10,
+          "p_value_two_sided": 1.0,
+          "positive": 5,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.003738878697710713,
+          "ci_low": -0.0003436459497167764,
+          "mean": 0.0016976163739969685,
+          "n": 10,
+          "negative": 5,
+          "p_value_two_sided": 0.09261045623679218,
+          "positive": 5,
+          "se": 0.0009023521253219837,
+          "ties": 0
+        }
+      }
+    },
+    "routing_k4_f050": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.012873667577259051,
+          "ci_low": 0.006060179663808472,
+          "mean": 0.009466923620533762,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 0.00014330600158839023,
+          "positive": 10,
+          "se": 0.0015059713854837114,
+          "ties": 0
+        }
+      }
+    },
+    "routing_k4_f075": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.02597307132989059,
+          "ci_low": 0.013101554406551901,
+          "mean": 0.019537312868221246,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 7.329679439133765e-05,
+          "positive": 10,
+          "se": 0.002844965224940222,
+          "ties": 0
+        }
+      }
+    },
+    "routing_k8_f050": {
+      "matched_random_minus_risk_aware_low_spread": {
+        "policy_seed_exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "policy_seed_t_interval": {
+          "ci_high": 0.013653856539848803,
+          "ci_low": 0.007207538917060035,
+          "mean": 0.01043069772845442,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 4.464537750072169e-05,
+          "positive": 10,
+          "se": 0.0014248164823914432,
+          "ties": 0
+        }
+      }
+    }
+  },
+  "group_count": 8,
+  "implementation_status": "pass",
+  "per_path_row_count": 2700,
+  "policy_seed_count": 10,
+  "protocol_fingerprint": "7498d1547fdfe3057a0b5faae809d21e6e3f185bf1802ede7922da505826cccf",
+  "protocol_version": "abides_dose_routing_sensitivity_v1",
+  "routing_robustness": {
+    "center_supported": true,
+    "classification": "broadly_robust",
+    "favorable_mean_settings": 5,
+    "nonsignificance_is_not_equivalence": true,
+    "significantly_adverse_settings": [],
+    "total_settings": 5
+  },
+  "scientific_result": "secondary_sensitivity_evaluated",
+  "task_count": 80
+}

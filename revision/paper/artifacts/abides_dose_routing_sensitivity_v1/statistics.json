@@ -1,0 +1,2971 @@
+{
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260714,
+  "groups": {
+    "dose_010": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.02439259882839572,
+          "policy_seed_exact_sign_test": {
+            "negative": 9,
+            "non_ties": 10,
+            "p_value_two_sided": 0.021484375,
+            "positive": 1,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": -0.0016896908374424814,
+            "ci_low": -0.0075699878808223485,
+            "mean": -0.004629839359132415,
+            "n": 10,
+            "negative": 9,
+            "p_value_two_sided": 0.00609814970709893,
+            "positive": 1,
+            "se": 0.001299710104129296,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.0014184566684586671,
+            "ci_low": -0.010806955106798483,
+            "mean": -0.004602291185579723,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        },
+        "spread_only_budget_matched": {
+          "holm_adjusted_p_value_global_family": 0.00012051376814158532,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.010673795358485082,
+            "ci_low": 0.006193233390100527,
+            "mean": 0.008433514374292805,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.339041868239837e-05,
+            "positive": 10,
+            "se": 0.0009903295053849308,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.013308056463678098,
+            "ci_low": 0.003494793646679131,
+            "mean": 0.008414363095487985,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.1,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0034000000000000002,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0603001775241296
+        },
+        "spread_only_budget_matched": {
+          "activation_absolute_difference": 0.01200000000000001,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 0.9941228839448075
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.08819105130859219,
+            "ci_low": 0.08400894869140778,
+            "mean": 0.08609999999999998,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.606775717396547e-15,
+            "positive": 10,
+            "se": 0.0009243616415908019,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.492305401593041,
+            "ci_low": 6.398274598406959,
+            "mean": 6.44529,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.9185750559340444e-19,
+            "positive": 10,
+            "se": 0.020783437315965488,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 153.03934880666282,
+            "ci_low": 138.8611311933367,
+            "mean": 145.95023999999975,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.856132632363329e-12,
+            "positive": 10,
+            "se": 3.133782622653392,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10858.159585980946,
+            "ci_low": 10674.484734019054,
+            "mean": 10766.32216,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.84349291646201e-19,
+            "positive": 10,
+            "se": 40.597279220457914,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.09061595465586847,
+            "ci_low": 0.08735262296090651,
+            "mean": 0.08898428880838749,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.673201056206849e-16,
+            "positive": 10,
+            "se": 0.0007212875720015606,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.494238162986321,
+            "ci_low": 6.402183790899665,
+            "mean": 6.448210976942993,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.578277406855156e-19,
+            "positive": 10,
+            "se": 0.020346590767043194,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.02503397956461783,
+            "ci_low": 0.023934991302662106,
+            "mean": 0.024484485433639968,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.7232557098472696e-15,
+            "positive": 10,
+            "se": 0.00024290714190900066,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.08491260095321677,
+            "ci_low": 0.08048739904678319,
+            "mean": 0.08269999999999998,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.2935535285461452e-14,
+            "positive": 10,
+            "se": 0.0009780933834080806,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.504856616199438,
+            "ci_low": 6.410573383800562,
+            "mean": 6.457715,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.931655604444244e-19,
+            "positive": 10,
+            "se": 0.020839231231821697,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 121.58347652389034,
+            "ci_low": 109.88268347610887,
+            "mean": 115.7330799999996,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.946226798558474e-12,
+            "positive": 10,
+            "se": 2.586202506155433,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10891.254479325735,
+            "ci_low": 10701.824160674265,
+            "mean": 10796.53932,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0095776207181668e-18,
+            "positive": 10,
+            "se": 41.869398325196265,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.04858021869609202,
+            "ci_low": 0.04568121921240471,
+            "mean": 0.04713071895424836,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.024897522165224e-14,
+            "positive": 10,
+            "se": 0.0006407599638280061,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.499110154557232,
+            "ci_low": 6.406571478047016,
+            "mean": 6.452840816302124,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.643941079969463e-19,
+            "positive": 10,
+            "se": 0.020453635589461745,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.023684695070490824,
+            "ci_low": 0.022499368561023126,
+            "mean": 0.023092031815756975,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.5784161085713122e-14,
+            "positive": 10,
+            "se": 0.00026199030927899974,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "spread_only_budget_matched": {
+          "activation_rate": {
+            "ci_high": 0.09657908886706348,
+            "ci_low": 0.0928209111329365,
+            "mean": 0.09469999999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.5606736271661504e-15,
+            "positive": 10,
+            "se": 0.0008306623862918081,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.501797283545128,
+            "ci_low": 6.40817271645487,
+            "mean": 6.454984999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.8204671311665883e-19,
+            "positive": 10,
+            "se": 0.020693647777357535,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 139.92553987299544,
+            "ci_low": 127.5706201270044,
+            "mean": 133.74807999999993,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.091817507047074e-12,
+            "positive": 10,
+            "se": 2.7307828007854233,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10872.410703638368,
+            "ci_low": 10684.637936361632,
+            "mean": 10778.52432,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.469314675224713e-19,
+            "positive": 10,
+            "se": 41.503033113718296,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.06871194205778575,
+            "ci_low": 0.06387026713087504,
+            "mean": 0.0662911045943304,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.754888751732919e-13,
+            "positive": 10,
+            "se": 0.001070145568666434,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.507505088581734,
+            "ci_low": 6.415043572771097,
+            "mean": 6.4612743306764155,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.61258048603723e-19,
+            "positive": 10,
+            "se": 0.020436580916858307,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.02332061565860783,
+            "ci_low": 0.02259201887104332,
+            "mean": 0.022956317264825575,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0910985195524647e-16,
+            "positive": 10,
+            "se": 0.00016104026712389407,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 4.0,
+      "study": "dose"
+    },
+    "dose_020": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.0008598360095303414,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.012873667577259051,
+            "ci_low": 0.006060179663808472,
+            "mean": 0.009466923620533762,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.00014330600158839023,
+            "positive": 10,
+            "se": 0.0015059713854837114,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.01855989629107401,
+            "ci_low": -3.761525383721374e-07,
+            "mean": 0.009488924661180854,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        },
+        "spread_only_budget_matched": {
+          "holm_adjusted_p_value_global_family": 4.615311887810887e-07,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.026609562406035948,
+            "ci_low": 0.02023372035778456,
+            "mean": 0.023421641381910253,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.6153118878108867e-08,
+            "positive": 10,
+            "se": 0.001409239409389039,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.029579611940822412,
+            "ci_low": 0.016938666388940433,
+            "mean": 0.02338705863063863,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0003999999999999837,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0147951732052303
+        },
+        "spread_only_budget_matched": {
+          "activation_absolute_difference": 0.0021999999999999797,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 0.9337775449210112
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.19252337668833383,
+            "ci_low": 0.1852766233116662,
+            "mean": 0.1889,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1506687965270208e-15,
+            "positive": 10,
+            "se": 0.0016017351702311965,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.431861359303689,
+            "ci_low": 6.337638640696309,
+            "mean": 6.384749999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.1273129965625223e-19,
+            "positive": 10,
+            "se": 0.020825855991477994,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 278.81409457560835,
+            "ci_low": 259.0658254243914,
+            "mean": 268.93995999999987,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.9405072595325466e-13,
+            "positive": 10,
+            "se": 4.364919793260774,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10734.572388763012,
+            "ci_low": 10552.092491236988,
+            "mean": 10643.33244,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.201681564202762e-19,
+            "positive": 10,
+            "se": 40.33316087017454,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2080314335774618,
+            "ci_low": 0.20055731155891138,
+            "mean": 0.20429437256818658,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.509044273867554e-16,
+            "positive": 10,
+            "se": 0.0016519899990327174,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.443262653412125,
+            "ci_low": 6.3507205233002395,
+            "mean": 6.396991588356182,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7783033145888963e-19,
+            "positive": 10,
+            "se": 0.020454398932019474,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.046664563415077326,
+            "ci_low": 0.04523994892371322,
+            "mean": 0.04595225616939527,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.6930115814724452e-16,
+            "positive": 10,
+            "se": 0.0003148796455783617,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.19173291470957496,
+            "ci_low": 0.18686708529042503,
+            "mean": 0.1893,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.1364346733620817e-17,
+            "positive": 10,
+            "se": 0.001075484386993446,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.446024686943996,
+            "ci_low": 6.3516253130560045,
+            "mean": 6.398825,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.1210251950224676e-19,
+            "positive": 10,
+            "se": 0.020864901749109717,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 245.83752247718456,
+            "ci_low": 227.38375752281593,
+            "mean": 236.61064000000025,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.770285108023838e-13,
+            "positive": 10,
+            "se": 4.0787981616374624,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10769.520139280576,
+            "ci_low": 10581.803380719422,
+            "mean": 10675.661759999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0295052473797087e-18,
+            "positive": 10,
+            "se": 41.49065362114753,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.142504563474773,
+            "ci_low": 0.13676293120638397,
+            "mean": 0.13963374734057848,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.147733697966131e-15,
+            "positive": 10,
+            "se": 0.0012690613107413265,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.433513344268977,
+            "ci_low": 6.34153598520232,
+            "mean": 6.387524664735649,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7055680352940596e-19,
+            "positive": 10,
+            "se": 0.020329568735757492,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.04595541082527282,
+            "ci_low": 0.044609182666545004,
+            "mean": 0.04528229674590891,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1612283165349228e-16,
+            "positive": 10,
+            "se": 0.00029755407379152015,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "spread_only_budget_matched": {
+          "activation_rate": {
+            "ci_high": 0.19459529090799893,
+            "ci_low": 0.18840470909200102,
+            "mean": 0.19149999999999998,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.4668569215434906e-16,
+            "positive": 10,
+            "se": 0.0013682917167849207,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.4490590190645705,
+            "ci_low": 6.357940980935428,
+            "mean": 6.403499999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.532569793742013e-19,
+            "positive": 10,
+            "se": 0.020139634775459322,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 241.76899422268366,
+            "ci_low": 227.4095657773159,
+            "mean": 234.58927999999977,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.681258137827613e-14,
+            "positive": 10,
+            "se": 3.1738352845588516,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10769.191482334945,
+            "ci_low": 10586.17475766505,
+            "mean": 10677.683119999998,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.180694605686423e-19,
+            "positive": 10,
+            "se": 40.45181468271381,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.15934726067587712,
+            "ci_low": 0.15420591050461852,
+            "mean": 0.15677658559024782,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.8068540831530478e-16,
+            "positive": 10,
+            "se": 0.0011363821788517845,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.455375684834759,
+            "ci_low": 6.366516927400359,
+            "mean": 6.410946306117559,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.2098978522152774e-19,
+            "positive": 10,
+            "se": 0.01964027055536,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.042704698823849245,
+            "ci_low": 0.04186248494370979,
+            "mean": 0.04228359188377952,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.161118046899998e-18,
+            "positive": 10,
+            "se": 0.0001861528221754634,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 4.0,
+      "study": "dose"
+    },
+    "dose_030": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.09935650905053534,
+          "policy_seed_exact_sign_test": {
+            "negative": 1,
+            "non_ties": 10,
+            "p_value_two_sided": 0.021484375,
+            "positive": 9,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.009367831112529906,
+            "ci_low": 8.170466496212371e-06,
+            "mean": 0.0046880007895130586,
+            "n": 10,
+            "negative": 1,
+            "p_value_two_sided": 0.04967825452526767,
+            "positive": 9,
+            "se": 0.00206874676961544,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.013422268205750269,
+            "ci_low": -0.0041477888805976065,
+            "mean": 0.004704923177129899,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        },
+        "spread_only_budget_matched": {
+          "holm_adjusted_p_value_global_family": 4.167179319061841e-10,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.06361333905771183,
+            "ci_low": 0.05628822079416692,
+            "mean": 0.059950779925939376,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.7883448355107644e-11,
+            "positive": 10,
+            "se": 0.001619056001905504,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.06524730103620298,
+            "ci_low": 0.054600146552099056,
+            "mean": 0.059930566162289596,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.3,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0022999999999999687,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0008809831937344
+        },
+        "spread_only_budget_matched": {
+          "activation_absolute_difference": 0.0006000000000000449,
+          "formal_realized_budget_within_passive_tolerances": false,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 0.8859057639640731
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.2881007181758711,
+            "ci_low": 0.28029928182412894,
+            "mean": 0.2842,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 5.66580774782782e-17,
+            "positive": 10,
+            "se": 0.0017243356208503351,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.358819968683957,
+            "ci_low": 6.262410031316044,
+            "mean": 6.310615,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.9051236850868836e-19,
+            "positive": 10,
+            "se": 0.021309292508720788,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 433.5324648583032,
+            "ci_low": 409.2029751416965,
+            "mean": 421.36771999999985,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.545055210366567e-14,
+            "positive": 10,
+            "se": 5.377497663758887,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10584.305207205647,
+            "ci_low": 10397.504152794356,
+            "mean": 10490.904680000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.152778027285464e-18,
+            "positive": 10,
+            "se": 41.288257394019894,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.24958512489843854,
+            "ci_low": 0.24377398038590392,
+            "mean": 0.24667955264217123,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.430932533500348e-17,
+            "positive": 10,
+            "se": 0.001284425460785156,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.354703098531463,
+            "ci_low": 6.259508951923321,
+            "mean": 6.307106025227392,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.6045876603099813e-19,
+            "positive": 10,
+            "se": 0.02104056874811426,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.06745459295267525,
+            "ci_low": 0.06582678207710285,
+            "mean": 0.06664068751488905,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.98248615995089e-17,
+            "positive": 10,
+            "se": 0.00035979172939483884,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.29107741475841875,
+            "ci_low": 0.2819225852415812,
+            "mean": 0.2865,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.2224355743821586e-16,
+            "positive": 10,
+            "se": 0.002023473361436819,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.373582783169223,
+            "ci_low": 6.274327216830779,
+            "mean": 6.323955000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.7033809678436065e-19,
+            "positive": 10,
+            "se": 0.02193825609649854,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 410.403900001782,
+            "ci_low": 383.30265999821785,
+            "mean": 396.8532799999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0534742976721472e-13,
+            "positive": 10,
+            "se": 5.99013199626044,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10614.497544467624,
+            "ci_low": 10416.34069553238,
+            "mean": 10515.419120000002,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.919822275522431e-18,
+            "positive": 10,
+            "se": 43.798205577643344,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2608670276251543,
+            "ci_low": 0.2516662098731686,
+            "mean": 0.25626661874916146,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.340138371749349e-16,
+            "positive": 10,
+            "se": 0.0020336380475831366,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.351883411063705,
+            "ci_low": 6.252952637812053,
+            "mean": 6.302418024437879,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.707841953352629e-19,
+            "positive": 10,
+            "se": 0.0218664677406486,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.06778559623733318,
+            "ci_low": 0.06537846349381232,
+            "mean": 0.06658202986557275,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.747801094701794e-16,
+            "positive": 10,
+            "se": 0.0005320436579401587,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "spread_only_budget_matched": {
+          "activation_rate": {
+            "ci_high": 0.2923939633273474,
+            "ci_low": 0.28180603667265264,
+            "mean": 0.2871,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.069253891052727e-16,
+            "positive": 10,
+            "se": 0.0023402279091290757,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.39976275981733,
+            "ci_low": 6.30283724018267,
+            "mean": 6.3513,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.8766934702576943e-19,
+            "positive": 10,
+            "se": 0.02142325060924853,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 354.99948992024173,
+            "ci_low": 326.2111500797576,
+            "mean": 340.60531999999967,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.3931914202484537e-12,
+            "positive": 10,
+            "se": 6.363028244280493,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10670.572821275638,
+            "ci_low": 10472.761338724364,
+            "mean": 10571.667080000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.8013354792455428e-18,
+            "positive": 10,
+            "se": 43.721869947732074,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2902143349900839,
+            "ci_low": 0.2813047572606971,
+            "mean": 0.2857595461253905,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7817388726693867e-16,
+            "positive": 10,
+            "se": 0.0019692658573168837,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.4106589603901325,
+            "ci_low": 6.314078648337504,
+            "mean": 6.362368804363818,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.742482006099673e-19,
+            "positive": 10,
+            "se": 0.021346950079006877,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.05992162273332541,
+            "ci_low": 0.05804918533535251,
+            "mean": 0.05898540403433896,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0944675743883066e-16,
+            "positive": 10,
+            "se": 0.0004138610324515404,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 4.0,
+      "study": "dose"
+    },
+    "routing_k2_f050": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.07422039552506603,
+          "policy_seed_exact_sign_test": {
+            "negative": 3,
+            "non_ties": 10,
+            "p_value_two_sided": 0.34375,
+            "positive": 7,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.007978615127165665,
+            "ci_low": 0.000691359596814347,
+            "mean": 0.004334987361990006,
+            "n": 10,
+            "negative": 3,
+            "p_value_two_sided": 0.024740131841688676,
+            "positive": 7,
+            "se": 0.0016106872789415738,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.013425561688492313,
+            "ci_low": -0.004994637859959523,
+            "mean": 0.004355231656473098,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0005999999999999894,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.046459403733846
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.19200370779541615,
+            "ci_low": 0.18479629220458388,
+            "mean": 0.1884,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1221244378174721e-15,
+            "positive": 10,
+            "se": 0.001593040419379804,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.444480706828056,
+            "ci_low": 6.349039293171941,
+            "mean": 6.396759999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.3480820748438597e-19,
+            "positive": 10,
+            "se": 0.021095221681171717,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 250.3073656633585,
+            "ci_low": 234.01775433664136,
+            "mean": 242.16255999999993,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.793073965971953e-13,
+            "positive": 10,
+            "se": 3.600459683836693,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10763.403985650379,
+            "ci_low": 10576.815694349623,
+            "mean": 10670.109840000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.797076975874901e-19,
+            "positive": 10,
+            "se": 41.24123079612658,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2080314335774618,
+            "ci_low": 0.20055731155891138,
+            "mean": 0.20429437256818658,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.509044273867554e-16,
+            "positive": 10,
+            "se": 0.0016519899990327174,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.455708241405318,
+            "ci_low": 6.3615210122978905,
+            "mean": 6.408614626851604,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0501137306041976e-19,
+            "positive": 10,
+            "se": 0.02081801181943395,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.038433798637856745,
+            "ci_low": 0.03702039868281436,
+            "mean": 0.03772709866033555,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.29618668012059e-16,
+            "positive": 10,
+            "se": 0.0003124009194080811,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.1916121140938461,
+            "ci_low": 0.1863878859061539,
+            "mean": 0.189,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.030345040094459e-17,
+            "positive": 10,
+            "se": 0.0011547005383792525,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.461132610355879,
+            "ci_low": 6.365527389644122,
+            "mean": 6.41333,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.3297241785944424e-19,
+            "positive": 10,
+            "se": 0.02113142762175182,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 214.62631343312506,
+            "ci_low": 196.6432865668749,
+            "mean": 205.63479999999998,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.891591227524723e-12,
+            "positive": 10,
+            "se": 3.974751878769001,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10801.041465363553,
+            "ci_low": 10612.233734636447,
+            "mean": 10706.6376,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0567031935503293e-18,
+            "positive": 10,
+            "se": 41.731788981649,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.142504563474773,
+            "ci_low": 0.13676293120638397,
+            "mean": 0.13963374734057848,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.147733697966131e-15,
+            "positive": 10,
+            "se": 0.0012690613107413265,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.451066941532328,
+            "ci_low": 6.3574923374469,
+            "mean": 6.404279639489614,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.9449952441695465e-19,
+            "positive": 10,
+            "se": 0.020682604555946883,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.03690573584051985,
+            "ci_low": 0.03519853982602283,
+            "mean": 0.03605213783327134,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.643924674704397e-15,
+            "positive": 10,
+            "se": 0.00037733806530557454,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 2.0,
+      "study": "routing"
+    },
+    "routing_k4_f025": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.09935650905053534,
+          "policy_seed_exact_sign_test": {
+            "negative": 5,
+            "non_ties": 10,
+            "p_value_two_sided": 1.0,
+            "positive": 5,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.003738878697710713,
+            "ci_low": -0.0003436459497167764,
+            "mean": 0.0016976163739969685,
+            "n": 10,
+            "negative": 5,
+            "p_value_two_sided": 0.09261045623679218,
+            "positive": 5,
+            "se": 0.0009023521253219837,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.00606244558602083,
+            "ci_low": -0.002723166775939523,
+            "mean": 0.0017005693048960694,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0009000000000000119,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.017017363284565
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.1915159819226259,
+            "ci_low": 0.18388401807737412,
+            "mean": 0.1877,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.9415705610899466e-15,
+            "positive": 10,
+            "se": 0.0016868774571840005,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.499252372388629,
+            "ci_low": 6.404607627611371,
+            "mean": 6.45193,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.015531239331407e-19,
+            "positive": 10,
+            "se": 0.020919135578061847,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 132.38241424197983,
+            "ci_low": 121.98238575802063,
+            "mean": 127.18240000000023,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0354941247606221e-12,
+            "positive": 10,
+            "se": 2.2986971583437144,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10877.559940128393,
+            "ci_low": 10692.620059871608,
+            "mean": 10785.09,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.213483852425425e-19,
+            "positive": 10,
+            "se": 40.87688585337951,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.20754598113298958,
+            "ci_low": 0.19823598655144484,
+            "mean": 0.2028909838422172,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 5.760125809986731e-15,
+            "positive": 10,
+            "se": 0.0020577691803249,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.508724549354682,
+            "ci_low": 6.415625655205966,
+            "mean": 6.462175102280324,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.713270680277413e-19,
+            "positive": 10,
+            "se": 0.020577459355488655,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.02320776958936791,
+            "ci_low": 0.022552179700245707,
+            "mean": 0.02287997464480681,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.333837759580317e-17,
+            "positive": 10,
+            "se": 0.0001449037007435564,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.19128086568879607,
+            "ci_low": 0.18591913431120397,
+            "mean": 0.18860000000000002,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.764883424355777e-17,
+            "positive": 10,
+            "se": 0.001185092588975413,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.506733807854337,
+            "ci_low": 6.412266192145664,
+            "mean": 6.4595,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.9610348042267575e-19,
+            "positive": 10,
+            "se": 0.020879985100037305,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 117.69122657286938,
+            "ci_low": 107.53389342713014,
+            "mean": 112.61255999999976,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.49624787970668e-12,
+            "positive": 10,
+            "se": 2.245054701001418,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10893.75788543263,
+            "ci_low": 10705.561794567371,
+            "mean": 10799.65984,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.494309783094707e-19,
+            "positive": 10,
+            "se": 41.596599466108096,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.142504563474773,
+            "ci_low": 0.13676293120638397,
+            "mean": 0.13963374734057848,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.147733697966131e-15,
+            "positive": 10,
+            "se": 0.0012690613107413265,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.506820068032105,
+            "ci_low": 6.414134903780547,
+            "mean": 6.460477485906326,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.64985428497565e-19,
+            "positive": 10,
+            "se": 0.020486013477202275,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.022841759655964095,
+            "ci_low": 0.022152505871447386,
+            "mean": 0.02249713276370574,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.522056265168453e-16,
+            "positive": 10,
+            "se": 0.000152344363122652,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.25,
+      "routing_target_kappa": 4.0,
+      "study": "routing"
+    },
+    "routing_k4_f050": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.0008598360095303414,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.012873667577259051,
+            "ci_low": 0.006060179663808472,
+            "mean": 0.009466923620533762,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.00014330600158839023,
+            "positive": 10,
+            "se": 0.0015059713854837114,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.01855989629107401,
+            "ci_low": -3.761525383721374e-07,
+            "mean": 0.009488924661180854,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0003999999999999837,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0147951732052303
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.19252337668833383,
+            "ci_low": 0.1852766233116662,
+            "mean": 0.1889,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1506687965270208e-15,
+            "positive": 10,
+            "se": 0.0016017351702311965,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.431861359303689,
+            "ci_low": 6.337638640696309,
+            "mean": 6.384749999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.1273129965625223e-19,
+            "positive": 10,
+            "se": 0.020825855991477994,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 278.81409457560835,
+            "ci_low": 259.0658254243914,
+            "mean": 268.93995999999987,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.9405072595325466e-13,
+            "positive": 10,
+            "se": 4.364919793260774,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10734.572388763012,
+            "ci_low": 10552.092491236988,
+            "mean": 10643.33244,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.201681564202762e-19,
+            "positive": 10,
+            "se": 40.33316087017454,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2080314335774618,
+            "ci_low": 0.20055731155891138,
+            "mean": 0.20429437256818658,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.509044273867554e-16,
+            "positive": 10,
+            "se": 0.0016519899990327174,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.443262653412125,
+            "ci_low": 6.3507205233002395,
+            "mean": 6.396991588356182,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7783033145888963e-19,
+            "positive": 10,
+            "se": 0.020454398932019474,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.046664563415077326,
+            "ci_low": 0.04523994892371322,
+            "mean": 0.04595225616939527,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.6930115814724452e-16,
+            "positive": 10,
+            "se": 0.0003148796455783617,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.19173291470957496,
+            "ci_low": 0.18686708529042503,
+            "mean": 0.1893,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.1364346733620817e-17,
+            "positive": 10,
+            "se": 0.001075484386993446,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.446024686943996,
+            "ci_low": 6.3516253130560045,
+            "mean": 6.398825,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.1210251950224676e-19,
+            "positive": 10,
+            "se": 0.020864901749109717,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 245.83752247718456,
+            "ci_low": 227.38375752281593,
+            "mean": 236.61064000000025,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.770285108023838e-13,
+            "positive": 10,
+            "se": 4.0787981616374624,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10769.520139280576,
+            "ci_low": 10581.803380719422,
+            "mean": 10675.661759999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0295052473797087e-18,
+            "positive": 10,
+            "se": 41.49065362114753,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.142504563474773,
+            "ci_low": 0.13676293120638397,
+            "mean": 0.13963374734057848,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.147733697966131e-15,
+            "positive": 10,
+            "se": 0.0012690613107413265,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.433513344268977,
+            "ci_low": 6.34153598520232,
+            "mean": 6.387524664735649,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7055680352940596e-19,
+            "positive": 10,
+            "se": 0.020329568735757492,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.04595541082527282,
+            "ci_low": 0.044609182666545004,
+            "mean": 0.04528229674590891,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1612283165349228e-16,
+            "positive": 10,
+            "se": 0.00029755407379152015,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 4.0,
+      "study": "routing"
+    },
+    "routing_k4_f075": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.0005130775607393635,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.02597307132989059,
+            "ci_low": 0.013101554406551901,
+            "mean": 0.019537312868221246,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.329679439133765e-05,
+            "positive": 10,
+            "se": 0.002844965224940222,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.03249940555069708,
+            "ci_low": 0.006731247828774907,
+            "mean": 0.019623201259109626,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.0012999999999999956,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0097241919647861
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.19275870880918927,
+            "ci_low": 0.18604129119081075,
+            "mean": 0.1894,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 5.679562973499583e-16,
+            "positive": 10,
+            "se": 0.0014847371634213406,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.365504765388289,
+            "ci_low": 6.2707152346117105,
+            "mean": 6.31811,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.4676229426619895e-19,
+            "positive": 10,
+            "se": 0.020951137333222666,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 441.4575242520757,
+            "ci_low": 412.95871574792363,
+            "mean": 427.20811999999967,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.663825610698735e-13,
+            "positive": 10,
+            "se": 6.299033721466973,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10574.088355187776,
+            "ci_low": 10396.040204812221,
+            "mean": 10485.064279999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.522600258111164e-19,
+            "positive": 10,
+            "se": 39.35362080477982,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2080314335774618,
+            "ci_low": 0.20055731155891138,
+            "mean": 0.20429437256818658,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.509044273867554e-16,
+            "positive": 10,
+            "se": 0.0016519899990327174,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.378866180878938,
+            "ci_low": 6.2855443207492785,
+            "mean": 6.332205250814108,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.1017539510337696e-19,
+            "positive": 10,
+            "se": 0.020626741073090937,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.07019563463320039,
+            "ci_low": 0.06820883262268052,
+            "mean": 0.06920223362794045,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.483253338390488e-17,
+            "positive": 10,
+            "se": 0.0004391388103232363,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.19337768239178318,
+            "ci_low": 0.18802231760821683,
+            "mean": 0.1907,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 6.953848802989212e-17,
+            "positive": 10,
+            "se": 0.0011836853936376477,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.381555165246471,
+            "ci_low": 6.286044834753527,
+            "mean": 6.333799999999999,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.583403849690721e-19,
+            "positive": 10,
+            "se": 0.021110454229546546,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 402.9845620393448,
+            "ci_low": 379.8107979606546,
+            "mean": 391.3976799999997,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 5.695929224578487e-14,
+            "positive": 10,
+            "se": 5.1220499749567665,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10612.914900572025,
+            "ci_low": 10428.834539427979,
+            "mean": 10520.874720000002,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 9.845941603610245e-19,
+            "positive": 10,
+            "se": 40.6869080908146,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.14479985658741398,
+            "ci_low": 0.13734345508720705,
+            "mean": 0.14107165583731052,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.053622367490596e-14,
+            "positive": 10,
+            "se": 0.0016480732688792027,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.359016158406821,
+            "ci_low": 6.266319717484953,
+            "mean": 6.312667937945887,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0341290652395556e-19,
+            "positive": 10,
+            "se": 0.02048850593672171,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.06966967868043153,
+            "ci_low": 0.06740187844108758,
+            "mean": 0.06853577856075956,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 3.0424806564314377e-16,
+            "positive": 10,
+            "se": 0.0005012472777273185,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.75,
+      "routing_target_kappa": 4.0,
+      "study": "routing"
+    },
+    "routing_k8_f050": {
+      "contrasts": {
+        "matched_random": {
+          "holm_adjusted_p_value_global_family": 0.00035716302000577354,
+          "policy_seed_exact_sign_test": {
+            "negative": 0,
+            "non_ties": 10,
+            "p_value_two_sided": 0.001953125,
+            "positive": 10,
+            "ties": 0
+          },
+          "policy_seed_t_interval": {
+            "ci_high": 0.013653856539848803,
+            "ci_low": 0.007207538917060035,
+            "mean": 0.01043069772845442,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.464537750072169e-05,
+            "positive": 10,
+            "se": 0.0014248164823914432,
+            "ties": 0
+          },
+          "two_way_paired_bootstrap": {
+            "ci_high": 0.01962437492643206,
+            "ci_low": 0.0008678734559388366,
+            "mean": 0.010455518950859848,
+            "replicates": 10000,
+            "rng_seed": 20260714
+          }
+        }
+      },
+      "dose_target": 0.2,
+      "formal_realized_budget_diagnostics": {
+        "matched_random": {
+          "activation_absolute_difference": 0.00040000000000001146,
+          "formal_realized_budget_within_passive_tolerances": true,
+          "passive_calibration_tolerances": {
+            "activation_difference_maximum": 0.02,
+            "routing_tv_ratio_maximum": 1.1,
+            "routing_tv_ratio_minimum": 0.9
+          },
+          "routing_tv_ratio_comparator_over_risk_aware": 1.0108237265343731
+        }
+      },
+      "method_seed_statistics": {
+        "matched_random": {
+          "activation_rate": {
+            "ci_high": 0.1926319972571467,
+            "ci_low": 0.1853680027428533,
+            "mean": 0.189,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.1699456895550807e-15,
+            "positive": 10,
+            "se": 0.0016055459438389743,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.42949277311224,
+            "ci_low": 6.335787226887761,
+            "mean": 6.38264,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0305423937619843e-19,
+            "positive": 10,
+            "se": 0.02071154643080896,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 284.6058001510105,
+            "ci_low": 264.008359848989,
+            "mean": 274.30707999999976,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 4.815960646146756e-13,
+            "positive": 10,
+            "se": 4.5526103668310824,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10728.183110333424,
+            "ci_low": 10547.747529666574,
+            "mean": 10637.96532,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.4446397303679215e-19,
+            "positive": 10,
+            "se": 39.88130966974879,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.2080314335774618,
+            "ci_low": 0.20055731155891138,
+            "mean": 0.20429437256818658,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 7.509044273867554e-16,
+            "positive": 10,
+            "se": 0.0016519899990327174,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.440917279874585,
+            "ci_low": 6.3489072198595,
+            "mean": 6.394912249867042,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.6933265515646425e-19,
+            "positive": 10,
+            "se": 0.02033679655992556,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.048435874506314695,
+            "ci_low": 0.04688834487449898,
+            "mean": 0.04766210969040684,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.5660432966277944e-16,
+            "positive": 10,
+            "se": 0.0003420473292543561,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "no_intervention": {
+          "activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.562346944122765,
+            "ci_low": 6.468493055877237,
+            "mean": 6.515420000000001,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.7112855969119454e-19,
+            "positive": 10,
+            "se": 0.020744334166224745,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 11006.126288245528,
+            "ci_low": 10818.418511754471,
+            "mean": 10912.2724,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 8.448281522859103e-19,
+            "positive": 10,
+            "se": 41.4886683324495,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.568525984241766,
+            "ci_low": 6.476466415341524,
+            "mean": 6.522496199791645,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.424413934690716e-19,
+            "positive": 10,
+            "se": 0.02034773940818773,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "mean": 0.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0,
+            "positive": 0,
+            "se": 0.0,
+            "ties": 10
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        },
+        "risk_aware": {
+          "activation_rate": {
+            "ci_high": 0.19181296764037772,
+            "ci_low": 0.1869870323596223,
+            "mean": 0.1894,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.898694750729692e-17,
+            "positive": 10,
+            "se": 0.0010666666666666676,
+            "ties": 0
+          },
+          "all_state_execution_half_spread": {
+            "ci_high": 6.443203660779899,
+            "ci_low": 6.3491863392201005,
+            "mean": 6.396195,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.0525925313087868e-19,
+            "positive": 10,
+            "se": 0.020780457499508753,
+            "ties": 0
+          },
+          "dealer_reward_loss_vs_no_intervention": {
+            "ci_high": 250.54851351516487,
+            "ci_low": 234.1149264848354,
+            "mean": 242.33172000000013,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.928439474987411e-13,
+            "positive": 10,
+            "se": 3.632282340983698,
+            "ties": 0
+          },
+          "dealer_reward_units_per_episode": {
+            "ci_high": 10763.598734998819,
+            "ci_low": 10576.28262500118,
+            "mean": 10669.94068,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.0147832628095173e-18,
+            "positive": 10,
+            "se": 41.40209908344905,
+            "ties": 0
+          },
+          "high_risk_activation_rate": {
+            "ci_high": 0.142504563474773,
+            "ci_low": 0.13676293120638397,
+            "mean": 0.13963374734057848,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.147733697966131e-15,
+            "positive": 10,
+            "se": 0.0012690613107413265,
+            "ties": 0
+          },
+          "low_execution_half_spread": {
+            "ci_high": 6.4302741928179525,
+            "ci_low": 6.338688911459224,
+            "mean": 6.384481552138588,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 1.6482974682657722e-19,
+            "positive": 10,
+            "se": 0.0202429085968498,
+            "ties": 0
+          },
+          "mean_routing_total_variation": {
+            "ci_high": 0.04772955155079361,
+            "ci_low": 0.046573952491038136,
+            "mean": 0.04715175202091587,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 2.042729543753884e-17,
+            "positive": 10,
+            "se": 0.0002554197114884556,
+            "ties": 0
+          },
+          "mean_volume": {
+            "ci_high": 20.0,
+            "ci_low": 20.0,
+            "mean": 20.0,
+            "n": 10,
+            "negative": 0,
+            "p_value_two_sided": 0.0,
+            "positive": 10,
+            "se": 0.0,
+            "ties": 0
+          }
+        }
+      },
+      "routing_routable_fraction": 0.5,
+      "routing_target_kappa": 8.0,
+      "study": "routing"
+    }
+  },
+  "holm_family": [
+    "dose_010:matched_random",
+    "dose_010:spread_only_budget_matched",
+    "dose_020:matched_random",
+    "dose_020:spread_only_budget_matched",
+    "dose_030:matched_random",
+    "dose_030:spread_only_budget_matched",
+    "routing_k2_f050:matched_random",
+    "routing_k4_f025:matched_random",
+    "routing_k4_f050:matched_random",
+    "routing_k4_f075:matched_random",
+    "routing_k8_f050:matched_random"
+  ],
+  "routing_robustness": {
+    "center_supported": true,
+    "classification": "broadly_robust",
+    "favorable_mean_settings": 5,
+    "nonsignificance_is_not_equivalence": true,
+    "significantly_adverse_settings": [],
+    "total_settings": 5
+  }
+}

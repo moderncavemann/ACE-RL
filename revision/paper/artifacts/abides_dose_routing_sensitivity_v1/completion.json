@@ -1,0 +1,13 @@
+{
+  "aggregate_sha256_after": "0bd6828acf1f9b156253d7234364b7f992697d9aa6eb9b2b4e12509f9d426193",
+  "aggregate_sha256_before": "0bd6828acf1f9b156253d7234364b7f992697d9aa6eb9b2b4e12509f9d426193",
+  "aggregate_unchanged_on_completed_resume": true,
+  "completed_resume_verification": true,
+  "completed_tasks": 80,
+  "containers_started": 0,
+  "elapsed_seconds": 0.11451833276078105,
+  "failed_tasks_this_invocation": [],
+  "finished_at": "2026-07-14T11:23:56.861457+00:00",
+  "protocol_fingerprint": "7498d1547fdfe3057a0b5faae809d21e6e3f185bf1802ede7922da505826cccf",
+  "required_tasks": 80
+}
