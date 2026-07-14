@@ -1,0 +1,103 @@
+{
+  "all_integrity_checks_pass": true,
+  "claim_classification": {
+    "ecology_e1": "favorable_timing_interval",
+    "ecology_e2": "favorable_timing_interval",
+    "official_IPPO": "positive_direction_inconclusive_interval",
+    "official_full_policy_MAPPO": "favorable_timing_interval"
+  },
+  "completed_resume_verified": {
+    "ecology_audit": true,
+    "ecology_e1": true,
+    "ecology_e2": true,
+    "official": true
+  },
+  "ecology_audit_all_checks_pass": true,
+  "ecology_audit_status": "pass",
+  "ecology_runner_checks": {
+    "ecology_e1": {
+      "evaluation_dose_exact": true,
+      "evaluation_no_routing_dose_exact": true,
+      "evaluation_paths_equal": true,
+      "gate_off_exact": true,
+      "no_intervention_failure_mode": true,
+      "required_policy_seed_count": true,
+      "response_converged": true,
+      "risk_activates_less_than_always_on": true,
+      "risk_activation_in_range": true,
+      "risk_aware_beats_random_mean": true,
+      "risk_aware_beats_random_seed_rate": true,
+      "risk_aware_positive_ci": true,
+      "risk_high_risk_activation_controlled": true,
+      "risk_reward_guardrail_vs_no_intervention": true,
+      "risk_reward_guardrail_vs_random": true,
+      "routing_channel_positive_ci": true,
+      "routing_channel_positive_mean": true,
+      "routing_channel_positive_seed_rate": true,
+      "threshold_has_more_high_risk_activation": true,
+      "training_dose_exact": true,
+      "training_no_routing_dose_exact": true,
+      "training_paths_equal": true,
+      "volume_conserved": true
+    },
+    "ecology_e2": {
+      "evaluation_dose_exact": true,
+      "evaluation_no_routing_dose_exact": true,
+      "evaluation_paths_equal": true,
+      "gate_off_exact": true,
+      "no_intervention_failure_mode": true,
+      "required_policy_seed_count": true,
+      "response_converged": true,
+      "risk_activates_less_than_always_on": true,
+      "risk_activation_in_range": true,
+      "risk_aware_beats_random_mean": true,
+      "risk_aware_beats_random_seed_rate": true,
+      "risk_aware_positive_ci": true,
+      "risk_high_risk_activation_controlled": true,
+      "risk_reward_guardrail_vs_no_intervention": true,
+      "risk_reward_guardrail_vs_random": true,
+      "routing_channel_positive_ci": true,
+      "routing_channel_positive_mean": true,
+      "routing_channel_positive_seed_rate": true,
+      "threshold_has_more_high_risk_activation": true,
+      "training_dose_exact": true,
+      "training_no_routing_dose_exact": true,
+      "training_paths_equal": true,
+      "volume_conserved": true
+    }
+  },
+  "ecology_status": {
+    "ecology_e1": "pass",
+    "ecology_e2": "pass"
+  },
+  "official_implementation_status": "pass",
+  "official_runner_checks": {
+    "base_budget_complete": true,
+    "evaluation_action_uniforms_equal": true,
+    "evaluation_paths_equal": true,
+    "evaluation_random_dose_exact": true,
+    "initial_response_models_identical": true,
+    "official_commit_exact": true,
+    "per_path_row_count": true,
+    "response_budget_complete": true,
+    "step_record_hashes_present": true,
+    "task_count": true,
+    "training_action_uniforms_equal": true,
+    "training_paths_equal": true,
+    "training_random_dose_exact": true,
+    "volume_conserved": true
+  },
+  "per_path_count": {
+    "actual": 2000,
+    "expected": 2000
+  },
+  "per_seed_count": {
+    "actual": 40,
+    "expected": 40
+  },
+  "step_record_count": {
+    "actual": 200000,
+    "expected": 200000
+  },
+  "step_stream_sha256": "02ef3f71cccc50aec282bb8ed169f0342ae89d52fd1d60e4a002f2cd6f1f13e5"
+}

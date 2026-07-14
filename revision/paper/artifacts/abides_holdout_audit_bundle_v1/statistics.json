@@ -1,0 +1,800 @@
+{
+  "ecology_e1": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "contrasts": {
+      "always_on": {
+        "exact_sign_test": {
+          "negative": 10,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 3.12186964576552e-13,
+        "t_interval": {
+          "ci_high": -1.028630340557904,
+          "ci_low": -1.0958866673052257,
+          "mean": -1.0622585039315648,
+          "n": 10,
+          "negative": 10,
+          "p_value_two_sided": 1.0406232152551733e-13,
+          "positive": 0,
+          "se": 0.014865529206305503,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -1.0300157574278848,
+          "ci_low": -1.092011758162363,
+          "mean": -1.0619747842243952,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "matched_random": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.03879929025927813,
+          "ci_low": 0.027764386717016826,
+          "mean": 0.033281838488147475,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 2.5589134274095625e-07,
+          "positive": 10,
+          "se": 0.0024390223021328182,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.043998368242314165,
+          "ci_low": 0.022380917183949082,
+          "mean": 0.03328753035368399,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "no_intervention": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.9649977211323067e-12,
+        "t_interval": {
+          "ci_high": 0.19248076607439882,
+          "ci_low": 0.17656536105382484,
+          "mean": 0.18452306356411183,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 1.6710801384512503e-12,
+          "positive": 10,
+          "se": 0.0035177496245428737,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.19922578228079837,
+          "ci_low": 0.1698241058231017,
+          "mean": 0.18449298886518553,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "no_routing": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.9649977211323067e-12,
+        "t_interval": {
+          "ci_high": 0.1918050025776996,
+          "ci_low": 0.17682120405619284,
+          "mean": 0.18431310331694623,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 9.824988605661534e-13,
+          "positive": 10,
+          "se": 0.0033118385334912222,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.19888777087691611,
+          "ci_low": 0.16974155671473087,
+          "mean": 0.18427693049592928,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "spread_only_threshold": {
+        "exact_sign_test": {
+          "negative": 10,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.0144028829573004e-15,
+        "t_interval": {
+          "ci_high": -0.22259307403022086,
+          "ci_low": -0.22992989529009036,
+          "mean": -0.2262614846601556,
+          "n": 10,
+          "negative": 10,
+          "p_value_two_sided": 2.536007207393251e-16,
+          "positive": 0,
+          "se": 0.0016216426913974577,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -0.21171015835122348,
+          "ci_low": -0.24087748997147865,
+          "mean": -0.22628830383050186,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      }
+    },
+    "method_means": {
+      "always_on": {
+        "activation_rate": 1.0,
+        "all_customer_cost_tick_units_per_episode": 10658.58,
+        "all_state_execution_half_spread": 5.32929,
+        "dealer_reward_units_per_episode": 8158.89012,
+        "high_execution_half_spread": 5.348600976049494,
+        "high_risk_activation_rate": 1.0,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 7865.67,
+        "low_execution_half_spread": 5.334781963620192,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.300222,
+        "mean_inventory_std": 14.092538058941486,
+        "mean_reward": 8.15889012,
+        "mean_routing_total_variation": 0.451255,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "matched_random": {
+        "activation_rate": 0.188,
+        "all_customer_cost_tick_units_per_episode": 12845.07,
+        "all_state_execution_half_spread": 6.422535,
+        "dealer_reward_units_per_episode": 10649.31396,
+        "high_execution_half_spread": 6.426288316864899,
+        "high_risk_activation_rate": 0.18924812996532592,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9482.78,
+        "low_execution_half_spread": 6.430322306039905,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.1618995,
+        "mean_inventory_std": 8.610379312970329,
+        "mean_reward": 10.64931396,
+        "mean_routing_total_variation": 0.281985,
+        "mean_signal_strength": 0.1439147426805403,
+        "mean_volume": 20.0
+      },
+      "no_intervention": {
+        "activation_rate": 0.0,
+        "all_customer_cost_tick_units_per_episode": 13157.17,
+        "all_state_execution_half_spread": 6.578585,
+        "dealer_reward_units_per_episode": 10997.8948,
+        "high_execution_half_spread": 6.584390322484486,
+        "high_risk_activation_rate": 0.0,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9711.55,
+        "low_execution_half_spread": 6.581563531115869,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.145255,
+        "mean_inventory_std": 7.718529999793418,
+        "mean_reward": 10.9978948,
+        "mean_routing_total_variation": 0.2587,
+        "mean_signal_strength": 0.0,
+        "mean_volume": 20.0
+      },
+      "no_routing": {
+        "activation_rate": 0.188,
+        "all_customer_cost_tick_units_per_episode": 13156.98,
+        "all_state_execution_half_spread": 6.57849,
+        "dealer_reward_units_per_episode": 10997.7048,
+        "high_execution_half_spread": 6.5846403363712716,
+        "high_risk_activation_rate": 0.06174469662539652,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9711.24,
+        "low_execution_half_spread": 6.581353570868703,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.145255,
+        "mean_inventory_std": 7.718529999793418,
+        "mean_reward": 10.9977048,
+        "mean_routing_total_variation": 0.2587,
+        "mean_signal_strength": 0.1439147426805403,
+        "mean_volume": 20.0
+      },
+      "risk_aware": {
+        "activation_rate": 0.188,
+        "all_customer_cost_tick_units_per_episode": 12861.27,
+        "all_state_execution_half_spread": 6.430635,
+        "dealer_reward_units_per_episode": 10670.71448,
+        "high_execution_half_spread": 6.55268322771464,
+        "high_risk_activation_rate": 0.06174469662539652,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9432.31,
+        "low_execution_half_spread": 6.397040467551757,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.16139,
+        "mean_inventory_std": 8.442981880183309,
+        "mean_reward": 10.67071448,
+        "mean_routing_total_variation": 0.28061,
+        "mean_signal_strength": 0.1439147426805403,
+        "mean_volume": 20.0
+      },
+      "spread_only_threshold": {
+        "activation_rate": 0.35,
+        "all_customer_cost_tick_units_per_episode": 12352.46,
+        "all_state_execution_half_spread": 6.17623,
+        "dealer_reward_units_per_episode": 10088.4524,
+        "high_execution_half_spread": 6.208828118836569,
+        "high_risk_activation_rate": 0.3470338715534619,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9105.09,
+        "low_execution_half_spread": 6.170778982891601,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.1984525,
+        "mean_inventory_std": 10.078052452683302,
+        "mean_reward": 10.0884524,
+        "mean_routing_total_variation": 0.32469000000000003,
+        "mean_signal_strength": 0.348665,
+        "mean_volume": 20.0
+      }
+    },
+    "secondary_holm_family": [
+      "no_intervention",
+      "spread_only_threshold",
+      "always_on",
+      "no_routing"
+    ]
+  },
+  "ecology_e2": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "contrasts": {
+      "always_on": {
+        "exact_sign_test": {
+          "negative": 10,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.6294271717386797e-12,
+        "t_interval": {
+          "ci_high": -1.0714194574809401,
+          "ci_low": -1.1561812757628986,
+          "mean": -1.1138003666219194,
+          "n": 10,
+          "negative": 10,
+          "p_value_two_sided": 5.431423905795599e-13,
+          "positive": 0,
+          "se": 0.018734732421291398,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -1.0716216656758584,
+          "ci_low": -1.1555181299494133,
+          "mean": -1.113819357521478,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "matched_random": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.046101570060031315,
+          "ci_low": 0.033577858938664946,
+          "mean": 0.03983971449934813,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 1.6145896844448362e-07,
+          "positive": 10,
+          "se": 0.00276809041542577,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.05043609432736614,
+          "ci_low": 0.029385949604682556,
+          "mean": 0.03984360633472476,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "no_intervention": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.6294271717386797e-12,
+        "t_interval": {
+          "ci_high": 0.22874287531708914,
+          "ci_low": 0.21182984855906528,
+          "mean": 0.2202863619380772,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 5.880314157357421e-13,
+          "positive": 10,
+          "se": 0.0037382519295620377,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.23576956968980767,
+          "ci_low": 0.2047928269566548,
+          "mean": 0.2201983781343606,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "no_routing": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 10,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.2574843151141875e-12,
+        "t_interval": {
+          "ci_high": 0.2279910388941403,
+          "ci_low": 0.2122298006409904,
+          "mean": 0.22011041976756535,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 3.1437107877854687e-13,
+          "positive": 10,
+          "se": 0.0034836744572743165,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.23530237017104572,
+          "ci_low": 0.20489086491739197,
+          "mean": 0.22002471042022717,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "spread_only_threshold": {
+        "exact_sign_test": {
+          "negative": 10,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 2.4325773753061487e-12,
+        "t_interval": {
+          "ci_high": -0.21816402920677375,
+          "ci_low": -0.23870910095962983,
+          "mean": -0.2284365650832018,
+          "n": 10,
+          "negative": 10,
+          "p_value_two_sided": 2.4325773753061487e-12,
+          "positive": 0,
+          "se": 0.004541035452845143,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -0.21052750799031703,
+          "ci_low": -0.24700744680534806,
+          "mean": -0.22847612661741068,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      }
+    },
+    "method_means": {
+      "always_on": {
+        "activation_rate": 1.0,
+        "all_customer_cost_tick_units_per_episode": 10482.79,
+        "all_state_execution_half_spread": 5.241395,
+        "dealer_reward_units_per_episode": 8171.1208,
+        "high_execution_half_spread": 5.177963700397021,
+        "high_risk_activation_rate": 1.0,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 7782.24,
+        "low_execution_half_spread": 5.260306356087124,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.30906300000000003,
+        "mean_inventory_std": 11.199876677115888,
+        "mean_reward": 8.1711208,
+        "mean_routing_total_variation": 0.45999500000000004,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "matched_random": {
+        "activation_rate": 0.20500000000000002,
+        "all_customer_cost_tick_units_per_episode": 12822.33,
+        "all_state_execution_half_spread": 6.4111650000000004,
+        "dealer_reward_units_per_episode": 10599.74564,
+        "high_execution_half_spread": 6.439675986292757,
+        "high_risk_activation_rate": 0.1768967005291423,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9443.39,
+        "low_execution_half_spread": 6.413946437208392,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.1647925,
+        "mean_inventory_std": 9.405863313816264,
+        "mean_reward": 10.59974564,
+        "mean_routing_total_variation": 0.285585,
+        "mean_signal_strength": 0.1593197479376933,
+        "mean_volume": 20.0
+      },
+      "no_intervention": {
+        "activation_rate": 0.0,
+        "all_customer_cost_tick_units_per_episode": 13185.4,
+        "all_state_execution_half_spread": 6.5927,
+        "dealer_reward_units_per_episode": 10982.8068,
+        "high_execution_half_spread": 6.595817834030199,
+        "high_risk_activation_rate": 0.0,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9736.06,
+        "low_execution_half_spread": 6.5943930846471215,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.145675,
+        "mean_inventory_std": 8.940556352310502,
+        "mean_reward": 10.9828068,
+        "mean_routing_total_variation": 0.2582,
+        "mean_signal_strength": 0.0,
+        "mean_volume": 20.0
+      },
+      "no_routing": {
+        "activation_rate": 0.20500000000000002,
+        "all_customer_cost_tick_units_per_episode": 13184.9,
+        "all_state_execution_half_spread": 6.59245,
+        "dealer_reward_units_per_episode": 10982.3068,
+        "high_execution_half_spread": 6.595535787449371,
+        "high_risk_activation_rate": 0.05967713656777505,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9735.75,
+        "low_execution_half_spread": 6.594217142476609,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.145675,
+        "mean_inventory_std": 8.940556352310502,
+        "mean_reward": 10.9823068,
+        "mean_routing_total_variation": 0.2582,
+        "mean_signal_strength": 0.1593197479376933,
+        "mean_volume": 20.0
+      },
+      "risk_aware": {
+        "activation_rate": 0.20500000000000002,
+        "all_customer_cost_tick_units_per_episode": 12822.78,
+        "all_state_execution_half_spread": 6.41139,
+        "dealer_reward_units_per_episode": 10601.56844,
+        "high_execution_half_spread": 6.5590995999651796,
+        "high_risk_activation_rate": 0.05967713656777505,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9392.16,
+        "low_execution_half_spread": 6.374106722709044,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.1640415,
+        "mean_inventory_std": 9.361269860750228,
+        "mean_reward": 10.60156844,
+        "mean_routing_total_variation": 0.28467,
+        "mean_signal_strength": 0.1593197479376933,
+        "mean_volume": 20.0
+      },
+      "spread_only_threshold": {
+        "activation_rate": 0.35,
+        "all_customer_cost_tick_units_per_episode": 12282.63,
+        "all_state_execution_half_spread": 6.141315,
+        "dealer_reward_units_per_episode": 10061.485,
+        "high_execution_half_spread": 6.131366883859345,
+        "high_risk_activation_rate": 0.3239078926654423,
+        "high_risk_steps": 26.2,
+        "low_customer_cost_tick_units_per_episode": 9076.15,
+        "low_execution_half_spread": 6.145670157625842,
+        "low_risk_steps": 73.8,
+        "mean_flow_hhi": 0.20194900000000002,
+        "mean_inventory_std": 9.327461274781525,
+        "mean_reward": 10.061485,
+        "mean_routing_total_variation": 0.32876,
+        "mean_signal_strength": 0.348825,
+        "mean_volume": 20.0
+      }
+    },
+    "secondary_holm_family": [
+      "no_intervention",
+      "spread_only_threshold",
+      "always_on",
+      "no_routing"
+    ]
+  },
+  "official_IPPO": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "contrasts": {
+      "brero_threshold_buybox_budget_matched": {
+        "exact_sign_test": {
+          "negative": 10,
+          "non_ties": 10,
+          "p_value_two_sided": 0.001953125,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 0.0001228982334004154,
+        "t_interval": {
+          "ci_high": -1.1301340591442557,
+          "ci_low": -2.360974184906062,
+          "mean": -1.745554122025159,
+          "n": 10,
+          "negative": 10,
+          "p_value_two_sided": 0.0001228982334004154,
+          "positive": 0,
+          "se": 0.2720500913846523,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -1.2031333554686219,
+          "ci_low": -2.203271956912554,
+          "mean": -1.7437449291926224,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "matched_random": {
+        "exact_sign_test": {
+          "negative": 3,
+          "non_ties": 10,
+          "p_value_two_sided": 0.34375,
+          "positive": 7,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.325156638882649,
+          "ci_low": -0.13721954080848156,
+          "mean": 0.09396854903708371,
+          "n": 10,
+          "negative": 3,
+          "p_value_two_sided": 0.38183012503422764,
+          "positive": 7,
+          "se": 0.10219806724386996,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.2898844115306919,
+          "ci_low": -0.10178734368398117,
+          "mean": 0.09505020569763398,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      }
+    },
+    "method_means": {
+      "brero_threshold_buybox_budget_matched": {
+        "activation_rate": 0.9167,
+        "all_customer_cost_tick_units_per_episode": 8853.39,
+        "all_state_execution_half_spread": 4.426695,
+        "dealer_reward_units_per_episode": 5135.31364,
+        "high_execution_half_spread": 4.522003463098392,
+        "high_risk_activation_rate": 0.9225005456201221,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 6508.84,
+        "low_execution_half_spread": 4.401236007898849,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.180592,
+        "mean_inventory_std": 9.768938320592069,
+        "mean_reward": 5.13531364,
+        "mean_routing_total_variation": 0.23176000000000002,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "matched_random": {
+        "activation_rate": 0.2152,
+        "all_customer_cost_tick_units_per_episode": 12499.07,
+        "all_state_execution_half_spread": 6.249535,
+        "dealer_reward_units_per_episode": 8819.90988,
+        "high_execution_half_spread": 6.248569736865687,
+        "high_risk_activation_rate": 0.2603748321120804,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 9181.66,
+        "low_execution_half_spread": 6.240758678961091,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.1603845,
+        "mean_inventory_std": 8.968552730693945,
+        "mean_reward": 8.819909879999999,
+        "mean_routing_total_variation": 0.05905043654534176,
+        "mean_signal_strength": 0.16434390304577715,
+        "mean_volume": 20.0
+      },
+      "no_intervention": {
+        "activation_rate": 0.0,
+        "all_customer_cost_tick_units_per_episode": 13854.97,
+        "all_state_execution_half_spread": 6.927485,
+        "dealer_reward_units_per_episode": 10194.7924,
+        "high_execution_half_spread": 6.909013930876096,
+        "high_risk_activation_rate": 0.0,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 10250.91,
+        "low_execution_half_spread": 6.93360284766133,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.14508000000000001,
+        "mean_inventory_std": 8.58013716882012,
+        "mean_reward": 10.194792399999999,
+        "mean_routing_total_variation": 0.0,
+        "mean_signal_strength": 0.0,
+        "mean_volume": 20.0
+      },
+      "risk_aware": {
+        "activation_rate": 0.21910000000000002,
+        "all_customer_cost_tick_units_per_episode": 12572.57,
+        "all_state_execution_half_spread": 6.286285,
+        "dealer_reward_units_per_episode": 8893.96008,
+        "high_execution_half_spread": 6.522160870924162,
+        "high_risk_activation_rate": 0.1378503851361913,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 9072.73,
+        "low_execution_half_spread": 6.146790129924008,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.1597625,
+        "mean_inventory_std": 9.002468649421301,
+        "mean_reward": 8.89396008,
+        "mean_routing_total_variation": 0.058445955888999444,
+        "mean_signal_strength": 0.16434390304577715,
+        "mean_volume": 20.0
+      }
+    },
+    "secondary_holm_family": [
+      "brero_threshold_buybox_budget_matched"
+    ]
+  },
+  "official_full_policy_MAPPO": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "contrasts": {
+      "brero_threshold_buybox_budget_matched": {
+        "exact_sign_test": {
+          "negative": 9,
+          "non_ties": 10,
+          "p_value_two_sided": 0.021484375,
+          "positive": 1,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 0.00010505579087550394,
+        "t_interval": {
+          "ci_high": -1.3107454495643243,
+          "ci_low": -2.693471808214089,
+          "mean": -2.0021086288892067,
+          "n": 10,
+          "negative": 9,
+          "p_value_two_sided": 0.00010505579087550394,
+          "positive": 1,
+          "se": 0.3056211967397568,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -1.3520927323773693,
+          "ci_low": -2.4884405222613606,
+          "mean": -2.0018105281905187,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "matched_random": {
+        "exact_sign_test": {
+          "negative": 2,
+          "non_ties": 10,
+          "p_value_two_sided": 0.109375,
+          "positive": 8,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.314279815474527,
+          "ci_low": 0.04935331787838729,
+          "mean": 0.18181656667645713,
+          "n": 10,
+          "negative": 2,
+          "p_value_two_sided": 0.012620347589996502,
+          "positive": 8,
+          "se": 0.05855616531565152,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.3031048300532043,
+          "ci_low": 0.07947146127425324,
+          "mean": 0.18177091118782532,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      }
+    },
+    "method_means": {
+      "brero_threshold_buybox_budget_matched": {
+        "activation_rate": 0.7878,
+        "all_customer_cost_tick_units_per_episode": 8630.91,
+        "all_state_execution_half_spread": 4.315455,
+        "dealer_reward_units_per_episode": 4911.79028,
+        "high_execution_half_spread": 4.618959036335821,
+        "high_risk_activation_rate": 0.7720296745824872,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 6179.56,
+        "low_execution_half_spread": 4.19796617438251,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.1806365,
+        "mean_inventory_std": 9.816103040660364,
+        "mean_reward": 4.91179028,
+        "mean_routing_total_variation": 0.215095,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "matched_random": {
+        "activation_rate": 0.2081,
+        "all_customer_cost_tick_units_per_episode": 12776.13,
+        "all_state_execution_half_spread": 6.388065,
+        "dealer_reward_units_per_episode": 9099.9952,
+        "high_execution_half_spread": 6.401364840750261,
+        "high_risk_activation_rate": 0.24277601819564912,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 9399.54,
+        "low_execution_half_spread": 6.381891369948175,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.16080250000000001,
+        "mean_inventory_std": 8.911048043955907,
+        "mean_reward": 9.0999952,
+        "mean_routing_total_variation": 0.057342030220702424,
+        "mean_signal_strength": 0.16605153870621464,
+        "mean_volume": 20.0
+      },
+      "no_intervention": {
+        "activation_rate": 0.0,
+        "all_customer_cost_tick_units_per_episode": 13837.47,
+        "all_state_execution_half_spread": 6.918735,
+        "dealer_reward_units_per_episode": 10177.2924,
+        "high_execution_half_spread": 6.9175739924705315,
+        "high_risk_activation_rate": 0.0,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 10233.76,
+        "low_execution_half_spread": 6.920970864355624,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.14508000000000001,
+        "mean_inventory_std": 8.58013716882012,
+        "mean_reward": 10.1772924,
+        "mean_routing_total_variation": 0.0,
+        "mean_signal_strength": 0.0,
+        "mean_volume": 20.0
+      },
+      "risk_aware": {
+        "activation_rate": 0.2199,
+        "all_customer_cost_tick_units_per_episode": 12646.09,
+        "all_state_execution_half_spread": 6.323045,
+        "dealer_reward_units_per_episode": 8962.23664,
+        "high_execution_half_spread": 6.557237339338395,
+        "high_risk_activation_rate": 0.13688960082246582,
+        "high_risk_steps": 26.1,
+        "low_customer_cost_tick_units_per_episode": 9157.42,
+        "low_execution_half_spread": 6.2000748032717174,
+        "low_risk_steps": 73.9,
+        "mean_flow_hhi": 0.1622065,
+        "mean_inventory_std": 9.123946383127622,
+        "mean_reward": 8.96223664,
+        "mean_routing_total_variation": 0.06330934754308289,
+        "mean_signal_strength": 0.16605153870621464,
+        "mean_volume": 20.0
+      }
+    },
+    "secondary_holm_family": [
+      "brero_threshold_buybox_budget_matched"
+    ]
+  }
+}
