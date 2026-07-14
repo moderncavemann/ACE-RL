@@ -12,6 +12,12 @@ from run_abides_dose_routing_sensitivity import (  # noqa: E402
     group_specs,
     routing_classification,
 )
+from verify_abides_dose_routing_sensitivity import (  # noqa: E402
+    holm_adjust as verifier_holm_adjust,
+    interval as verifier_interval,
+    paired_bootstrap as verifier_paired_bootstrap,
+    specifications as verifier_specifications,
+)
 
 
 def load_config() -> dict:
@@ -57,3 +63,49 @@ def test_routing_classification_does_not_treat_nonsignificance_as_equivalence() 
     result = routing_classification(specs, statistics)
     assert result["classification"] == "broadly_robust"
     assert result["nonsignificance_is_not_equivalence"]
+
+
+def test_independent_verifier_reconstructs_frozen_group_grid() -> None:
+    config = load_config()
+    runner = [
+        {
+            key: spec[key]
+            for key in (
+                "group_id",
+                "study",
+                "dose_target",
+                "routing_target_kappa",
+                "routing_routable_fraction",
+                "methods",
+            )
+        }
+        for spec in group_specs(config)
+    ]
+    assert verifier_specifications(config) == runner
+
+
+def test_independent_sensitivity_statistics_are_deterministic() -> None:
+    rows = []
+    for policy_seed in (1, 2):
+        for evaluation_seed in (10, 11):
+            for method, spread in (("risk_aware", 2.0), ("matched_random", 2.5)):
+                rows.append(
+                    {
+                        "policy_seed": str(policy_seed),
+                        "evaluation_seed": str(evaluation_seed),
+                        "method": method,
+                        "low_execution_half_spread": str(
+                            spread + 0.01 * policy_seed + 0.001 * evaluation_seed
+                        ),
+                    }
+                )
+    first = verifier_paired_bootstrap(rows, "matched_random", 100, 7)
+    second = verifier_paired_bootstrap(rows, "matched_random", 100, 7)
+    assert first == second
+    assert first["ci_low"] == first["ci_high"] == 0.5
+    assert verifier_interval([0.5, 0.5])["mean"] == 0.5
+    assert verifier_holm_adjust({"a": 0.01, "b": 0.04, "c": 0.03}) == {
+        "a": 0.03,
+        "b": 0.06,
+        "c": 0.06,
+    }
