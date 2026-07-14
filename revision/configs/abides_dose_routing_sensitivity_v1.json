@@ -1,7 +1,7 @@
 {
   "protocol_version": "abides_dose_routing_sensitivity_v1",
-  "freeze_status": "calibration_pending",
-  "formal_execution_allowed": false,
+  "freeze_status": "frozen_after_passive_calibration",
+  "formal_execution_allowed": true,
   "backend": "abides",
   "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
   "device": "cpu",
@@ -59,13 +59,41 @@
     "realized_activation_definition": "routing_total_variation_gt_active_routing_tv_epsilon",
     "artifact": "revision/configs/abides_dose_routing_sensitivity_v1_calibration.json"
   },
+  "calibration_artifact_sha256": "298e12de28116dcd60cdfecf4ac07605eee5672ac655fa2be611affd10424a4e",
+  "calibration_protocol_fingerprint": "a4a557ce5921ba0c33308dfb8eff2ca8ae14779958ee9d56a226ddd708fc4808",
+  "calibrated_dose_parameters": {
+    "0.10": {
+      "risk_aware": {"controller_target_rate": 0.1, "probability_cutoff": 0.5},
+      "spread_only_budget_matched": {"controller_target_rate": 0.1, "severity_threshold": 0.75, "signal_scale": 0.6},
+      "calibration_risk_activation_rate": 0.0809,
+      "calibration_spread_activation_rate": 0.0958,
+      "calibration_tv_ratio": 1.0011153943572402,
+      "budget_match_status": "matched"
+    },
+    "0.20": {
+      "risk_aware": {"controller_target_rate": 0.2, "probability_cutoff": 0.15},
+      "spread_only_budget_matched": {"controller_target_rate": 0.2, "severity_threshold": 0.75, "signal_scale": 0.55},
+      "calibration_risk_activation_rate": 0.1832,
+      "calibration_spread_activation_rate": 0.1915,
+      "calibration_tv_ratio": 1.0331785466239287,
+      "budget_match_status": "matched"
+    },
+    "0.30": {
+      "risk_aware": {"controller_target_rate": 0.3, "probability_cutoff": 0.05},
+      "spread_only_budget_matched": {"controller_target_rate": 0.3, "severity_threshold": 0.0, "signal_scale": 0.5},
+      "calibration_risk_activation_rate": 0.2887,
+      "calibration_spread_activation_rate": 0.2904,
+      "calibration_tv_ratio": 0.9931908932361274,
+      "budget_match_status": "matched"
+    }
+  },
   "response_environment_seed_namespace": 630000000,
   "response_action_namespace": 571117,
   "evaluation_action_namespace": 581117,
   "bootstrap_replicates": 10000,
   "bootstrap_seed": 20260714,
   "required_policy_seed_count": 10,
-  "workers": 8,
+  "workers": 24,
   "device": "cpu",
   "output_dir": "revision/experiments/outputs/abides_dose_routing_sensitivity_v1"
 }

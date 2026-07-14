@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 from pathlib import Path
 
@@ -49,3 +51,26 @@ def test_budget_metrics_rejects_misaligned_records() -> None:
         assert "counts differ" in str(exc)
     else:
         raise AssertionError("misaligned calibration records were accepted")
+
+
+def test_formal_dose_parameters_match_frozen_calibration_artifact() -> None:
+    revision = Path(__file__).resolve().parents[1]
+    config = json.loads(
+        (revision / "configs" / "abides_dose_routing_sensitivity_v1.json").read_text()
+    )
+    artifact_path = revision.parent / config["calibration"]["artifact"]
+    assert hashlib.sha256(artifact_path.read_bytes()).hexdigest() == config[
+        "calibration_artifact_sha256"
+    ]
+    artifact = json.loads(artifact_path.read_text())
+    assert artifact["calibration_status"] == "pass"
+    assert artifact["calibration_protocol_fingerprint"] == config[
+        "calibration_protocol_fingerprint"
+    ]
+    for target, parameters in config["calibrated_dose_parameters"].items():
+        selected = artifact["selected"][target]
+        assert selected["budget_match_status"] == "matched"
+        for key, value in parameters["risk_aware"].items():
+            assert selected["risk_aware"][key] == value
+        for key, value in parameters["spread_only_budget_matched"].items():
+            assert selected["spread_only_budget_matched"][key] == value
