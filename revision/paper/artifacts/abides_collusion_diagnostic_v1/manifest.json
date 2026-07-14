@@ -1,0 +1,267 @@
+{
+  "command": "python revision/experiments/run_abides_collusion_diagnostic.py --config revision/configs/abides_collusion_diagnostic_v1.json",
+  "completed_resume_verified": true,
+  "config": {
+    "action_namespace": 561117,
+    "arms": [
+      "sham",
+      "forced_undercut",
+      "upward_deviation"
+    ],
+    "backend": "abides",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "dealer_selection": "sha256_policy_path_step_mod_n_agents",
+    "device": "cpu",
+    "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
+    "engineering_smoke": false,
+    "episode_steps": 100,
+    "estimand_rules": {
+      "asymmetry_requires": "both_flow_and_reward_loss_asymmetry_policy_seed_ci_low_gt_zero",
+      "complete_policy_seed_coverage_required": true,
+      "continuation_loss_requires": "both_flow_and_reward_policy_seed_ci_low_gt_zero",
+      "continuation_window": "t1_through_tH_excluding_t0",
+      "event_spread_source": "current_sham_policy_joint_proposal",
+      "minimum_recovery_rate_ci_lower_bound": 0.5,
+      "recovery_definition": "first_t1_to_tH_joint_mean_ge_pre_event_mean"
+    },
+    "evaluation_seeds": [
+      536000,
+      536001,
+      536002,
+      536003,
+      536004,
+      536005,
+      536006,
+      536007,
+      536008,
+      536009,
+      536010,
+      536011,
+      536012,
+      536013,
+      536014,
+      536015,
+      536016,
+      536017,
+      536018,
+      536019
+    ],
+    "event_horizon": 10,
+    "event_risk_state": "low",
+    "event_selection": "first_eligible_state",
+    "fallback_wording": "high-spread coordination",
+    "formal_execution_allowed": true,
+    "freeze_status": "preregistered",
+    "market": {
+      "flow_events_per_step": 20,
+      "flow_quantity": 1,
+      "half_spread_levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "high_sigma_ticks": 4.0,
+      "informed_flow_probability": 0.8,
+      "initial_high_probability": 0.3,
+      "inventory_penalty": 0.002,
+      "low_sigma_ticks": 0.75,
+      "n_agents": 10,
+      "p_high_to_low": 0.1,
+      "p_low_to_high": 0.04
+    },
+    "maximum_events_per_episode": 1,
+    "minimum_mean_half_spread": 6.0,
+    "minimum_remaining_steps": 11,
+    "output_dir": "revision/experiments/outputs/abides_collusion_diagnostic_v1",
+    "protocol_version": "abides_collusion_diagnostic_v1",
+    "required_policy_seed_count": 20,
+    "reward_scale": 100.0,
+    "routing_allocation_mode": "soft_rank",
+    "routing_routable_fraction": 0.5,
+    "routing_target_kappa": 4.0,
+    "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+    "source_base_manifest_sha256": "a83caf63dd9d7d2d8d7c21c8b743c22b386e046f3518b85bceb20480433f15ec",
+    "source_base_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_base_v1",
+    "source_policy_seeds": [
+      530000,
+      530001,
+      530002,
+      530003,
+      530004,
+      530005,
+      530006,
+      530007,
+      530008,
+      530009,
+      530010,
+      530011,
+      530012,
+      530013,
+      530014,
+      530015,
+      530016,
+      530017,
+      530018,
+      530019
+    ],
+    "strong_collusion_requirements": [
+      "rival_spread_compression_after_undercut",
+      "deviator_continuation_loss",
+      "high_spread_state_recovery",
+      "upward_deviation_asymmetry",
+      "policy_seed_ci_support"
+    ],
+    "workers": 8
+  },
+  "config_sha256": "1ecec49f6e2e1ad6bf1174ade047bc85948f7214664a317326e0357239530eea",
+  "docker_image_id": "sha256:2b72c2a8f0215d59e8cbf6b6e992ef2e7d3745d5cb5e8e764f2c249cd51a8c23",
+  "evaluation_seeds": [
+    536000,
+    536001,
+    536002,
+    536003,
+    536004,
+    536005,
+    536006,
+    536007,
+    536008,
+    536009,
+    536010,
+    536011,
+    536012,
+    536013,
+    536014,
+    536015,
+    536016,
+    536017,
+    536018,
+    536019
+  ],
+  "event_count": 400,
+  "execution_commit": "09c6ee290961119c707d372698fe4cc6b4156bb7",
+  "implementation_status": "pass",
+  "output_file_sha256": {
+    "README.md": "5de16483d2806273b282bf26d9c5b6ab4955e975d18e63a6b5f217ba16f7bfed",
+    "aggregate.json": "fb083647e80baaca72313c2e1a05cf848b6c570749d43088a25341faa4649431",
+    "completion.json": "4ef4dbaebe66b761348f75d8e31e877048235849740241df5078b65b64128677",
+    "per_event.csv": "1233f11db837c16aefd4a2c5ae1056c832f49ec6122d86f12e3a8f5dcfc0f330",
+    "per_seed.csv": "853d32c175e824136da5876c19d35bec0ee0cae275013bdf2712c63f8b6ee909",
+    "trajectory.csv": "e07a1cb4ac1a1c2cabe1707cfb0d9b6d49713ea6ad55f821ea7b68c13299f76d"
+  },
+  "policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "protocol_fingerprint": "a1623a3712c301bc08752311b49304308764a7c604f4c8b88483a5a5a8ed2a52",
+  "protocol_version": "abides_collusion_diagnostic_v1",
+  "required_wording": "high-spread coordination",
+  "result_archival_commit": null,
+  "scientific_result": "high_spread_coordination_only",
+  "source_base_manifest_sha256": "a83caf63dd9d7d2d8d7c21c8b743c22b386e046f3518b85bceb20480433f15ec",
+  "source_policy_artifacts": {
+    "530000": {
+      "model_digest": "56acb05fe9a8f3041ae4057727ccbb9bc65ccc64533c4b822042fde7dabfcce7",
+      "source_checkpoint_sha256": "4d077d023ec8186a180260b60ded7b44cada7599bb8e22cdd6186eda48fb17fe"
+    },
+    "530001": {
+      "model_digest": "0dfe6ed10b8c95b8abc410240d5aa60a6897e6368efeb14203a66e6c768f5872",
+      "source_checkpoint_sha256": "102c922a4e504debb75674a6f6db79fde268f433edddc61d003ae2ee57ae6693"
+    },
+    "530002": {
+      "model_digest": "2e344c95877d7f579ef83b20ae2224d55770ccf17c86b99a8213847867127f83",
+      "source_checkpoint_sha256": "7a71d819bd2e30ce6cc56bb804bdcdbb53dd0aa2d4ecf29316aed6926a201f29"
+    },
+    "530003": {
+      "model_digest": "640b9a29b9efd7a6cc4bd46e7a59259da5ff11fc550a13f3a7a2e5074b407a1b",
+      "source_checkpoint_sha256": "5980eaeb58991b12dfc9ef869ddc78611d015f351a40fb6b4e8af9b9c1a7c687"
+    },
+    "530004": {
+      "model_digest": "582ddb6459b876d2683d678d8d1fc3c0640ddd29c5988beba216b7b6677db7d3",
+      "source_checkpoint_sha256": "27207717157be7e142e583180db583ad7a3e43b245f5f02e014c426e9183a4b0"
+    },
+    "530005": {
+      "model_digest": "16a03e411f2b972a948b33499dc1a6c0d7a3d5e66e47b105306e23aacc3603b5",
+      "source_checkpoint_sha256": "c66b10025c919051bbcc94a129b0b72b0c4bc2bddd5806f2f1f76b632bb111b3"
+    },
+    "530006": {
+      "model_digest": "4bfa8bc6b8c6ae2aa4198c9f9d996189206f8354a806578fa020933d42bbc1d9",
+      "source_checkpoint_sha256": "05fc2e7daa75b291ca7659f8e7d0399d108d4763eb414ae9ccaec6ce540fdaec"
+    },
+    "530007": {
+      "model_digest": "efdf7b19694132654f6ffd0f2c2195af6b52793834525ac2535fb66aaa30c8d3",
+      "source_checkpoint_sha256": "74c59df9fa21108eea8dfa63dbf4f9b159cafd6f7674c03e299d29071af694bd"
+    },
+    "530008": {
+      "model_digest": "5865e4759064449e4c0fd13d544f29688d3f4be671526a3619ab79e7184686b2",
+      "source_checkpoint_sha256": "caca136991b70ba473a0989b6f1423c6c9ab27387e32b6617c1bc8c2d697e303"
+    },
+    "530009": {
+      "model_digest": "d5965a545567cc48fcce808fd52d81290b1192f4bff2a6632995351f7926bf2e",
+      "source_checkpoint_sha256": "0ef0c2739ec63824aa3a69c7853f1721ada1f5f9b340d5f19b5fa69b1aeddc37"
+    },
+    "530010": {
+      "model_digest": "97b2788bf2d1bed5659219a90dc857231a2b9c6e07a19fb5cc5e63fb78979da5",
+      "source_checkpoint_sha256": "ff884eccc71253d5294390ebabd8c1d1257bdb20ec55faf54f9d9c0a570d04c0"
+    },
+    "530011": {
+      "model_digest": "c8eea239629e1c3f0f83032082b8ee13274c5fb08b18db56e066771612bd3e3d",
+      "source_checkpoint_sha256": "ef468396292d2b6643e4aed6e1e1607b79c6e4ac50626a841182ef3f32950735"
+    },
+    "530012": {
+      "model_digest": "6ab2005c36c425396eeaf4ef3d7ee3c7076e2932d6efacc66224e1984bda91a7",
+      "source_checkpoint_sha256": "0a727ac91139d2c16524f5218d59b191e30dd8dc38fc40217d31a8209706d379"
+    },
+    "530013": {
+      "model_digest": "9d3a5f5ad95d52d5861eb89935d708f0e3325cfc0a85abde82164299f50042d7",
+      "source_checkpoint_sha256": "ca7280f38705292ba028c4a84fdea94f3179188daa017b6a450666edc0317249"
+    },
+    "530014": {
+      "model_digest": "9c3a453f50f99cc19dacafd810d79e3c0c773fd938e00f7fe19f5ba6215f9c03",
+      "source_checkpoint_sha256": "4a82cfa2142877088a42c3964b97da7f32676ea05b4bed46710a229094370b64"
+    },
+    "530015": {
+      "model_digest": "c4f56e13e6c2760c0729b3be80bb1c991ea316ee7903f89e20f9180e20b74012",
+      "source_checkpoint_sha256": "2549022e1fefbe3f226b227091f95247e426e8848b31f4eafc8f3b82841edce5"
+    },
+    "530016": {
+      "model_digest": "af9dacd484b203e4518e956479a8c4e94d0f0e4d8674c38219b1b82bfe9949e5",
+      "source_checkpoint_sha256": "7a257ad94e5755c7da4429ccacc0abc803bd05f226989ef8c4e3debff02a0b3f"
+    },
+    "530017": {
+      "model_digest": "ab653bc738a77ba6f4cc93f99018c3e214ec1c2addffc0fb393643716ef37b46",
+      "source_checkpoint_sha256": "459b48aab14241d7eafafc9d685d48e323836b45b6b53616ee3ca9d40b6e777b"
+    },
+    "530018": {
+      "model_digest": "6318e10613d613e032c653d2b72848dae90d239d56e44b94cf1745fb3727147d",
+      "source_checkpoint_sha256": "d29af1b8e0ff38a3576afa3d3e2b49463dcf21609d05cd5117c31ae8b9270cd2"
+    },
+    "530019": {
+      "model_digest": "ea722485cb4d2649023655c7e9d774d43f59f1e4b8c07d625f9f0a6239bd5301",
+      "source_checkpoint_sha256": "db214d9928e71f35f73033535a5179ebfe6ca0927721ce35838d66fa2e6412a3"
+    }
+  },
+  "trajectory_row_count": 13200
+}

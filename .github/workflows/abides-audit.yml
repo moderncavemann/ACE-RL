@@ -40,5 +40,10 @@ jobs:
       - name: Recompute and verify the independent audit
         run: python revision/experiments/verify_abides_audit_bundle.py
 
+      - name: Recompute the collusion diagnostic claim boundary
+        run: python revision/experiments/verify_abides_collusion_diagnostic.py
+
       - name: Verify deterministic paper exports
-        run: python revision/experiments/export_abides_audit_bundle.py --check
+        run: |
+          python revision/experiments/export_abides_audit_bundle.py --check
+          python revision/experiments/export_abides_collusion_audit_bundle.py --check
