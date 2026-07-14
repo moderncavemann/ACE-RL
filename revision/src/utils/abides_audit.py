@@ -113,11 +113,17 @@ def t_interval(values: Sequence[float]) -> dict[str, float | int]:
         ci_low = ci_high = average
         p_value = 1.0
     else:
-        standard_error = float(np.std(data, ddof=1) / math.sqrt(len(data)))
-        critical = float(t.ppf(0.975, len(data) - 1))
-        ci_low = average - critical * standard_error
-        ci_high = average + critical * standard_error
-        p_value = float(ttest_1samp(data, 0.0).pvalue)
+        sample_standard_deviation = float(np.std(data, ddof=1))
+        if sample_standard_deviation <= 1e-15:
+            standard_error = 0.0
+            ci_low = ci_high = average
+            p_value = 0.0 if abs(average) > 1e-12 else 1.0
+        else:
+            standard_error = sample_standard_deviation / math.sqrt(len(data))
+            critical = float(t.ppf(0.975, len(data) - 1))
+            ci_low = average - critical * standard_error
+            ci_high = average + critical * standard_error
+            p_value = float(ttest_1samp(data, 0.0).pvalue)
     return {
         "mean": average,
         "se": standard_error,

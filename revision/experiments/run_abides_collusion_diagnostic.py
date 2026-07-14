@@ -732,12 +732,15 @@ def summarize(
             all(bool(value) for value in result["integrity"].values())
             for result in results
         ),
+    }
+    sample_adequacy_checks = {
         "one_or_more_events_per_policy_seed": all(
             int(result["eligible_event_count"]) > 0 for result in results
         ),
         "complete_policy_seed_estimands": complete_seed_metrics,
     }
     integrity_pass = all(integrity_checks.values())
+    sample_adequacy_pass = all(sample_adequacy_checks.values())
     requirements = {
         "rival_spread_compression_after_undercut": bool(
             statistics.get("rival_spread_compression_after_undercut", {})
@@ -779,12 +782,14 @@ def summarize(
             .get("ci_low", -math.inf)
             > 0.0
         ),
-        "policy_seed_ci_support": complete_seed_metrics,
+        "policy_seed_ci_support": sample_adequacy_pass,
     }
     if bool(config.get("engineering_smoke")):
         scientific_result = "not_evaluated_engineering_smoke"
     elif not integrity_pass:
         scientific_result = "not_evaluated_integrity_fail"
+    elif not sample_adequacy_pass:
+        scientific_result = "inconclusive_insufficient_eligible_events"
     elif all(requirements.values()):
         scientific_result = "punishment_supported_collusion_pattern_supported"
     else:
@@ -797,6 +802,7 @@ def summarize(
         "eligible_event_count": sum(bool(row["event_found"]) for row in event_rows),
         "trajectory_row_count": len(trajectory_rows),
         "integrity_checks": integrity_checks,
+        "sample_adequacy_checks": sample_adequacy_checks,
         "implementation_status": "pass" if integrity_pass else "fail",
         "strong_collusion_requirements": requirements,
         "scientific_result": scientific_result,
@@ -850,6 +856,9 @@ def summary_markdown(summary: Mapping[str, Any]) -> str:
         "",
     ]
     for key, value in summary["strong_collusion_requirements"].items():
+        lines.append(f"- `{key}`: `{str(bool(value)).lower()}`")
+    lines.extend(["", "## Sample Adequacy", ""])
+    for key, value in summary["sample_adequacy_checks"].items():
         lines.append(f"- `{key}`: `{str(bool(value)).lower()}`")
     lines.extend(["", "## Policy-seed Contrasts", ""])
     for metric, payload in summary["statistics"].items():

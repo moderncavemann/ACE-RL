@@ -18,6 +18,7 @@ from src.utils.abides_audit import (  # noqa: E402
     aggregate_per_seed,
     exact_sign_test,
     holm_adjust,
+    t_interval,
     two_way_paired_bootstrap,
 )
 from export_abides_audit_bundle import (  # noqa: E402
@@ -29,6 +30,15 @@ from verify_abides_audit_bundle import parse_checksums  # noqa: E402
 
 def load_config(name: str) -> dict:
     return json.loads((REVISION_ROOT / "configs" / name).read_text(encoding="utf-8"))
+
+
+def test_zero_variance_t_interval_is_finite() -> None:
+    zero = t_interval([0.0, 0.0, 0.0])
+    assert zero["ci_low"] == zero["ci_high"] == 0.0
+    assert zero["p_value_two_sided"] == 1.0
+    nonzero = t_interval([2.0, 2.0, 2.0])
+    assert nonzero["ci_low"] == nonzero["ci_high"] == 2.0
+    assert nonzero["p_value_two_sided"] == 0.0
 
 
 def test_audit_schemas_cover_required_identity_and_metrics() -> None:
