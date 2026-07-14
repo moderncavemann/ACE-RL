@@ -21,7 +21,7 @@ def test_holdout_audit_fingerprint_is_order_sensitive_and_stable() -> None:
     left = [{"cell": "e1", "sha": "a"}, {"cell": "e2", "sha": "b"}]
     assert evaluation_fingerprint(left) == evaluation_fingerprint(left)
     assert evaluation_fingerprint(left) != evaluation_fingerprint(list(reversed(left)))
-    assert EVALUATOR_VERSION == "abides_holdout_audit_evaluation_v2"
+    assert EVALUATOR_VERSION == "abides_holdout_audit_evaluation_v3"
 
 
 def test_holdout_audit_task_paths_are_cell_and_seed_scoped() -> None:
@@ -50,6 +50,7 @@ def test_ecology_audit_configs_are_frozen_and_disjoint() -> None:
 
 def test_compact_record_normalization_preserves_flow_and_derives_tv() -> None:
     record = {
+        "gate_active": True,
         "info": {
             "flow_shares": [0.1, 0.2, 0.3, 0.4],
             "routing_effective_alpha": 0.25,
@@ -59,6 +60,7 @@ def test_compact_record_normalization_preserves_flow_and_derives_tv() -> None:
     normalized = normalize_compact_record(record)
     info = normalized["info"]
     assert info["routing_weights"] == record["info"]["flow_shares"]
+    assert info["active_routing"] is True
     assert info["routing_total_variation"] == 0.2
     assert info["routing_mechanism_parameters"]["audit_weights_source"] == (
         "realized_flow_shares"

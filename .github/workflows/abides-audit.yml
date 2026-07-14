@@ -52,9 +52,13 @@ jobs:
       - name: Recompute temporary commitment audit
         run: python revision/experiments/verify_abides_temporary_commitment.py
 
+      - name: Recompute learner and ecology holdout audit
+        run: python revision/experiments/verify_abides_holdout_audit_bundle.py
+
       - name: Verify deterministic paper exports
         run: |
           python revision/experiments/export_abides_audit_bundle.py --check
           python revision/experiments/export_abides_collusion_audit_bundle.py --check
           python revision/experiments/export_abides_dose_routing_audit_bundle.py --check
           python revision/experiments/export_abides_temporary_commitment_audit_bundle.py --check
+          python revision/experiments/export_abides_holdout_audit_bundle.py --check

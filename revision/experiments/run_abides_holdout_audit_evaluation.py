@@ -51,8 +51,8 @@ from src.envs.abides_docker_env import (  # noqa: E402
 from src.interventions.abides_gate import ABIDESTwoStageGateModel  # noqa: E402
 
 
-EVALUATOR_VERSION = "abides_holdout_audit_evaluation_v2"
-OUTPUT_DIR = REPO / "revision/experiments/outputs/abides_holdout_audit_evaluation_v2"
+EVALUATOR_VERSION = "abides_holdout_audit_evaluation_v3"
+OUTPUT_DIR = REPO / "revision/experiments/outputs/abides_holdout_audit_evaluation_v3"
 CELL_CONFIGS = {
     "ecology_e1": REPO / "revision/configs/abides_ecology_e1_response_v1.json",
     "ecology_e2": REPO / "revision/configs/abides_ecology_e2_response_v1.json",
@@ -123,6 +123,9 @@ def normalize_compact_record(record: Mapping[str, Any]) -> dict[str, Any]:
     """Map compact-runner flow instrumentation into the common audit schema."""
     normalized = dict(record)
     info = dict(record["info"])
+    if "gate_active" not in record:
+        raise RuntimeError("compact audit record has no gate activation flag")
+    info["active_routing"] = bool(record["gate_active"])
     flow_shares = [float(value) for value in info.get("flow_shares", [])]
     if not flow_shares:
         raise RuntimeError("compact audit record has no realized flow shares")
@@ -259,6 +262,7 @@ def evaluate_task(
                     step["learner"] = LEARNER_LABEL
                     step["flow_shares"] = list(record["info"]["flow_shares"])
                     step["routing_weights_source"] = "realized_flow_shares"
+                    step["gate_active"] = bool(record["gate_active"])
                     step_rows.append(step)
 
     recomputed = {
