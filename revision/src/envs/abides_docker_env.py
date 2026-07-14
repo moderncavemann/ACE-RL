@@ -71,6 +71,7 @@ class ABIDESDockerDealerEnv:
         gate_active: bool = False,
         routing_enabled: bool = True,
         routing_strength: float | None = None,
+        routing_mechanism: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         if not self._episode_open:
             raise RuntimeError("reset must be called before step")
@@ -82,6 +83,8 @@ class ABIDESDockerDealerEnv:
         }
         if routing_strength is not None:
             payload["routing_strength"] = float(routing_strength)
+        if routing_mechanism is not None:
+            payload["routing_mechanism"] = dict(routing_mechanism)
         response = self._request(payload)
         state = response["state"]
         self._validate_state(state)
@@ -139,7 +142,9 @@ class ABIDESDockerDealerEnv:
             raise RuntimeError(self._worker_failure("worker exited before request"))
         assert self._process.stdin is not None
         assert self._process.stdout is not None
-        self._process.stdin.write(json.dumps(dict(payload), separators=(",", ":")) + "\n")
+        self._process.stdin.write(
+            json.dumps(dict(payload), separators=(",", ":")) + "\n"
+        )
         self._process.stdin.flush()
         ready, _, _ = select.select(
             [self._process.stdout],

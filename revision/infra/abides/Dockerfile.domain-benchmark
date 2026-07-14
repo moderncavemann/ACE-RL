@@ -1,0 +1,13 @@
+FROM ace-rl-abides-ace:adaptive-v3
+
+# Keep the completed adaptive-v3 image immutable. This derived image replaces
+# only the ACE adapter and adds the pure benchmark mechanism module.
+COPY revision/src/interventions/abides_literature_baselines.py \
+    /opt/ace-abides/abides_literature_baselines.py
+COPY revision/infra/abides/ace_abides /opt/ace-abides/ace_abides
+COPY revision/infra/abides/worker.py /opt/ace-abides/worker.py
+COPY revision/infra/abides/smoke_domain_benchmark.py \
+    /opt/ace-abides/smoke_domain_benchmark.py
+
+LABEL org.opencontainers.image.title="ACE-RL ABIDES domain benchmark v1"
+ENV PYTHONPATH=/opt/ace-abides

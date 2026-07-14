@@ -2,6 +2,7 @@
   "protocol_version": "abides_domain_baseline_calibration_v1",
   "freeze_status": "preregistered",
   "backend": "abides",
+  "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
   "source_policy_seeds": [
     530000,
     530001,
@@ -35,6 +36,7 @@
   "gate_artifact": "revision/configs/abides_two_stage_gate_v1.json",
   "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
   "reference_method": "risk_aware",
+  "reference_controller_target_rate": 0.35,
   "routing_allocation_mode": "soft_rank",
   "routing_target_kappa": 4.0,
   "routing_routable_fraction": 0.5,

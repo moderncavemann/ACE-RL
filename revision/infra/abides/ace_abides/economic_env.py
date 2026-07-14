@@ -2,9 +2,18 @@
 
 from dataclasses import asdict, dataclass
 from hashlib import sha256
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Literal, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
+
+from abides_literature_baselines import (
+    brero_threshold_decision,
+    eligible_routing_weights,
+    flow_hhi,
+    routing_total_variation,
+    soft_rank_routing_weights,
+    uniform_routing_weights,
+)
 
 from abides_core import Agent, Kernel, Message, NanosecondTime
 from abides_core.utils import str_to_ns, subdict
@@ -94,9 +103,7 @@ def generate_exogenous_path(
 
     path: List[ExogenousStep] = []
     for _ in range(config.episode_steps):
-        sigma = (
-            config.high_sigma_ticks if risk == "high" else config.low_sigma_ticks
-        )
+        sigma = config.high_sigma_ticks if risk == "high" else config.low_sigma_ticks
         shock = int(np.rint(rng.normal(0.0, sigma)))
         events = []
         for _ in range(config.flow_events_per_step):
@@ -259,9 +266,7 @@ class EconomicCoordinator(CoreGymAgent):
                 agent_id,
                 CancelQuotesMsg(decision_id=self.step_id),
             )
-        for agent_id, half_spread in zip(
-            self.controlled_agent_ids, half_spreads
-        ):
+        for agent_id, half_spread in zip(self.controlled_agent_ids, half_spreads):
             self.send_message(
                 agent_id,
                 QuoteInstructionMsg(
@@ -299,31 +304,90 @@ class EconomicCoordinator(CoreGymAgent):
             contract_strength = severity if gate_active else 0.0
         else:
             contract_strength = announced_strength
-        effective_alpha = (
-            self.config.routing_routable_fraction * contract_strength
-            if routing_enabled
-            else 0.0
+        routing_mechanism_raw = actions.get("routing_mechanism")
+        routing_mechanism = (
+            {} if routing_mechanism_raw is None else dict(routing_mechanism_raw)
         )
-        spread_values, spread_counts = np.unique(
-            half_spreads, return_counts=True
-        )
+        mechanism_kind = str(routing_mechanism.get("kind", "soft_rank"))
+        spread_values, spread_counts = np.unique(half_spreads, return_counts=True)
         modal_candidates = spread_values[spread_counts == np.max(spread_counts)]
         modal_half_spread = float(np.max(modal_candidates))
         eligible_indices = np.flatnonzero(
-            half_spreads
-            <= modal_half_spread - self.config.routing_undercut_delta_ticks
+            half_spreads <= modal_half_spread - self.config.routing_undercut_delta_ticks
         )
         target_probabilities: Optional[np.ndarray] = None
-        if self.config.routing_allocation_mode == "soft_rank":
+        routing_threshold: Optional[float] = None
+        mechanism_parameters: Dict[str, Any] = {}
+        if mechanism_kind == "brero_threshold_buybox":
+            order_statistic_k = int(routing_mechanism["order_statistic_k"])
+            margin_ticks = int(routing_mechanism["margin_ticks"])
+            routable_fraction = float(
+                routing_mechanism.get(
+                    "routable_fraction",
+                    self.config.routing_routable_fraction,
+                )
+            )
+            decision = brero_threshold_decision(
+                half_spreads,
+                order_statistic_k,
+                margin_ticks,
+                routable_fraction,
+                enabled=routing_enabled,
+            )
+            routing_threshold = decision.threshold
+            target_indices = np.asarray(decision.eligible_indices, dtype=int)
+            planned_routing_weights = np.asarray(decision.routing_weights, dtype=float)
+            effective_alpha = (
+                routable_fraction
+                if routing_enabled and decision.active_routing
+                else 0.0
+            )
+            mechanism_parameters = dict(decision.parameters)
+        elif (
+            mechanism_kind == "soft_rank"
+            and self.config.routing_allocation_mode == "soft_rank"
+        ):
+            effective_alpha = (
+                self.config.routing_routable_fraction * contract_strength
+                if routing_enabled
+                else 0.0
+            )
             target_indices = np.arange(self.config.n_agents, dtype=int)
             centered = half_spreads - float(np.min(half_spreads))
             weights = np.exp(-self.config.routing_target_kappa * centered)
             target_probabilities = weights / float(np.sum(weights))
+            planned_routing_weights = soft_rank_routing_weights(
+                half_spreads,
+                contract_strength,
+                self.config.routing_target_kappa,
+                self.config.routing_routable_fraction,
+                enabled=routing_enabled,
+            )
         elif eligible_indices.size:
+            if mechanism_kind != "soft_rank":
+                raise ValueError(f"unsupported routing mechanism: {mechanism_kind}")
+            effective_alpha = (
+                self.config.routing_routable_fraction * contract_strength
+                if routing_enabled
+                else 0.0
+            )
             minimum = float(np.min(half_spreads[eligible_indices]))
             target_indices = eligible_indices[half_spreads[eligible_indices] == minimum]
+            planned_routing_weights = eligible_routing_weights(
+                self.config.n_agents,
+                target_indices,
+                effective_alpha,
+                enabled=routing_enabled,
+            )
         else:
+            if mechanism_kind != "soft_rank":
+                raise ValueError(f"unsupported routing mechanism: {mechanism_kind}")
+            effective_alpha = 0.0
             target_indices = np.asarray([], dtype=int)
+            planned_routing_weights = uniform_routing_weights(self.config.n_agents)
+
+        planned_routing_tv = routing_total_variation(planned_routing_weights)
+        planned_flow_hhi = flow_hhi(planned_routing_weights)
 
         target_count = 0
         total_quantity = 0
@@ -338,10 +402,7 @@ class EconomicCoordinator(CoreGymAgent):
         for event_index, event in enumerate(path_step.flow_events):
             destination_index = event.base_agent_index
             route_kind = f"base_s{self.step_id}"
-            if (
-                target_indices.size
-                and event.route_uniform < effective_alpha
-            ):
+            if target_indices.size and event.route_uniform < effective_alpha:
                 if target_probabilities is None:
                     target_slot = min(
                         int(event.target_uniform * len(target_indices)),
@@ -350,7 +411,11 @@ class EconomicCoordinator(CoreGymAgent):
                 else:
                     cumulative = np.cumsum(target_probabilities)
                     target_slot = min(
-                        int(np.searchsorted(cumulative, event.target_uniform, side="right")),
+                        int(
+                            np.searchsorted(
+                                cumulative, event.target_uniform, side="right"
+                            )
+                        ),
                         len(target_indices) - 1,
                     )
                 destination_index = int(target_indices[target_slot])
@@ -363,9 +428,7 @@ class EconomicCoordinator(CoreGymAgent):
                     decision_id=self.step_id,
                     side=event.side,
                     quantity=event.quantity,
-                    eligible_agent_ids=(
-                        self.controlled_agent_ids[destination_index],
-                    ),
+                    eligible_agent_ids=(self.controlled_agent_ids[destination_index],),
                     route_kind=route_kind,
                 ),
                 delay=flow_start_delay + event_index * flow_spacing,
@@ -384,11 +447,22 @@ class EconomicCoordinator(CoreGymAgent):
         )
         self.last_step_info = {
             "gate_active": gate_active,
+            "active_routing": bool(planned_routing_tv > 1e-12),
             "routing_enabled": routing_enabled,
             "routing_severity": severity,
             "routing_signal_strength": contract_strength,
             "routing_effective_alpha": effective_alpha,
+            "routing_mechanism": mechanism_kind,
+            "routing_mechanism_parameters": mechanism_parameters,
+            "routing_threshold": routing_threshold,
+            "routing_weights": planned_routing_weights.tolist(),
+            "routing_total_variation": planned_routing_tv,
+            "planned_flow_hhi": planned_flow_hhi,
             "eligible_agent_count": int(target_indices.size),
+            "eligible_agent_indices": target_indices.tolist(),
+            "eligible_agent_ids": [
+                self.controlled_agent_ids[int(index)] for index in target_indices
+            ],
             "modal_half_spread": modal_half_spread,
             "targeted_event_count": target_count,
             "planned_flow_quantity": total_quantity,
@@ -459,9 +533,7 @@ class EconomicCoordinator(CoreGymAgent):
         total_execution_quantity = float(np.sum(new_execution_quantity))
         total_spread_revenue = float(np.sum(spread_revenue))
         if total_execution_quantity > 0:
-            self.last_flow_shares = (
-                new_execution_quantity / total_execution_quantity
-            )
+            self.last_flow_shares = new_execution_quantity / total_execution_quantity
 
         public_volatility = float(
             np.std(self.public_shock_history[-10:])
@@ -473,16 +545,17 @@ class EconomicCoordinator(CoreGymAgent):
             observations.append(
                 [
                     float(entry["inventory"]) / 100.0,
-                    float(self.last_actions[index])
-                    / max(1, self.config.n_actions - 1),
+                    float(self.last_actions[index]) / max(1, self.config.n_actions - 1),
                     float(np.mean(self.last_half_spreads))
                     / max(self.config.half_spread_levels),
                     public_volatility / max(1.0, self.config.high_sigma_ticks),
                     float(self.last_flow_shares[index]),
-                    float(self.public_shock_history[-1])
-                    / max(1.0, self.config.high_sigma_ticks)
-                    if self.public_shock_history
-                    else 0.0,
+                    (
+                        float(self.public_shock_history[-1])
+                        / max(1.0, self.config.high_sigma_ticks)
+                        if self.public_shock_history
+                        else 0.0
+                    ),
                 ]
             )
 
@@ -503,9 +576,7 @@ class EconomicCoordinator(CoreGymAgent):
                     if total_execution_quantity > 0
                     else 0.0
                 ),
-                "mean_adverse_selection_component": float(
-                    np.mean(adverse_selection)
-                ),
+                "mean_adverse_selection_component": float(np.mean(adverse_selection)),
                 "mean_inventory_penalty": float(np.mean(penalty)),
                 "flow_shares": self.last_flow_shares.tolist(),
                 "avg_half_spread": float(np.mean(self.last_half_spreads)),
@@ -578,9 +649,7 @@ def build_economic_config(
             id=len(agents),
             symbol=symbol,
             starting_cash=config.starting_cash,
-            random_state=np.random.RandomState(
-                rng.randint(0, 2**32, dtype="uint32")
-            ),
+            random_state=np.random.RandomState(rng.randint(0, 2**32, dtype="uint32")),
         )
         controlled.append(agent)
         agents.append(agent)
@@ -633,9 +702,7 @@ class ABIDESDealerMarketEnv:
         if not self.closed:
             self.close()
         episode_seed = self.config.seed if seed is None else int(seed)
-        kernel_config, self.handles = build_economic_config(
-            self.config, episode_seed
-        )
+        kernel_config, self.handles = build_economic_config(self.config, episode_seed)
         self.kernel = Kernel(
             random_state=kernel_config["random_state_kernel"],
             **subdict(
@@ -663,6 +730,7 @@ class ABIDESDealerMarketEnv:
         gate_active: bool = False,
         routing_enabled: bool = True,
         routing_strength: Optional[float] = None,
+        routing_mechanism: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
         if self.closed or self.kernel is None:
             raise RuntimeError("reset must be called before step")
@@ -674,6 +742,9 @@ class ABIDESDealerMarketEnv:
                     "gate_active": gate_active,
                     "routing_enabled": routing_enabled,
                     "routing_strength": routing_strength,
+                    "routing_mechanism": (
+                        None if routing_mechanism is None else dict(routing_mechanism)
+                    ),
                 },
             )
         )

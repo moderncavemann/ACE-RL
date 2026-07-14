@@ -18,7 +18,9 @@ def actor_observations(
 ) -> np.ndarray:
     base = np.asarray(state["observations"], dtype=np.float32)
     if base.shape != (10, 6):
-        raise ValueError(f"expected ABIDES observations with shape (10, 6), got {base.shape}")
+        raise ValueError(
+            f"expected ABIDES observations with shape (10, 6), got {base.shape}"
+        )
     signal = np.full((base.shape[0], 1), float(gate_signal), dtype=np.float32)
     return np.concatenate([base, signal], axis=1)
 
@@ -106,18 +108,24 @@ def rollout_episode(
     action_namespace: int = 73_117,
     deterministic: bool = False,
     defer_update: bool = False,
+    routing_mechanism: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if gate_schedule is not None and gate_decision is not None:
         raise ValueError("provide either gate_schedule or gate_decision, not both")
-    if (announced_signal_schedule is not None or announced_signal_decision is not None) and (
-        gate_schedule is not None or gate_decision is not None
-    ):
+    if (
+        announced_signal_schedule is not None or announced_signal_decision is not None
+    ) and (gate_schedule is not None or gate_decision is not None):
         raise ValueError("announced signals cannot be combined with post-action gates")
     if announced_signal_schedule is not None and announced_signal_decision is not None:
-        raise ValueError("provide either announced signal schedule or decision, not both")
+        raise ValueError(
+            "provide either announced signal schedule or decision, not both"
+        )
     if gate_schedule is not None and len(gate_schedule) != episode_steps:
         raise ValueError("gate schedule length must match episode_steps")
-    if announced_signal_schedule is not None and len(announced_signal_schedule) != episode_steps:
+    if (
+        announced_signal_schedule is not None
+        and len(announced_signal_schedule) != episode_steps
+    ):
         raise ValueError("announced signal schedule length must match episode_steps")
 
     state = env.reset(seed=seed)
@@ -167,6 +175,7 @@ def rollout_episode(
             gate_active=active,
             routing_enabled=routing_enabled,
             routing_strength=announced_strength,
+            routing_mechanism=routing_mechanism,
         )
         rewards = np.asarray(next_state["rewards"], dtype=float) / reward_scale
         obs_rows.append(obs)
@@ -180,7 +189,9 @@ def rollout_episode(
                 "step": step,
                 "actions": actions.tolist(),
                 "gate_active": active,
-                "gate_signal": 0.0 if announced_strength is None else announced_strength,
+                "gate_signal": (
+                    0.0 if announced_strength is None else announced_strength
+                ),
                 "pre_info": dict(state["info"]),
                 "pre_observations": state["observations"],
                 "info": dict(next_state["info"]),

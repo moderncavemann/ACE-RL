@@ -46,6 +46,7 @@ def main() -> None:
                         if request.get("routing_strength") is None
                         else float(request["routing_strength"])
                     ),
+                    routing_mechanism=request.get("routing_mechanism"),
                 )
                 write({"ok": True, "state": state})
             elif command == "close_episode":

@@ -4,7 +4,7 @@
   "formal_execution_allowed": false,
   "engineering_smoke": false,
   "backend": "abides",
-  "docker_image": "ace-rl-abides-ace:adaptive-v3",
+  "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
   "episode_steps": 100,
   "policy_seeds": [
     530000,
