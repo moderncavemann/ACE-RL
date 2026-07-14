@@ -1,0 +1,65 @@
+{
+  "cells": [
+    {
+      "all_finite": true,
+      "cell_id": "lr3e-4_entropy001",
+      "critic_learning_rate": 0.0003,
+      "entropy_coefficient": 0.01,
+      "learning_rate": 0.0003,
+      "mean_dealer_reward": 11143.621777777778,
+      "mean_low_execution_half_spread": 6.84419344479177,
+      "policy_seed_count": 3
+    },
+    {
+      "all_finite": true,
+      "cell_id": "lr3e-4_entropy002",
+      "critic_learning_rate": 0.0003,
+      "entropy_coefficient": 0.02,
+      "learning_rate": 0.0003,
+      "mean_dealer_reward": 10465.066222222222,
+      "mean_low_execution_half_spread": 6.515870487600118,
+      "policy_seed_count": 3
+    },
+    {
+      "all_finite": true,
+      "cell_id": "lr5e-4_entropy001",
+      "critic_learning_rate": 0.0005,
+      "entropy_coefficient": 0.01,
+      "learning_rate": 0.0005,
+      "mean_dealer_reward": 11149.510666666667,
+      "mean_low_execution_half_spread": 6.847191460321948,
+      "policy_seed_count": 3
+    },
+    {
+      "all_finite": true,
+      "cell_id": "lr5e-4_entropy002",
+      "critic_learning_rate": 0.0005,
+      "entropy_coefficient": 0.02,
+      "learning_rate": 0.0005,
+      "mean_dealer_reward": 10483.288444444444,
+      "mean_low_execution_half_spread": 6.528280754482511,
+      "policy_seed_count": 3
+    }
+  ],
+  "created_at": "2026-07-14T12:12:55.575021+00:00",
+  "official_commit": "de66d7a4b23fac2513f56f96f73b3f5cb96695ac",
+  "protocol_version": "abides_standard_learner_holdout_v1",
+  "selected_hyperparameters": {
+    "cell_id": "lr5e-4_entropy001",
+    "critic_learning_rate": 0.0005,
+    "entropy_coefficient": 0.01,
+    "learning_rate": 0.0005
+  },
+  "selection_rule": "highest_mean_no_intervention_dealer_reward_on_validation_paths_subject_to_all_updates_and_metrics_finite;ties_lower_learning_rate_then_lower_entropy",
+  "validation_evaluation_seeds": [
+    554000,
+    554001,
+    554002
+  ],
+  "validation_policy_seeds": [
+    553000,
+    553001,
+    553002
+  ],
+  "validation_protocol_fingerprint": "b565a78e8d57e1a940bdd5164168feab6e6a88f427d6761145f75eb8d4d9b25b"
+}

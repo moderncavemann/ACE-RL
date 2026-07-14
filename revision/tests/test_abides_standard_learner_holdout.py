@@ -17,12 +17,19 @@ def load_config() -> dict:
     )
 
 
-def test_standard_learner_grid_is_frozen_before_validation() -> None:
+def test_standard_learner_grid_and_selection_are_frozen_before_formal() -> None:
     config = load_config()
-    assert config["freeze_status"] == "frozen_before_hyperparameter_validation"
-    assert config["formal_execution_allowed"] is False
-    assert config["selected_hyperparameters"] is None
-    assert config["selection_artifact_sha256"] is None
+    assert config["freeze_status"] == "frozen_after_validation_selection"
+    assert config["formal_execution_allowed"] is True
+    assert config["selected_hyperparameters"] == {
+        "cell_id": "lr5e-4_entropy001",
+        "learning_rate": 0.0005,
+        "critic_learning_rate": 0.0005,
+        "entropy_coefficient": 0.01,
+    }
+    assert config["selection_artifact_sha256"] == (
+        "87979b0bfe0064a04ae9e69d402d38088daa22c121af17df11d7a113dd610dbc"
+    )
     cells = config["hyperparameter_search_space"]
     assert len(cells) == 4
     assert {cell["learning_rate"] for cell in cells} == {0.0003, 0.0005}

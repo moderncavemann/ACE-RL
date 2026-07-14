@@ -1,7 +1,7 @@
 {
   "protocol_version": "abides_standard_learner_holdout_v1",
-  "freeze_status": "frozen_before_hyperparameter_validation",
-  "formal_execution_allowed": false,
+  "freeze_status": "frozen_after_validation_selection",
+  "formal_execution_allowed": true,
   "backend": "abides",
   "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
   "official_repository": "https://github.com/marlbenchmark/on-policy",
@@ -30,9 +30,14 @@
     {"cell_id": "lr5e-4_entropy002", "learning_rate": 0.0005, "critic_learning_rate": 0.0005, "entropy_coefficient": 0.02}
   ],
   "hyperparameter_selection_rule": "highest_mean_no_intervention_dealer_reward_on_validation_paths_subject_to_all_updates_and_metrics_finite;ties_lower_learning_rate_then_lower_entropy",
-  "selected_hyperparameters": null,
+  "selected_hyperparameters": {
+    "cell_id": "lr5e-4_entropy001",
+    "learning_rate": 0.0005,
+    "critic_learning_rate": 0.0005,
+    "entropy_coefficient": 0.01
+  },
   "selection_artifact": "revision/configs/abides_standard_learner_holdout_v1_selection.json",
-  "selection_artifact_sha256": null,
+  "selection_artifact_sha256": "87979b0bfe0064a04ae9e69d402d38088daa22c121af17df11d7a113dd610dbc",
   "official_algorithm_parameters": {
     "recurrent_policy": true,
     "hidden_size": 64,

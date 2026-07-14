@@ -1,6 +1,6 @@
 # ABIDES Standard Learner Holdout v1 Protocol
 
-Status: source, wrapper contract, grid, and evaluation design frozen before validation
+Status: validation complete; selected configuration frozen before formal execution
 Date: 2026-07-14
 
 ## Source
@@ -66,3 +66,17 @@ actor hyperparameters and the same official actor, PPO trainer, recurrent
 masks, and shared replay buffer implementation. They differ only in whether
 the critic receives the frozen centralized observation or the local actor
 observation.
+
+## Frozen Selection
+
+All four validation cells completed with finite updates and metrics. Under the
+pre-registered no-intervention dealer-reward rule, the selected cell is
+`lr5e-4_entropy001`: actor learning rate `5e-4`, critic learning rate `5e-4`,
+and entropy coefficient `0.01`. Its mean dealer reward was `11149.5107` across
+the three validation policy seeds and three validation paths. The next-highest
+cell was `lr3e-4_entropy001` at `11143.6218`.
+
+The complete selection artifact is
+`revision/configs/abides_standard_learner_holdout_v1_selection.json`, SHA-256
+`87979b0bfe0064a04ae9e69d402d38088daa22c121af17df11d7a113dd610dbc`.
+This selection did not read intervention outcomes or final evaluation paths.
