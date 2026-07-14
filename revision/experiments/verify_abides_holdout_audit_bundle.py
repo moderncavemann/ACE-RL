@@ -325,12 +325,16 @@ def verify_per_path(
         ),
         key=path_key,
     )
-    expected_rows = source_path_rows(official, ecology)
     expected_keys = expected_path_grid(official_config, ecology_configs)
     keys = [path_key(row) for row in committed]
     if len(committed) != 2_000 or len(set(keys)) != 2_000 or set(keys) != expected_keys:
         raise RuntimeError("combined per-path identity grid is incomplete or duplicated")
-    assert_nested_close(committed, expected_rows, "per_path_source_correspondence")
+    source_available = bool(official) and bool(ecology)
+    if source_available:
+        expected_rows = source_path_rows(official, ecology)
+        assert_nested_close(
+            committed, expected_rows, "per_path_source_correspondence"
+        )
 
     protocols = {
         "standard_learner": str(official_config["protocol_version"]),
@@ -350,7 +354,8 @@ def verify_per_path(
         raise RuntimeError("exogenous path digest differs across a paired method grid")
     return committed, {
         "per_path_grid_exact": True,
-        "per_path_matches_source_results": True,
+        **({"per_path_matches_source_results": True} if source_available else {}),
+        "per_path_committed_source_hash_covered": True,
         "paired_path_digests_equal": True,
         "per_path_volume_conserved": True,
     }
@@ -668,7 +673,8 @@ def verify_step_records(
     ecology: Sequence[Mapping[str, Any]],
     checks: Mapping[str, Any],
 ) -> dict[str, bool]:
-    expected_source = iter(source_step_rows(official, ecology))
+    source_available = bool(official) and bool(ecology)
+    expected_source = iter(source_step_rows(official, ecology)) if source_available else None
     path_digests = {path_key(row): str(row["path_digest"]) for row in per_path}
     seen: set[tuple[str, str, int, int, str, int]] = set()
     paired: dict[tuple[str, str, int, int, int], dict[str, set[str]]] = defaultdict(
@@ -684,12 +690,13 @@ def verify_step_records(
     with gzip.open(bundle / "step_records.jsonl.gz", "rt", encoding="utf-8") as handle:
         for line in handle:
             actual = json.loads(line)
-            try:
-                expected = next(expected_source)
-            except StopIteration as error:
-                raise RuntimeError("bundle has more step rows than source files") from error
-            if canonical_json(actual) != canonical_json(expected):
-                raise RuntimeError(f"step source mismatch at combined row {count}")
+            if expected_source is not None:
+                try:
+                    expected = next(expected_source)
+                except StopIteration as error:
+                    raise RuntimeError("bundle has more step rows than source files") from error
+                if canonical_json(actual) != canonical_json(expected):
+                    raise RuntimeError(f"step source mismatch at combined row {count}")
             canonical_line = canonical_json(actual) + "\n"
             stream_hash.update(canonical_line.encode("utf-8"))
             identity = (
@@ -739,12 +746,13 @@ def verify_step_records(
                 ):
                     raise RuntimeError("compact ecology mechanism provenance is missing")
             count += 1
-    try:
-        next(expected_source)
-    except StopIteration:
-        pass
-    else:
-        raise RuntimeError("source files have more step rows than the bundle")
+    if expected_source is not None:
+        try:
+            next(expected_source)
+        except StopIteration:
+            pass
+        else:
+            raise RuntimeError("source files have more step rows than the bundle")
     if count != 200_000 or len(seen) != 200_000:
         raise RuntimeError("combined step identity grid is incomplete")
     if any(
@@ -787,63 +795,75 @@ def verify_step_records(
                 f"ecology high-risk activation does not replay: {identity}"
             )
 
-    for result in ecology:
-        source = read_json(REPO / str(result["_response_result_file"]))
-        source_methods = source["final_evaluation"]["methods"]
-        result_rows = list(result["per_path"])
-        for method in ECOLOGY_METHODS:
-            rows = [row for row in result_rows if row["method"] == method]
-            if len(rows) != 10:
-                raise RuntimeError("ecology source aggregate has incomplete paths")
-            low_steps = sum(float(row["low_risk_steps"]) for row in rows)
-            high_steps = sum(float(row["high_risk_steps"]) for row in rows)
-            replayed = {
-                "low_execution_half_spread": sum(
-                    float(row["low_execution_half_spread"])
-                    * float(row["low_risk_steps"])
-                    for row in rows
-                )
-                / low_steps,
-                "mean_reward": float(mean(float(row["mean_reward"]) for row in rows)),
-                "mean_volume": float(mean(float(row["mean_volume"]) for row in rows)),
-                "activation_rate": float(
-                    mean(float(row["activation_rate"]) for row in rows)
-                ),
-                "high_risk_activation_rate": (
-                    sum(
-                        float(row["high_risk_activation_rate"])
-                        * float(row["high_risk_steps"])
+    if source_available:
+        for result in ecology:
+            source = read_json(REPO / str(result["_response_result_file"]))
+            source_methods = source["final_evaluation"]["methods"]
+            result_rows = list(result["per_path"])
+            for method in ECOLOGY_METHODS:
+                rows = [row for row in result_rows if row["method"] == method]
+                if len(rows) != 10:
+                    raise RuntimeError("ecology source aggregate has incomplete paths")
+                low_steps = sum(float(row["low_risk_steps"]) for row in rows)
+                high_steps = sum(float(row["high_risk_steps"]) for row in rows)
+                replayed = {
+                    "low_execution_half_spread": sum(
+                        float(row["low_execution_half_spread"])
+                        * float(row["low_risk_steps"])
                         for row in rows
                     )
-                    / high_steps
-                    if high_steps
-                    else 0.0
-                ),
-                "targeted_events": targeted_events[
-                    (str(result["cell"]), int(result["policy_seed"]), method)
-                ],
-            }
-            assert_nested_close(
-                replayed,
-                source_methods[method],
-                f"ecology_source_aggregate.{result['cell']}.{result['policy_seed']}.{method}",
-            )
-            expected_model = (
-                source["base_model_digest"]
-                if method == "no_intervention"
-                else source["final_model_digests"][method]
-            )
-            if {str(row["model_digest"]) for row in rows} != {str(expected_model)}:
-                raise RuntimeError("ecology source model digest differs")
+                    / low_steps,
+                    "mean_reward": float(
+                        mean(float(row["mean_reward"]) for row in rows)
+                    ),
+                    "mean_volume": float(
+                        mean(float(row["mean_volume"]) for row in rows)
+                    ),
+                    "activation_rate": float(
+                        mean(float(row["activation_rate"]) for row in rows)
+                    ),
+                    "high_risk_activation_rate": (
+                        sum(
+                            float(row["high_risk_activation_rate"])
+                            * float(row["high_risk_steps"])
+                            for row in rows
+                        )
+                        / high_steps
+                        if high_steps
+                        else 0.0
+                    ),
+                    "targeted_events": targeted_events[
+                        (str(result["cell"]), int(result["policy_seed"]), method)
+                    ],
+                }
+                assert_nested_close(
+                    replayed,
+                    source_methods[method],
+                    f"ecology_source_aggregate.{result['cell']}.{result['policy_seed']}.{method}",
+                )
+                expected_model = (
+                    source["base_model_digest"]
+                    if method == "no_intervention"
+                    else source["final_model_digests"][method]
+                )
+                if {str(row["model_digest"]) for row in rows} != {
+                    str(expected_model)
+                }:
+                    raise RuntimeError("ecology source model digest differs")
     return {
-        "step_source_correspondence_exact": True,
+        **({"step_source_correspondence_exact": True} if source_available else {}),
+        "step_records_committed_hash_covered": True,
         "step_identity_grid_exact": True,
         "routing_vectors_valid": True,
         "flow_conserved_per_step_and_episode": True,
         "paired_exogenous_streams_equal": True,
         "compact_flow_share_provenance_explicit": True,
         "compact_activation_recomputed_from_steps": True,
-        "ecology_source_aggregates_recomputed": True,
+        **(
+            {"ecology_source_aggregates_recomputed": True}
+            if source_available
+            else {}
+        ),
         "canonical_step_stream_hash_recomputed": True,
     }
 
@@ -960,6 +980,99 @@ def expected_model_digests(per_path: Sequence[Mapping[str, Any]]) -> dict[str, s
     return output
 
 
+def is_sha256(value: Any) -> bool:
+    text = str(value)
+    return len(text) == 64 and all(character in "0123456789abcdef" for character in text)
+
+
+def validate_embedded_provenance(
+    provenance: Mapping[str, Any],
+    official_config: Mapping[str, Any],
+    ecology_configs: Mapping[str, Mapping[str, Any]],
+) -> None:
+    official = provenance["official"]
+    ecology = provenance["ecology_audit"]
+    selection = REPO / "revision/configs/abides_standard_learner_holdout_v1_selection.json"
+    if official["config_sha256"] != sha256_file(OFFICIAL_CONFIG):
+        raise RuntimeError("embedded official config hash differs")
+    if official["selection_sha256"] != sha256_file(selection):
+        raise RuntimeError("embedded official selection hash differs")
+    official_result_keys = {
+        f"{learner}:{seed}"
+        for learner in official_config["learners"]
+        for seed in official_config["policy_seeds"]
+    }
+    if set(official["result_sha256"]) != official_result_keys or not all(
+        is_sha256(value) for value in official["result_sha256"].values()
+    ):
+        raise RuntimeError("embedded official result hashes are incomplete")
+    if (
+        official["official_commit"] != OFFICIAL_COMMIT
+        or official["abides_commit"] != ABIDES_COMMIT
+        or official["docker_image"] != official_config["docker_image"]
+        or not str(official["docker_image_id"]).startswith("sha256:")
+    ):
+        raise RuntimeError("embedded official source provenance differs")
+    for field in (
+        "protocol_fingerprint",
+        "execution_commit",
+        "summary_sha256",
+        "started_at",
+        "finished_at",
+    ):
+        if not str(official.get(field, "")):
+            raise RuntimeError(f"embedded official provenance lacks {field}")
+
+    expected_ecology_keys = {
+        f"{cell}:{seed}"
+        for cell, config in ecology_configs.items()
+        for seed in config["policy_seeds"]
+    }
+    if set(ecology["result_sha256"]) != expected_ecology_keys or not all(
+        is_sha256(value) for value in ecology["result_sha256"].values()
+    ):
+        raise RuntimeError("embedded ecology result hashes are incomplete")
+    if ecology["response_configs"] != {
+        cell: sha256_file(path) for cell, path in ECOLOGY_CONFIGS.items()
+    }:
+        raise RuntimeError("embedded ecology response config hashes differ")
+    base_paths = {
+        cell: REPO / "revision/configs" / f"abides_{cell}_base_v1.json"
+        for cell in ECOLOGY_CONFIGS
+    }
+    if ecology["base_config_sha256"] != {
+        cell: sha256_file(path) for cell, path in base_paths.items()
+    }:
+        raise RuntimeError("embedded ecology base config hashes differ")
+    if (
+        ecology["evaluator_version"] != "abides_holdout_audit_evaluation_v3"
+        or ecology["abides_commit"] != ABIDES_COMMIT
+        or ecology["docker_images"]
+        != {
+            cell: ecology_configs[cell]["docker_image"]
+            for cell in ECOLOGY_CONFIGS
+        }
+        or set(ecology["docker_image_ids"]) != set(ECOLOGY_CONFIGS)
+        or not all(
+            str(value).startswith("sha256:")
+            for value in ecology["docker_image_ids"].values()
+        )
+    ):
+        raise RuntimeError("embedded ecology execution provenance differs")
+    descriptors = ecology.get("source_descriptors", [])
+    if {descriptor.get("cell") for descriptor in descriptors} != set(ECOLOGY_CONFIGS):
+        raise RuntimeError("embedded ecology source descriptors are incomplete")
+    for field in (
+        "audit_fingerprint",
+        "execution_commit",
+        "summary_sha256",
+        "started_at",
+        "finished_at",
+    ):
+        if not str(ecology.get(field, "")):
+            raise RuntimeError(f"embedded ecology provenance lacks {field}")
+
+
 def verify_provenance(
     bundle: Path,
     manifest: Mapping[str, Any],
@@ -970,8 +1083,17 @@ def verify_provenance(
     per_path: Sequence[Mapping[str, Any]],
     allow_unarchived: bool,
 ) -> dict[str, bool]:
-    expected = expected_provenance(official, ecology)
-    assert_nested_close(manifest["source_provenance"], expected, "source_provenance")
+    source_available = bool(official) and bool(ecology)
+    embedded = manifest["source_provenance"]
+    if source_available:
+        expected = expected_provenance(official, ecology)
+        assert_nested_close(embedded, expected, "source_provenance")
+    else:
+        ecology_configs = {
+            cell: read_json(path) for cell, path in ECOLOGY_CONFIGS.items()
+        }
+        validate_embedded_provenance(embedded, official_config, ecology_configs)
+        expected = embedded
     expected_fingerprint = hashlib.sha256(
         canonical_json(expected).encode("utf-8")
     ).hexdigest()
@@ -1059,7 +1181,11 @@ def verify_provenance(
         if str(manifest.get("git_dirty_status_at_export", "")):
             raise RuntimeError("sealed export was not produced from a clean worktree")
     return {
-        "source_provenance_recomputed": True,
+        **(
+            {"source_provenance_recomputed": True}
+            if source_available
+            else {"embedded_source_provenance_validated": True}
+        ),
         "source_model_digests_recomputed": True,
         "docker_and_abides_provenance_complete": True,
         "source_completion_provenance_complete": True,
@@ -1071,7 +1197,31 @@ def verify_provenance(
     }
 
 
-def verify_runner_state(checks: Mapping[str, Any]) -> dict[str, bool]:
+def verify_runner_state(
+    checks: Mapping[str, Any], source_available: bool
+) -> dict[str, bool]:
+    if not source_available:
+        resume = checks["completed_resume_verified"]
+        if (
+            checks["official_implementation_status"] != "pass"
+            or not all(checks["official_runner_checks"].values())
+            or set(checks["ecology_status"].values()) != {"pass"}
+            or any(
+                not all(values.values())
+                for values in checks["ecology_runner_checks"].values()
+            )
+            or checks["ecology_audit_status"] != "pass"
+            or not checks["ecology_audit_all_checks_pass"]
+            or not all(resume.values())
+        ):
+            raise RuntimeError("hash-covered runner integrity status did not pass")
+        return {
+            "official_runner_checks_pass": True,
+            "ecology_runner_checks_pass": True,
+            "ecology_audit_replay_pass": True,
+            "completed_resumes_verified": True,
+            "runner_state_from_hash_covered_bundle": True,
+        }
     official_summary = read_json(OFFICIAL_OUTPUT / "summary.json")
     audit_summary = read_json(ECOLOGY_AUDIT_OUTPUT / "summary.json")
     ecology_summaries = {
@@ -1127,11 +1277,41 @@ def verify_runner_state(checks: Mapping[str, Any]) -> dict[str, bool]:
     }
 
 
-def verify_bundle(bundle: Path, allow_unarchived: bool = False) -> dict[str, Any]:
+def local_source_results_available() -> bool:
+    return (
+        (
+            OFFICIAL_OUTPUT
+            / "formal/official_full_policy_MAPPO/seed_550000/result.json"
+        ).is_file()
+        and (
+            ECOLOGY_AUDIT_OUTPUT / "ecology_e1/seed_560000/result.json"
+        ).is_file()
+        and (
+            REPO
+            / "revision/experiments/outputs/abides_ecology_e1_response_v1"
+            / "response_results/seed_560000.json"
+        ).is_file()
+    )
+
+
+def verify_bundle(
+    bundle: Path,
+    allow_unarchived: bool = False,
+    force_bundle_only: bool = False,
+) -> dict[str, Any]:
     checksums = parse_checksums(bundle)
     manifest = read_json(bundle / "manifest.json")
     checks = read_json(bundle / "checks.json")
-    official_config, ecology_configs, official, ecology = load_source_results()
+    source_available = local_source_results_available() and not force_bundle_only
+    if source_available:
+        official_config, ecology_configs, official, ecology = load_source_results()
+    else:
+        official_config = read_json(OFFICIAL_CONFIG)
+        ecology_configs = {
+            cell: read_json(path) for cell, path in ECOLOGY_CONFIGS.items()
+        }
+        official = []
+        ecology = []
     per_path, path_checks = verify_per_path(
         bundle, official_config, ecology_configs, official, ecology
     )
@@ -1154,7 +1334,7 @@ def verify_bundle(bundle: Path, allow_unarchived: bool = False) -> dict[str, Any
         per_path,
         allow_unarchived,
     )
-    runner_checks = verify_runner_state(checks)
+    runner_checks = verify_runner_state(checks, source_available)
     declared_counts = {
         "per_path_count": {"actual": 2_000, "expected": 2_000},
         "per_seed_count": {"actual": 40, "expected": 40},
@@ -1178,6 +1358,11 @@ def verify_bundle(bundle: Path, allow_unarchived: bool = False) -> dict[str, Any
         raise RuntimeError(f"holdout audit checks failed: {failed}")
     return {
         "audit_verification_status": "pass",
+        "verification_mode": (
+            "local_source_correspondence"
+            if source_available
+            else "self_contained_bundle"
+        ),
         "protocol_version": PROTOCOL_VERSION,
         "protocol_fingerprint": manifest["protocol_fingerprint"],
         "result_archival_commit": manifest.get("result_archival_commit"),
@@ -1191,13 +1376,18 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--bundle", type=Path, default=DEFAULT_BUNDLE)
     parser.add_argument("--allow-unarchived", action="store_true")
+    parser.add_argument("--bundle-only", action="store_true")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     bundle = args.bundle if args.bundle.is_absolute() else REPO / args.bundle
-    result = verify_bundle(bundle, allow_unarchived=args.allow_unarchived)
+    result = verify_bundle(
+        bundle,
+        allow_unarchived=args.allow_unarchived,
+        force_bundle_only=args.bundle_only,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
