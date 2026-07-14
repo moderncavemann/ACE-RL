@@ -1,0 +1,800 @@
+{
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "artifact_hashes": {
+    "calibration_artifact_sha256": "6f6405f5f9f6dfc226756ebabe60ef071785d4ef3930c5d58a2d9f241506d96e",
+    "docker_image_id": "sha256:2b72c2a8f0215d59e8cbf6b6e992ef2e7d3745d5cb5e8e764f2c249cd51a8c23",
+    "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
+    "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+    "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c"
+  },
+  "calibration_environment_seeds": [
+    535000,
+    535001,
+    535002,
+    535003,
+    535004,
+    535005,
+    535006,
+    535007,
+    535008,
+    535009
+  ],
+  "command": "python revision/experiments/run_abides_domain_benchmark.py --config revision/configs/abides_domain_benchmark_v1.json",
+  "completed_policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "completed_resume_verified": true,
+  "docker_image": "ace-rl-abides-ace:domain-benchmark-v1",
+  "docker_image_id": "sha256:2b72c2a8f0215d59e8cbf6b6e992ef2e7d3745d5cb5e8e764f2c249cd51a8c23",
+  "evaluation_action_namespace": 541117,
+  "evaluation_seeds": [
+    534000,
+    534001,
+    534002,
+    534003,
+    534004,
+    534005,
+    534006,
+    534007,
+    534008,
+    534009
+  ],
+  "execution_commit": "4d3b660f10f6a5c1d06491bd336f543e5a69e993",
+  "execution_records": {
+    "530000": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.17881019167835444,
+          "brero_threshold_buybox_budget_matched": 0.0292192613370732,
+          "spread_only_budget_matched": 0.008707339878447407
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1784.9560009161942,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "48d28524a3c3fc79314f88041b0049523120a06dea9be8411a84946c28ea52f9",
+      "step_records_sha256": "6cfa88f1963b4165c4b7f8243d92b57f9fb1a56f01f5096f1d0965c8b615be36",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530001": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.140287517531557,
+          "brero_threshold_buybox_budget_matched": 0.05492052360916322,
+          "spread_only_budget_matched": 0.016584852734923494
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1787.5009467909113,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "0e68e186c15475bac0883aeb55d86200ce6d953a9d2a612c8922e2f9630d9a0e",
+      "step_records_sha256": "93d6fc1cebbad5125f8ce1748fbc206391e20c0920f465e35e769dde52c3802c",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530002": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.15133239831697054,
+          "brero_threshold_buybox_budget_matched": 0.08992519869097748,
+          "spread_only_budget_matched": 0.015053763440860735
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1758.4485776661895,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "9122a476aeb9b95f628b0386d320cdc3468d4b9c231483505b05fceb89427e28",
+      "step_records_sha256": "ab22f0e36bcb377f61d2079210684338ebd6e19fab5f03c901a1584d1ea46a61",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530003": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.15715287517531618,
+          "brero_threshold_buybox_budget_matched": 0.029324450677886915,
+          "spread_only_budget_matched": 0.004254324450678304
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1787.9423927501775,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "824ccf5722edb9c797f139085eb6534c1c1a8eb724d37758b1d153f09fc078a3",
+      "step_records_sha256": "981d99e005ec3f64934d2d0d739b72e24ca8ba9cde0921458fc1443817a02213",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530004": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.14481065918653613,
+          "brero_threshold_buybox_budget_matched": 0.05072463768115831,
+          "spread_only_budget_matched": 0.010565684899486172
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1794.8477913751267,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "e857b78cf588162c677e87aac4d2c7b4886f1bbeacfdfac6c1825b2d62b92322",
+      "step_records_sha256": "3ad6963dcb42fbc2bfb875da03e54642ad560629a940714d1e81f0ee398bdef1",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530005": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.12337540906965927,
+          "brero_threshold_buybox_budget_matched": 0.031989247311827285,
+          "spread_only_budget_matched": 0.007258064516128648
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1775.054506166838,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "e7b7cc0e99b16021277612bf274b4025044815f15fb6f5b701630efe6af750aa",
+      "step_records_sha256": "1501c13c167a205703fa4b751b0673534b27a712a96fa66621084c0ad748f781",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530006": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.08169705469845745,
+          "brero_threshold_buybox_budget_matched": 0.066701729780271,
+          "spread_only_budget_matched": 0.008380084151472289
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1780.1546334163286,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "f7d145b9f556456e5cad4ea5a3d46d8fff4e59d43466664c8627fc6199d1e82a",
+      "step_records_sha256": "095251d213b1cf72e3ed09ad51434a4ab75be99a0e0755cc612af0e5073d675f",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530007": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.09984805984104739,
+          "brero_threshold_buybox_budget_matched": 0.054301075268817556,
+          "spread_only_budget_matched": 0.009163160355305067
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1796.3881535422988,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "e4e8fd84b0130236ed3f0eebacbcdd418af77e136d9581188109e872b27da0f6",
+      "step_records_sha256": "60b1070caa7fd4e29088d996e2009dd900ea6b0938d885095f8b25b1d06d87d1",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530008": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.08359046283310079,
+          "brero_threshold_buybox_budget_matched": 0.042157550257129195,
+          "spread_only_budget_matched": 0.014481065918653613
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2515.319059208967,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "f7548b52872d09a98510c40bcab4a548728927e71eadcf9f1dd6c915cca5159f",
+      "step_records_sha256": "aa9db57d9e7c2d8497b68d1d65a91922014c69ae148078a0f4dd51010ff7bae7",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530009": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.17322346891070595,
+          "brero_threshold_buybox_budget_matched": 0.05828658251519414,
+          "spread_only_budget_matched": 0.01399018232819138
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2525.6283036670648,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "6ecd56c2c72d30f267c7a885b789b448bcd9b769fc8de8eb00edbab9eccc412e",
+      "step_records_sha256": "0acba9b43d3f872954967a405621caa9c7489ca555c48a87404b8d851ce4010f",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530010": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.14488078541374527,
+          "brero_threshold_buybox_budget_matched": 0.037342215988779515,
+          "spread_only_budget_matched": 0.014492753623187582
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2532.858441541437,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "10f49d00b346b5a61b15b52d60a0edd932e978e8ac4c4d55d837cf74f9f4ae2f",
+      "step_records_sha256": "f2dab01cc2a45616531f482b547ab5ede3d4e3798097b45788c1518250ccbf33",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530011": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.13930575035063075,
+          "brero_threshold_buybox_budget_matched": 0.07296633941094033,
+          "spread_only_budget_matched": 0.006147732585320753
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2550.496280791238,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "2e64811c26985e7fa5cca002bdb0692c4fe12fc4f6d0c53af9c6f231460cb262",
+      "step_records_sha256": "30f383d43f9c143c9afd59997b89a3031a043ff6a4ca2a26412b621b52fd7bc6",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530012": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.16014492753623166,
+          "brero_threshold_buybox_budget_matched": 0.049672744273024705,
+          "spread_only_budget_matched": 0.008169705469845745
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2542.470622499939,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "3cdde5d1b2e0da17e7d2cd5beae0afcd8e50f73db554c5cafb66e63731269008",
+      "step_records_sha256": "a7f708cc92e6fb1e82a6b0e434ad1aa87b77aeeb234ba80131c6eba6a996b697",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530013": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.14560542309490376,
+          "brero_threshold_buybox_budget_matched": 0.17748948106591822,
+          "spread_only_budget_matched": 0.005738662926600746
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2553.0927825002,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "31d44913ce0bc55840e740eb397631b6c5b5b7983f4f790524e3d9343ca10e94",
+      "step_records_sha256": "70e91384efd47a6219b169cca24c1c69884f8c5f1eb2a4b7334279f8238068c8",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530014": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.1624006545114547,
+          "brero_threshold_buybox_budget_matched": 0.052197288452547674,
+          "spread_only_budget_matched": 0.002863487611032056
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2544.3667576662265,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "582741f5dc8a3aac3c563b87d55c3dbd0e8f6cead2c078df288f187aca13ea6b",
+      "step_records_sha256": "91177dd84aeb470cb1669c48745dffbdff309d9cc055e869f972c6f54a8e1cce",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530015": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.13930575035063164,
+          "brero_threshold_buybox_budget_matched": 0.028330995792426705,
+          "spread_only_budget_matched": 0.0035296867695180367
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2574.2982224584557,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "8114eb799de724c8b1314af457962ee90d591b9c5dd196a381c50ba458515f2c",
+      "step_records_sha256": "0d73f6fa322c52ef46ae76e731535322feece2c31a0ae12731c00e012d17096e",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530016": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.11896914446002782,
+          "brero_threshold_buybox_budget_matched": 0.04983637213651271,
+          "spread_only_budget_matched": 0.003494623655914353
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1888.0121133751236,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "828183f16ed9438ba3f6e5e28590be0c85bb84e955993f7913a783daf5f10f1d",
+      "step_records_sha256": "e38f46714586f2bbbbebe2e23820a4a7067d117b161b4a2fce14ae636e117104",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530017": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.11972884525479177,
+          "brero_threshold_buybox_budget_matched": 0.09324450677886809,
+          "spread_only_budget_matched": 0.0029569892473126913
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2141.1920509580523,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "cfd7e480a82c3393e182882aa2229035a85c40e49633c1260d42967714b7c2c2",
+      "step_records_sha256": "15807a432474ddab93622616384bc95093d2d94fc05875c5f027f587d5274051",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530018": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.15884759233286605,
+          "brero_threshold_buybox_budget_matched": 0.057281439925198185,
+          "spread_only_budget_matched": 0.004873772791023967
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2238.756606040988,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "f4fa48adc4e19a8000883611d9ef58d2f615bd88a16c77b2e5f29d755bae2f3f",
+      "step_records_sha256": "a2c1a57a106a72d3c24e4ec1379dcf2f1740319d0cdcc89acf63c54aad900b6e",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    },
+    "530019": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "brero_threshold_buybox": 0.1307737260402062,
+          "brero_threshold_buybox_budget_matched": 0.03239831697054729,
+          "spread_only_budget_matched": 0.0017999064983627022
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 2431.9324906659313,
+      "gate_off_exact": true,
+      "initial_adapter_digest": "a6cc46ad22c55ab68e3f1cd642f8527fbba163e91d4a0978728a50fe831878c3",
+      "step_records_sha256": "61656384ca471e74de2dd676d025082f05b2d6becd79edfb89ac30fdcb9d29b8",
+      "training_action_uniforms_equal": true,
+      "training_paths_equal": true
+    }
+  },
+  "failures": [],
+  "finished_at": "2026-07-14T08:56:55.857580+00:00",
+  "formal_config_sha256": "5b8c8bf4e84d96f842a72c42271abbb9eafa08ab84b3603d47a62218cfc4636b",
+  "git_dirty_status_at_export": "M revision/experiments/export_abides_audit_bundle.py\nAM revision/notes/abides_domain_benchmark_v1_summary.md\nA  revision/paper/artifacts/abides_audit_bundle_v1/README.md\nA  revision/paper/artifacts/abides_audit_bundle_v1/SHA256SUMS\nA  revision/paper/artifacts/abides_audit_bundle_v1/checks.json\nA  revision/paper/artifacts/abides_audit_bundle_v1/manifest.json\nAM revision/paper/artifacts/abides_audit_bundle_v1/per_path.csv\nAM revision/paper/artifacts/abides_audit_bundle_v1/per_seed.csv\nA  revision/paper/artifacts/abides_audit_bundle_v1/step_records.jsonl.gz\nA  revision/paper/data/abides_domain_benchmark_v1_per_path.csv\nA  revision/paper/data/abides_domain_benchmark_v1_per_seed.csv",
+  "implementation_status": "fail",
+  "output_file_sha256": {
+    "README.md": "3f9a5904cc6c074e9f3e707d1bdd195a3d4a38a5cdf648a09c232d7791b93431",
+    "checks.json": "7dcfa7065c0724c91ced8e2a24ea2f207abbb7d77a65a808eca52b7c8c05bda4",
+    "per_path.csv": "e447d2af19b690722ffb0705bc4c3e679e1d73b6e3b5b53a5b8a0fd4b1098b97",
+    "per_seed.csv": "3e03a71c0084d3fa748e4166018caeec6a508d41fd439bacd92268a969a0908b",
+    "step_records.jsonl.gz": "34801f2b6927545453a51dac47ba4f64e55bae7557289b30b4c122fede4d073e"
+  },
+  "pending_policy_seeds": [],
+  "policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "protocol_fingerprint": "16f527416f09846baab3147008c301821c06ba1cd04e601065531645df5fef1f",
+  "protocol_freeze_commit": "4d3b660f10f6a5c1d06491bd336f543e5a69e993",
+  "protocol_version": "abides_domain_benchmark_v1",
+  "response_action_namespace": 511117,
+  "response_environment_seed_namespace": 620000000,
+  "result_archival_commit": null,
+  "retained_failure_events": [],
+  "runner_scientific_result": "not_evaluated_engineering_smoke",
+  "scientific_result": "not_evaluated_integrity_fail",
+  "software": {
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 08:22:19) [Clang 14.0.6 ]",
+    "scipy": "1.13.1",
+    "torch": "2.8.0"
+  },
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_model_digests": {
+    "530000": {
+      "base": "56acb05fe9a8f3041ae4057727ccbb9bc65ccc64533c4b822042fde7dabfcce7",
+      "new": {
+        "brero_threshold_buybox": "432fe0a9b799491cda366e6cad33987147ba6d09258185817fb12dab4f6fb700",
+        "brero_threshold_buybox_budget_matched": "28b59cd3a562b51b94f0a054dc82fe52aca551d48c0746a8fb0bab5d0ddc3591",
+        "spread_only_budget_matched": "225b5c1df0ff3509ec7f16f7afbe45396342c19b866fad8f9d0739a755714e5a"
+      },
+      "v5": {
+        "always_on": "31e302e98179a9a71648944852fd8ad482cba44c4ab565dc150f84ad6cb0d158",
+        "matched_random": "55e899df7d7031487df44035c6a18055db00042f6f51a8bc25d3c231224719c2",
+        "no_routing": "9c4b79317d6f8e0a87d5416aee314faa77d7a7e7e70ea66f4723ca875177217f",
+        "risk_aware": "f70a55a988067d38be85d6fa2695b5e2f056795d73de385692e8c47e11b94cc9",
+        "spread_only_threshold": "7ec693b9d27ed6510f4df7095e961595e04291239f77d513d638a0a225f72968"
+      }
+    },
+    "530001": {
+      "base": "0dfe6ed10b8c95b8abc410240d5aa60a6897e6368efeb14203a66e6c768f5872",
+      "new": {
+        "brero_threshold_buybox": "3653874ba0bb1d2aba7e1053b54de5a1162efa9456219a2e28993537b7f34fcc",
+        "brero_threshold_buybox_budget_matched": "15c178e9eadf53200f0c7300f345b3d7876851d835888df5fc73e08cce736b6b",
+        "spread_only_budget_matched": "e2fb6390065f82347e75f9a798e400b5973d938c982c381cc4397fcb53b2df97"
+      },
+      "v5": {
+        "always_on": "2f1cc3a766f6903100658c45f8fb920a9f26a5c1687ef7cfc8f63ce9eddeea4a",
+        "matched_random": "08edbf156d155c05812e2996e593bb98f3a28a70531e5a1b27ed7a89e56ded08",
+        "no_routing": "509cf608a340424c9ba074c21cd1d6296f3df569a97647828f015eafdf3f7b00",
+        "risk_aware": "04d2341972fe1c9a0ba0f531753c5b0c55db7db12dbe9e4077bb13fc7539d3d1",
+        "spread_only_threshold": "830482bb65683c1a9b0fb03e22fd3431df01a4d94b22713e87fb7fd761f7025f"
+      }
+    },
+    "530002": {
+      "base": "2e344c95877d7f579ef83b20ae2224d55770ccf17c86b99a8213847867127f83",
+      "new": {
+        "brero_threshold_buybox": "a72d859b13a7c480a790d2c569fc326a0a039a70adfc8023ac0bae69166898fc",
+        "brero_threshold_buybox_budget_matched": "ea0291b592121f836156c3527d3575990f66a2f03e8fd6fe8f4167d219153c4d",
+        "spread_only_budget_matched": "5fe9d576be123ac5d575301cef8c9e0126883a37b99597a5586342630afabc62"
+      },
+      "v5": {
+        "always_on": "194059cc6f9a97d80d6361a43dd1c33f83088f580720bafdf1127242320d51d7",
+        "matched_random": "2a41992c326e84241abe7b1fa01369504cc3dd5069eb6209d68de4e5a0272a0f",
+        "no_routing": "6f98e9ea4141fa4e6a1787a71e4299bd044f5b82be690dfe016cc92a080eca8a",
+        "risk_aware": "0fd19522986b2d92e16b8bfd111346a288ed45d66226f30683ce3eaa9b420216",
+        "spread_only_threshold": "dd5d0aeabd033015c6602a734229b5f8f7e6d3b3b9af09afc8b76e27e69eefb0"
+      }
+    },
+    "530003": {
+      "base": "640b9a29b9efd7a6cc4bd46e7a59259da5ff11fc550a13f3a7a2e5074b407a1b",
+      "new": {
+        "brero_threshold_buybox": "6b40e916f0edbd38580ab1a1c371069b74902cbc92bb368abe9ff3f4e25ed301",
+        "brero_threshold_buybox_budget_matched": "65da4f032b20ea528bd18566937473dd09d939b7bf297cfac6cffc21b535962f",
+        "spread_only_budget_matched": "e212feffa2c61297a20d7a692bf7be01f0fdd8a3209b1213bbe34ae3f60189d4"
+      },
+      "v5": {
+        "always_on": "c1c5ddc2a5321fc6c1f99017e39a0a63c721a658ccd76733fb27131d942f47fe",
+        "matched_random": "0948223c2ed3cdc2e84c3c7c096018c5879c1a9f3973ab8d3e7a65232c9672ab",
+        "no_routing": "35b92cd3ef36876ebca89ad2a86a1ab4b8681d500e661d58aadd71b0dd57b621",
+        "risk_aware": "9faa5b0e7398509cad706bb6e15108fe83fa92acce7adebaf62f1909cec937f0",
+        "spread_only_threshold": "1a87b20592861981229fc5df87254b8d5719fc664650148ccc5c4f799c8ee8b9"
+      }
+    },
+    "530004": {
+      "base": "582ddb6459b876d2683d678d8d1fc3c0640ddd29c5988beba216b7b6677db7d3",
+      "new": {
+        "brero_threshold_buybox": "29338c8494a48e9518b2c6dfad843ee66eb99ff32e0b97d19cc3caa73b70da46",
+        "brero_threshold_buybox_budget_matched": "012802c26056eba778e3021284c8cd4bb24d91c17744cd792aebe8bee7c0c05b",
+        "spread_only_budget_matched": "4ec026db1273f350c545b608d44bc0d03b85d223bcc87950f546b48ee3df3e00"
+      },
+      "v5": {
+        "always_on": "60ec87b9fac9586412199beb19dca403092938fa694a2b33da45e19fa0337cfa",
+        "matched_random": "6e821f9a01fb576e603207e58d0d3f54d9c56c5eeda8e1643b77c2b113022187",
+        "no_routing": "ea5220f7fe0404ccc4bc3d32c1e6de3d4be0deb29759969686de053bc4984090",
+        "risk_aware": "eed379563758e223949be965b5ac991f00eb360873036d0e258dbf259aa41dba",
+        "spread_only_threshold": "d26475a997033a1263fd2a9a70a5d796b35ee7ceab12fdcede0e634707ee67c0"
+      }
+    },
+    "530005": {
+      "base": "16a03e411f2b972a948b33499dc1a6c0d7a3d5e66e47b105306e23aacc3603b5",
+      "new": {
+        "brero_threshold_buybox": "4f8457f1a07d2521f1d051bca49999331fb5bacaff7de783e9af56951a406846",
+        "brero_threshold_buybox_budget_matched": "020553ef3b157b0483894adcbf0726c3c815383a34a8b6282a9fcda763693604",
+        "spread_only_budget_matched": "41ee0be54c8312ccd14bf709d557a55812572945329d65a02e29cd6a10e11587"
+      },
+      "v5": {
+        "always_on": "4cf86d489fdd5d010aa8672dee63e522735349c61cff48121317834bce11dbff",
+        "matched_random": "e27dfb52bdffaae2cb959e495ea90650e189a0850e4b4ee4fa47442793f59d33",
+        "no_routing": "25f952b871121dec290432fcf1125da93c612953f1945b92a3b9ca785ee5ce02",
+        "risk_aware": "185f67dd68ecc8c54daf8e48ebeb3758450b24a687fac2affbb802d2ed3629f3",
+        "spread_only_threshold": "0e80fda34c679908d3427034c06d184d672b3353074d6234813fcddd98f37a20"
+      }
+    },
+    "530006": {
+      "base": "4bfa8bc6b8c6ae2aa4198c9f9d996189206f8354a806578fa020933d42bbc1d9",
+      "new": {
+        "brero_threshold_buybox": "034e0ca6195ba52c83d75cf86e476e1d9dd8e0a5581bc543cf9bbc147cb33209",
+        "brero_threshold_buybox_budget_matched": "7040ec360bc8d700141a848007e171856ee2a53fa53b6a5b16dd1e494ce16b0d",
+        "spread_only_budget_matched": "a1410c58df81d5d64d84c0eee1961211dbca3d69a25e0969227c5da8d90c97a6"
+      },
+      "v5": {
+        "always_on": "855766b2763315ec5d743d9ae11e9fe087a31230d540205da1042e546eaccc25",
+        "matched_random": "87eb8037fa676bb7ecfe15750eb4adc4b9e6ec9579b94bd510fbae720deac6f6",
+        "no_routing": "4186424dc2c640319b1771073e3ec74c8da59c24681088cdc7de90d54c8494f3",
+        "risk_aware": "63a200e5bda100a2ec477e08c5ca6ec77202e5e2431d04c0653bd7dffd25b6bf",
+        "spread_only_threshold": "d8dc60ee567a4818cef682fbb44552ec29aac4a0370c0ba11de26a8f7b082feb"
+      }
+    },
+    "530007": {
+      "base": "efdf7b19694132654f6ffd0f2c2195af6b52793834525ac2535fb66aaa30c8d3",
+      "new": {
+        "brero_threshold_buybox": "29424cec949ba946879942126e25eb5735ccf1a675449d2cc1d223f66cb30375",
+        "brero_threshold_buybox_budget_matched": "51b5ac6e1d4b86cca43104ecf91efe4f95eaf187bc6445c408bd08e7e414e780",
+        "spread_only_budget_matched": "df85d25e9ac9336f57bacb280f4a8141d31c89acdd76454a5ead8142b57d0728"
+      },
+      "v5": {
+        "always_on": "8eb9124027de93a42fe11fe23eef459b80dbf5499b4853a0c3239a4f7e1e4863",
+        "matched_random": "28df4785d9f84ebde558a2c8beee8f36fb7a0bb17ff426fdc0aed3adb2b14e7e",
+        "no_routing": "75b57e3009cc5856350a6b68366d3b198bf0bc35d7945098ddc8816ab512ac92",
+        "risk_aware": "ca243b56bda3a1dbd39a024bf1bf4f24f1f046f08586ebca93a4356556598675",
+        "spread_only_threshold": "f0543d710360630fc8eccc8aa0033d91af7846752ccfb0769dc7a910462b8a4a"
+      }
+    },
+    "530008": {
+      "base": "5865e4759064449e4c0fd13d544f29688d3f4be671526a3619ab79e7184686b2",
+      "new": {
+        "brero_threshold_buybox": "3ec122fa28cdf3f69e3712b91eea59cfdcdffbd213d0035ce1d33e9af2458e61",
+        "brero_threshold_buybox_budget_matched": "6443b90d5c676a0dbe4bfc30a126cdcf949637526209befa4040a2395a67c926",
+        "spread_only_budget_matched": "f89811858d3bf2e92febd5d46be47525ecd98d75b2d5b476ac72a8635099634d"
+      },
+      "v5": {
+        "always_on": "3b6b102d2462be388e610cad471d0f16ae35451368b1fb7786cc902258bd0e34",
+        "matched_random": "c492564d77b84dc2472d3621c671ea76ac67cb194eb13cea850445ec277d0c25",
+        "no_routing": "7202c7614178c46b0d38961c74a7bacf1989c25f3d36f10a9dad8701af2e05d0",
+        "risk_aware": "5d3285ff9d92abc65e32aab51c3dd25959c0a83ec564eef6f0de9f3667ba3923",
+        "spread_only_threshold": "2865b4c11b94a25917a7892b6b07f74c99db82ca52ead8eabda3653246f37eb8"
+      }
+    },
+    "530009": {
+      "base": "d5965a545567cc48fcce808fd52d81290b1192f4bff2a6632995351f7926bf2e",
+      "new": {
+        "brero_threshold_buybox": "28986dd1b02e6f3a1772967863ece997718953546b3fdd9e1116fc70718f90b1",
+        "brero_threshold_buybox_budget_matched": "ade2b691d37005e9df10e047673175291411508dd6d95482d1bc2321b3529ed2",
+        "spread_only_budget_matched": "1e76280e872d583f181b7ce9c944e4f0e90a4b30e58b454a93ab817e794c483d"
+      },
+      "v5": {
+        "always_on": "1e17ee7701f27d278df1bd34d921d7323d18be45b0610cec04e556dbfaa27e8b",
+        "matched_random": "5e7c71770b18555a67a59f5a8517847eab089663bf8a34f51edacfecb31b3371",
+        "no_routing": "2c7ab4688f4e7e41ec7164737154c824841187f15bee77930c93110d15372c41",
+        "risk_aware": "e2ebaa85102ce7902e11570aca45d407dc58db721ec302b64e29fcd15abb55fa",
+        "spread_only_threshold": "d58664cfb7c546a2c3d0eb5880660a19eb01514f9e4d823c0fb2aaa50809742b"
+      }
+    },
+    "530010": {
+      "base": "97b2788bf2d1bed5659219a90dc857231a2b9c6e07a19fb5cc5e63fb78979da5",
+      "new": {
+        "brero_threshold_buybox": "263c5b692700faa2a754cc0455c4847846c07e812e5c65d916310f44c32f382d",
+        "brero_threshold_buybox_budget_matched": "fb4ab6ade167582741619168abda2314bc9d5a21b9ca75f31e914481174f28c2",
+        "spread_only_budget_matched": "d0de60109f9c63f27539ef8071592a5dc08fdaf4d234791068a7be7642f04eaa"
+      },
+      "v5": {
+        "always_on": "960ae3875823cb08c42a1ed6796d3604522e11eae15974597332f88838720912",
+        "matched_random": "3353656e616d66de470f7ad9f18211bb3aa8fac235fb32ef4df9ff74c87a299e",
+        "no_routing": "e5360179110be9586c9989c5e99c51e7590b9144f857d91596015bc8eae3f1e9",
+        "risk_aware": "25d0b4387634aade9ce13d0290857c32627c73820e2553c43aac89f2295520fe",
+        "spread_only_threshold": "e9729921862d134c00a7ec5cf7f2ac11ac213bacb2121719b3c6f349aa1d60e2"
+      }
+    },
+    "530011": {
+      "base": "c8eea239629e1c3f0f83032082b8ee13274c5fb08b18db56e066771612bd3e3d",
+      "new": {
+        "brero_threshold_buybox": "dcd6e35eb1d160a42e9752a9fd82a8055e44b32fa8e31855e96b59f657e89228",
+        "brero_threshold_buybox_budget_matched": "505cc12a62d01e58712768ea9400ec6888af829f95e869314136c8da8c8c928c",
+        "spread_only_budget_matched": "c363a4e60c4167e22f78e658a57f977a39edd3192b9cff53157658f7c2b5573d"
+      },
+      "v5": {
+        "always_on": "4e25e0907877719bac6a709b7b64b553a77fb71d7771fe7f33bd27048163eab5",
+        "matched_random": "86a574a567674bcccfdb9564ee0d04ea876295396f68cda8d9634942854c8168",
+        "no_routing": "d83057435e399b40a0ba69cdb456ae017be59089f0ee511298964c6e5aae8fae",
+        "risk_aware": "203d6f38b74fe883912ec34b3e887a7ce00b21d62a2eaf36c7b0814102c770b3",
+        "spread_only_threshold": "1989cac534170427ad70573888ee04c23a5b9357f3b167759881b76e387c4a18"
+      }
+    },
+    "530012": {
+      "base": "6ab2005c36c425396eeaf4ef3d7ee3c7076e2932d6efacc66224e1984bda91a7",
+      "new": {
+        "brero_threshold_buybox": "18d8661bfadae1032e9c25756229cd246dea699649cf4a242182c0f9c60a5b21",
+        "brero_threshold_buybox_budget_matched": "8b5201a97d0abf49c53501dc8d47b9301d9e09a5d9fb3a885d43762b8255cc62",
+        "spread_only_budget_matched": "372818803615880a0e0837655a1dd973b38bbcf84e8c680374182be3f1d1d100"
+      },
+      "v5": {
+        "always_on": "a5b3d13c841644bcf9f325174b4020246ae4ad0046eb43e67e208df0060ff42b",
+        "matched_random": "970e0926bf1ad216fb8ffae9ec4adb6b8f78cf73cef896250884ebd0e7d25a9b",
+        "no_routing": "1781ad2ea53f4378b385b84e2e2e0cf491636148129c7722e7c55a1097bcce3f",
+        "risk_aware": "e218a08577fdf5e4e41706eb43fe6a499c0bc64f013ecd001811ef023515e5e3",
+        "spread_only_threshold": "3bd569ba4fa73575a9532470a95e0c598b9d15a75585b1faa373522203f80ebc"
+      }
+    },
+    "530013": {
+      "base": "9d3a5f5ad95d52d5861eb89935d708f0e3325cfc0a85abde82164299f50042d7",
+      "new": {
+        "brero_threshold_buybox": "d94c248f20c65498d6810cfb8638e51f1e0b62336867e67c44a6412e0fe6e063",
+        "brero_threshold_buybox_budget_matched": "137539a5d36d7d0713f79b2f9197de78b543e3c7b23f70a2535a191c2a5e4135",
+        "spread_only_budget_matched": "1907132399ca420495b872b03be22a15de33d4034a63b75f0020edea6b5886c9"
+      },
+      "v5": {
+        "always_on": "75f20f6db2c1f60410abca2fb9441169ded7c76708e55e8f2b1f2e570b390556",
+        "matched_random": "2d2c0e35eac2a90c7e6425df7a244b7739cb4804c69ecfda96222ebf50c373a4",
+        "no_routing": "2e1f51b5ca5a26ba6243af06e3b62e5747d7ed02e3129b12a9fa4b9c04fad13d",
+        "risk_aware": "275c523dc355a58984b8342fada1b6a21d6f5f2808d861362a74edb52ca00e5e",
+        "spread_only_threshold": "d021b64da2d2c5690f6175161b78a02a76806c82f8f472149a34786eef064c10"
+      }
+    },
+    "530014": {
+      "base": "9c3a453f50f99cc19dacafd810d79e3c0c773fd938e00f7fe19f5ba6215f9c03",
+      "new": {
+        "brero_threshold_buybox": "de0ca2a4a417190adbdb52535a4edd74548df5f66b6c99e881e784ea2f2e14b4",
+        "brero_threshold_buybox_budget_matched": "0f4738ca45c47cae507d031dedbaf3ab51f664c04054bda878206f49918126b2",
+        "spread_only_budget_matched": "26c9b509823a10aa87dbe4a8f5a76afe316bdc7fdb3718c13856d0db2cd39d0c"
+      },
+      "v5": {
+        "always_on": "d5fe3db66fbd2d011a59a8a4c5cbeb6bf4a8be6f79b8c1c26f72eba14c04aedb",
+        "matched_random": "4dc49e09b07ab0096a27f7c0bab36b2b9c97b8f3f0c03b2cbef050c28895a17c",
+        "no_routing": "aa4a6fe397dc92373f4722bf9ab820b236daf9816424db41259f43a94b4c852b",
+        "risk_aware": "eea50508d9c75ed7804da1783bb8238bee2fb0853b83910a04b0442310ab144a",
+        "spread_only_threshold": "7f40d037aa80ce32ad3b317688ba98d2f45680b74aa6c7d2a8e28914ca86f3cb"
+      }
+    },
+    "530015": {
+      "base": "c4f56e13e6c2760c0729b3be80bb1c991ea316ee7903f89e20f9180e20b74012",
+      "new": {
+        "brero_threshold_buybox": "944f0ff2c985830aeeddf1bc70d0094fe1d018a1282418252066a5db3e29977d",
+        "brero_threshold_buybox_budget_matched": "0a47635db0e02298c69d4b49076525a6a4a866716ab4f04beef98e2dc63d7208",
+        "spread_only_budget_matched": "c7583a38223fa40e6aef196449316432616cdbfe91cb2ab397b51777215be72f"
+      },
+      "v5": {
+        "always_on": "927cb9eb8606cfc0fa6b1ddde17463da7fc46e549da9440184e44d31cd72a6d5",
+        "matched_random": "7bfb11aea6d214b5ecad87a24e6d121cd54fb8cd369e252b6ad2295b1acc7ee2",
+        "no_routing": "8500f1656a5449ca6734e2b057300da55ac941b4979f2796efaab164ed9fd16f",
+        "risk_aware": "c66db28c7764040176023c170f0700a1744d1fe13fc17ea82a373d359299f6a9",
+        "spread_only_threshold": "03bd80b8ff21e8b553b0e694a199a0124b5ef1e0ddff6f445593bb32e9e410eb"
+      }
+    },
+    "530016": {
+      "base": "af9dacd484b203e4518e956479a8c4e94d0f0e4d8674c38219b1b82bfe9949e5",
+      "new": {
+        "brero_threshold_buybox": "7757a411002a6fc68c99062397d029e15d7a9c0f94fe2d0ad70a8bacf3da2a86",
+        "brero_threshold_buybox_budget_matched": "79c3d76fd54af3c6071e0af7f12ff5936c7ff8b16fb76461cc02ff64f62340d9",
+        "spread_only_budget_matched": "1909fbba22f8c54453c0232babb87a8c802c5457f5723870455cea218a710252"
+      },
+      "v5": {
+        "always_on": "07a7dc50b033e746aad2b2bf73a3440bce3682e337f29e2806c900e512d3d8cc",
+        "matched_random": "6fb43db3053b2e6dac0e106c066246f136d2d20be04e213abd08a1da7f7f3cfc",
+        "no_routing": "834f93ae834c07e192ec8d4cdcb599016303602887f085f8f78e82d411cb3427",
+        "risk_aware": "5c736c2d77ccb6b90721002bffd8f38903608ad9ce72ef1990547ec3de487b3d",
+        "spread_only_threshold": "a531ada75ce857450274308f9908a47fb702fb6f18cb73e2af62b7c5e71a5cca"
+      }
+    },
+    "530017": {
+      "base": "ab653bc738a77ba6f4cc93f99018c3e214ec1c2addffc0fb393643716ef37b46",
+      "new": {
+        "brero_threshold_buybox": "871dae6dc78dc14f9447a37eec7705a1bca849d184c65c3467834dc04167f079",
+        "brero_threshold_buybox_budget_matched": "ef46996d8777841fa35ab0687f66a2f3b01f0594b45e8aea976ab09dc13a4419",
+        "spread_only_budget_matched": "f12eca3f842ae80372e9d9b9a1c69ad9884f3ce000bd8342d820c3954a151973"
+      },
+      "v5": {
+        "always_on": "a3f53a72e535d231a0b8a6560e1faa4510e29fd560ee27f7f28d7313b335fd0d",
+        "matched_random": "443aebad1faa8c321d634a397a7e1dbbd5b9e621f55e3406a7be32557858174c",
+        "no_routing": "59af8fc0f1c253654a265c69fc4ea17e93bb42d8d7227262e91c11d965ebbe00",
+        "risk_aware": "745035689c433b3abdc8dee3f92d246a3cd7171bd30203b020e329559264efe9",
+        "spread_only_threshold": "593defa42a3e401f5cbfd3898e39485e112e8d9d5aeeb7f34610433b30db7f35"
+      }
+    },
+    "530018": {
+      "base": "6318e10613d613e032c653d2b72848dae90d239d56e44b94cf1745fb3727147d",
+      "new": {
+        "brero_threshold_buybox": "f7a6031049d162122f3d06767f0c1ce5a506f65e5978d08aff1b6aeadae8fad6",
+        "brero_threshold_buybox_budget_matched": "f3eabbcbf64d93fda46f3db47a9ec8253f2e9c02cba70680f4d13dac900384fc",
+        "spread_only_budget_matched": "baecc5dffaa58afecb558786fba7aca8cc8e660380e5d80864155cfccb3e1adc"
+      },
+      "v5": {
+        "always_on": "b74b6a80342e5db3cfeeaa351c9c4ff46fe0575f7f5136c5072ad8bef5175dc2",
+        "matched_random": "a9178defb7797f7544ef5bf7fdb0a06509a3fce3065e1961ce740793e129d41d",
+        "no_routing": "f64fe106b9e91366534ff3eb8602785893ca996c008153384e720b8792253c57",
+        "risk_aware": "bd352a999f7391d2de43b78d62beafdb5ddda73ff31f041f27da31ffeba8d5cc",
+        "spread_only_threshold": "9215c2fd23ad415b837af94c735e35cf3c64a17670a519d53ba6d70129ed2a46"
+      }
+    },
+    "530019": {
+      "base": "ea722485cb4d2649023655c7e9d774d43f59f1e4b8c07d625f9f0a6239bd5301",
+      "new": {
+        "brero_threshold_buybox": "e357530dfb1a46f294bdf5a67e9f07382c368de34b6e2a1ecaaac6feabe28856",
+        "brero_threshold_buybox_budget_matched": "f322eb549def0cf700bd17b73ae8ecab0dd70294b62974163609e8893cdfedbe",
+        "spread_only_budget_matched": "484a56ab2964b99a58094f82e5fd8837771a5a6938dde6a0aca9886af2e11806"
+      },
+      "v5": {
+        "always_on": "625a650694445382332d9d2f827e07970277f37ce8da0921868c3066f316d5cd",
+        "matched_random": "8d84d87845f08ea6f23e2d99b1b0b47df2cf836bff44cb1e5632128a79fbf3d6",
+        "no_routing": "bc61a777e2d46417acba8b623b6a329009118842dfb07ecd368040716e0d363d",
+        "risk_aware": "1769b0acff63137e4c74bd869bbd4dd9c6eeac7f0566b21d0669f8cf6165a211",
+        "spread_only_threshold": "d07dfb5ef9808c699352f686409c716ca89ac03f6492ce536668f4148d5d4a32"
+      }
+    }
+  },
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "started_at": "2026-07-14T07:03:21.500261+00:00"
+}
