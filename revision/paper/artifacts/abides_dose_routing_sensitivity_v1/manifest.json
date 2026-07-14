@@ -248,8 +248,7 @@
   "execution_commit": "7e6683814daccd0126fb033236266daccad8ada5",
   "export_git_dirty_paths": [
     " M revision/configs/abides_temporary_commitment_benchmark_v1.json",
-    " M revision/experiments/run_abides_domain_benchmark.py",
-    "?? revision/paper/artifacts/abides_dose_routing_sensitivity_v1/"
+    " M revision/experiments/run_abides_domain_benchmark.py"
   ],
   "failed_tasks": [],
   "finished_at": "2026-07-14T11:23:56.861457+00:00",
@@ -278,7 +277,7 @@
   "protocol_freeze_commit": "7e6683814daccd0126fb033236266daccad8ada5",
   "protocol_version": "abides_dose_routing_sensitivity_v1",
   "required_tasks": 80,
-  "result_archival_commit": null,
+  "result_archival_commit": "f23c707e3fec6a2422c0be4caa8310a269288569",
   "routing_robustness": {
     "center_supported": true,
     "classification": "broadly_robust",
