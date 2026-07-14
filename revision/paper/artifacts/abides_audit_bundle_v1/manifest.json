@@ -444,7 +444,7 @@
   "failures": [],
   "finished_at": "2026-07-14T08:56:55.857580+00:00",
   "formal_config_sha256": "5b8c8bf4e84d96f842a72c42271abbb9eafa08ab84b3603d47a62218cfc4636b",
-  "git_dirty_status_at_export": "M revision/experiments/export_abides_audit_bundle.py\nAM revision/notes/abides_domain_benchmark_v1_summary.md\nA  revision/paper/artifacts/abides_audit_bundle_v1/README.md\nA  revision/paper/artifacts/abides_audit_bundle_v1/SHA256SUMS\nA  revision/paper/artifacts/abides_audit_bundle_v1/checks.json\nA  revision/paper/artifacts/abides_audit_bundle_v1/manifest.json\nAM revision/paper/artifacts/abides_audit_bundle_v1/per_path.csv\nAM revision/paper/artifacts/abides_audit_bundle_v1/per_seed.csv\nA  revision/paper/artifacts/abides_audit_bundle_v1/step_records.jsonl.gz\nA  revision/paper/data/abides_domain_benchmark_v1_per_path.csv\nA  revision/paper/data/abides_domain_benchmark_v1_per_seed.csv",
+  "git_dirty_status_at_export": "",
   "implementation_status": "fail",
   "output_file_sha256": {
     "README.md": "3f9a5904cc6c074e9f3e707d1bdd195a3d4a38a5cdf648a09c232d7791b93431",
@@ -481,7 +481,7 @@
   "protocol_version": "abides_domain_benchmark_v1",
   "response_action_namespace": 511117,
   "response_environment_seed_namespace": 620000000,
-  "result_archival_commit": null,
+  "result_archival_commit": "031cee87684983953926da0e63362a969399512e",
   "retained_failure_events": [],
   "runner_scientific_result": "not_evaluated_engineering_smoke",
   "scientific_result": "not_evaluated_integrity_fail",
