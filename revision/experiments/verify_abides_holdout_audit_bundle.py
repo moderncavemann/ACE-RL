@@ -36,6 +36,7 @@ PROTOCOL_VERSION = "abides_holdout_audit_bundle_v1"
 OFFICIAL_COMMIT = "de66d7a4b23fac2513f56f96f73b3f5cb96695ac"
 BOOTSTRAP_REPLICATES = 10_000
 BOOTSTRAP_SEED = 20_260_714
+ABIDES_COMMIT = "f9cbe51342b7dedd9587e4e069040d68a5c6477f"
 OFFICIAL_METHODS = (
     "no_intervention",
     "risk_aware",
@@ -855,11 +856,33 @@ def logbook_events(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def latest_event_timestamp(path: Path, event_name: str) -> str:
+    matches = [
+        str(event["timestamp"])
+        for event in logbook_events(path)
+        if event.get("event") == event_name and event.get("timestamp")
+    ]
+    if not matches:
+        raise RuntimeError(f"logbook has no {event_name} event: {path}")
+    return matches[-1]
+
+
 def expected_provenance(
     official: Sequence[Mapping[str, Any]], ecology: Sequence[Mapping[str, Any]]
 ) -> dict[str, Any]:
     official_manifest = read_json(OFFICIAL_OUTPUT / "formal/manifest.json")
     audit_manifest = read_json(ECOLOGY_AUDIT_OUTPUT / "manifest.json")
+    official_config = read_json(OFFICIAL_CONFIG)
+    ecology_configs = {cell: read_json(path) for cell, path in ECOLOGY_CONFIGS.items()}
+    ecology_base_configs = {
+        cell: REPO / "revision/configs" / f"abides_{cell}_base_v1.json"
+        for cell in ECOLOGY_CONFIGS
+    }
+    if {
+        read_json(path)["abides_source_commit"]
+        for path in ecology_base_configs.values()
+    } != {ABIDES_COMMIT}:
+        raise RuntimeError("ecology ABIDES source commit differs")
     return {
         "official": {
             "config_sha256": sha256_file(OFFICIAL_CONFIG),
@@ -878,6 +901,13 @@ def expected_provenance(
             "official_repository": "https://github.com/marlbenchmark/on-policy",
             "official_commit": OFFICIAL_COMMIT,
             "official_license": "MIT",
+            "abides_commit": ABIDES_COMMIT,
+            "docker_image": official_config["docker_image"],
+            "docker_image_id": official_manifest["artifacts"]["docker_image_id"],
+            "started_at": official_manifest["started_at"],
+            "finished_at": latest_event_timestamp(
+                OFFICIAL_OUTPUT / "logbook.jsonl", "formal_finished"
+            ),
         },
         "ecology_audit": {
             "evaluator_version": audit_manifest["evaluator_version"],
@@ -893,8 +923,41 @@ def expected_provenance(
             "response_configs": {
                 cell: sha256_file(path) for cell, path in ECOLOGY_CONFIGS.items()
             },
+            "source_descriptors": audit_manifest["sources"],
+            "abides_commit": ABIDES_COMMIT,
+            "base_config_sha256": {
+                cell: sha256_file(path)
+                for cell, path in ecology_base_configs.items()
+            },
+            "docker_images": {
+                cell: ecology_configs[cell]["docker_image"]
+                for cell in ECOLOGY_CONFIGS
+            },
+            "docker_image_ids": audit_manifest["docker_images"],
+            "started_at": audit_manifest["started_at"],
+            "finished_at": latest_event_timestamp(
+                ECOLOGY_AUDIT_OUTPUT / "logbook.jsonl", "audit_evaluation_finished"
+            ),
         },
     }
+
+
+def expected_model_digests(per_path: Sequence[Mapping[str, Any]]) -> dict[str, str]:
+    output: dict[str, str] = {}
+    for row in per_path:
+        key = ":".join(
+            (
+                str(row["holdout"]),
+                str(row["learner"]),
+                str(row["policy_seed"]),
+                str(row["method"]),
+            )
+        )
+        value = str(row["model_digest"])
+        if key in output and output[key] != value:
+            raise RuntimeError(f"one policy/method has multiple model digests: {key}")
+        output[key] = value
+    return output
 
 
 def verify_provenance(
@@ -904,6 +967,7 @@ def verify_provenance(
     official_config: Mapping[str, Any],
     official: Sequence[Mapping[str, Any]],
     ecology: Sequence[Mapping[str, Any]],
+    per_path: Sequence[Mapping[str, Any]],
     allow_unarchived: bool,
 ) -> dict[str, bool]:
     expected = expected_provenance(official, ecology)
@@ -919,6 +983,26 @@ def verify_provenance(
         "abides_holdout_audit_evaluation_v3"
     ):
         raise RuntimeError("ecology audit evaluator is not the corrected v3 schema")
+    if manifest["source_model_digests"] != expected_model_digests(per_path):
+        raise RuntimeError("source model digest provenance differs")
+    if manifest.get("command") != (
+        "python revision/experiments/export_abides_holdout_audit_bundle.py"
+    ):
+        raise RuntimeError("bundle export command provenance differs")
+    if not str(manifest.get("exported_at_utc", "")):
+        raise RuntimeError("bundle export timestamp is missing")
+    completion = manifest.get("source_completion", {})
+    if (
+        completion.get("official", {}).get("result_count") != 20
+        or completion.get("official", {}).get("pending")
+        or completion.get("official", {}).get("failures")
+        or not completion.get("official", {}).get("completed_resume")
+        or completion.get("ecology_audit", {}).get("result_count") != 20
+        or completion.get("ecology_audit", {}).get("pending")
+        or completion.get("ecology_audit", {}).get("failures")
+        or not completion.get("ecology_audit", {}).get("completed_resume")
+    ):
+        raise RuntimeError("source completion provenance is incomplete")
     for relative, digest in manifest["output_file_sha256"].items():
         if checksums.get(relative) != digest:
             raise RuntimeError(f"manifest/checksum disagreement: {relative}")
@@ -976,6 +1060,9 @@ def verify_provenance(
             raise RuntimeError("sealed export was not produced from a clean worktree")
     return {
         "source_provenance_recomputed": True,
+        "source_model_digests_recomputed": True,
+        "docker_and_abides_provenance_complete": True,
+        "source_completion_provenance_complete": True,
         "official_source_commit_exact": True,
         "protocol_freeze_commits_verified": True,
         "bundle_hashes_valid": True,
@@ -1064,6 +1151,7 @@ def verify_bundle(bundle: Path, allow_unarchived: bool = False) -> dict[str, Any
         official_config,
         official,
         ecology,
+        per_path,
         allow_unarchived,
     )
     runner_checks = verify_runner_state(checks)

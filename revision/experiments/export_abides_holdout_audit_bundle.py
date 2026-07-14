@@ -13,6 +13,7 @@ import platform
 import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -48,6 +49,7 @@ ECOLOGY_CONFIGS = {
 }
 BOOTSTRAP_REPLICATES = 10_000
 BOOTSTRAP_SEED = 20_260_714
+ABIDES_COMMIT = "f9cbe51342b7dedd9587e4e069040d68a5c6477f"
 OFFICIAL_METHODS = (
     "no_intervention",
     "risk_aware",
@@ -121,6 +123,17 @@ def logbook_events(path: Path) -> list[dict[str, Any]]:
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
+
+
+def latest_event_timestamp(path: Path, event_name: str) -> str:
+    matches = [
+        str(event["timestamp"])
+        for event in logbook_events(path)
+        if event.get("event") == event_name and event.get("timestamp")
+    ]
+    if not matches:
+        raise RuntimeError(f"logbook has no {event_name} event: {path}")
+    return matches[-1]
 
 
 def validate_archival_commit(commit: str | None) -> str | None:
@@ -316,6 +329,22 @@ def source_provenance(
     audit_manifest = json.loads(
         (ECOLOGY_AUDIT_OUTPUT / "manifest.json").read_text(encoding="utf-8")
     )
+    official_config = json.loads(OFFICIAL_CONFIG.read_text(encoding="utf-8"))
+    ecology_configs = {
+        cell: json.loads(path.read_text(encoding="utf-8"))
+        for cell, path in ECOLOGY_CONFIGS.items()
+    }
+    ecology_base_configs = {
+        cell: REPO
+        / "revision/configs"
+        / f"abides_{cell}_base_v1.json"
+        for cell in ECOLOGY_CONFIGS
+    }
+    if {
+        json.loads(path.read_text(encoding="utf-8"))["abides_source_commit"]
+        for path in ecology_base_configs.values()
+    } != {ABIDES_COMMIT}:
+        raise RuntimeError("ecology ABIDES source commit differs")
     return {
         "official": {
             "config_sha256": sha256_file(OFFICIAL_CONFIG),
@@ -339,6 +368,13 @@ def source_provenance(
             "official_repository": "https://github.com/marlbenchmark/on-policy",
             "official_commit": "de66d7a4b23fac2513f56f96f73b3f5cb96695ac",
             "official_license": "MIT",
+            "abides_commit": ABIDES_COMMIT,
+            "docker_image": official_config["docker_image"],
+            "docker_image_id": official_manifest["artifacts"]["docker_image_id"],
+            "started_at": official_manifest["started_at"],
+            "finished_at": latest_event_timestamp(
+                OFFICIAL_OUTPUT / "logbook.jsonl", "formal_finished"
+            ),
         },
         "ecology_audit": {
             "evaluator_version": audit_manifest["evaluator_version"],
@@ -357,8 +393,43 @@ def source_provenance(
             "response_configs": {
                 cell: sha256_file(path) for cell, path in ECOLOGY_CONFIGS.items()
             },
+            "source_descriptors": audit_manifest["sources"],
+            "abides_commit": ABIDES_COMMIT,
+            "base_config_sha256": {
+                cell: sha256_file(path)
+                for cell, path in ecology_base_configs.items()
+            },
+            "docker_images": {
+                cell: ecology_configs[cell]["docker_image"]
+                for cell in ECOLOGY_CONFIGS
+            },
+            "docker_image_ids": audit_manifest["docker_images"],
+            "started_at": audit_manifest["started_at"],
+            "finished_at": latest_event_timestamp(
+                ECOLOGY_AUDIT_OUTPUT / "logbook.jsonl", "audit_evaluation_finished"
+            ),
         },
     }
+
+
+def model_digest_provenance(
+    per_path: Sequence[Mapping[str, Any]],
+) -> dict[str, str]:
+    output: dict[str, str] = {}
+    for row in per_path:
+        key = ":".join(
+            (
+                str(row["holdout"]),
+                str(row["learner"]),
+                str(row["policy_seed"]),
+                str(row["method"]),
+            )
+        )
+        digest_value = str(row["model_digest"])
+        if key in output and output[key] != digest_value:
+            raise RuntimeError(f"one policy/method has multiple model digests: {key}")
+        output[key] = digest_value
+    return output
 
 
 def export_bundle(result_archival_commit: str | None = None) -> dict[str, Any]:
@@ -465,6 +536,12 @@ repository's compact MAPPO-style intervention-adapter and are not renamed as
 standard MAPPO. Compact ecology records expose realized flow shares rather
 than latent routing probabilities; the step records label that provenance.
 
+The cross-group audit uses an equal-weight mean over the ten evaluation paths
+inside each policy seed. The compact ecology runner's preregistered source
+summary pools low/high-risk steps instead. The verifier reconstructs that
+source estimand as a separate integrity check; both definitions preserve the
+reported direction, and they are not silently treated as identical numbers.
+
 Inference uses policy-seed paired t intervals, exact sign tests, and a
 10,000-replicate two-way paired bootstrap with RNG seed 20260714. Secondary
 contrasts use Holm adjustment. Groups are never pooled to hide a reversal.
@@ -502,6 +579,7 @@ verify source correspondence, hashes, grids, statistics, and paper exports.
             ),
         },
         "source_provenance": provenance,
+        "source_model_digests": model_digest_provenance(per_path),
         "result_archival_commit": validate_archival_commit(result_archival_commit),
         "bootstrap_replicates": BOOTSTRAP_REPLICATES,
         "bootstrap_seed": BOOTSTRAP_SEED,
@@ -522,6 +600,24 @@ verify source correspondence, hashes, grids, statistics, and paper exports.
             "numpy": np.__version__,
             "scipy": scipy.__version__,
             "torch": torch.__version__,
+        },
+        "exported_at_utc": datetime.now(timezone.utc).isoformat(),
+        "command": "python revision/experiments/export_abides_holdout_audit_bundle.py",
+        "source_completion": {
+            "official": {
+                "result_count": len(official),
+                "pending": [],
+                "failures": json.loads(
+                    (OFFICIAL_OUTPUT / "failures.json").read_text(encoding="utf-8")
+                ),
+                "completed_resume": official_resume,
+            },
+            "ecology_audit": {
+                "result_count": len(ecology),
+                "pending": [],
+                "failures": ecology_audit_summary["failures"],
+                "completed_resume": ecology_audit_summary["completed_resume"],
+            },
         },
         "git_dirty_status_at_export": git_output("status", "--porcelain"),
         "claim_classification": classification,

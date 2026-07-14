@@ -43,5 +43,10 @@ domain-runner `routing_weights` field. The audit schema preserves those shares
 and derives total variation relative to uniform flow, marking every affected
 step with `routing_weights_source=realized_flow_shares`. It does not represent
 the derived value as a latent platform probability. The initial v1 audit replay
-failed closed on this schema difference before writing any accepted task; v2
-adds the explicit adapter and retains that failed launch in the logbook.
+failed closed on this schema difference before writing any accepted task. v2
+added the explicit flow-share adapter, but a post-run audit found that compact
+records stored `gate_active` at the top level while the common path schema read
+`info.active_routing`; v2 therefore exported zero activation rates and is not
+accepted as paper evidence. v3 preserves the flow-share provenance, bridges
+and stores `gate_active` explicitly, and adds independent step-level activation
+reconstruction. v1 and v2 outputs and logbooks remain retained.
