@@ -403,7 +403,7 @@
   "failures": [],
   "finished_at": "2026-07-14T11:53:47.139876+00:00",
   "formal_config_sha256": "84942f80bb5dbb68385fdee2ac06ba84bfff76aaaafdf504cb63f20b2e16f21c",
-  "git_dirty_status_at_export": "M revision/configs/abides_standard_learner_holdout_v1.json\n M revision/notes/abides_standard_learner_holdout_v1_protocol.md\n?? revision/configs/abides_ecology_e1_base_v1.json\n?? revision/configs/abides_ecology_e1_response_v1.json\n?? revision/configs/abides_ecology_e2_base_v1.json\n?? revision/configs/abides_ecology_e2_response_v1.json\n?? revision/experiments/export_abides_temporary_commitment_audit_bundle.py\n?? revision/experiments/run_abides_standard_learner_holdout.py\n?? revision/experiments/setup_official_on_policy.py\n?? revision/experiments/verify_abides_temporary_commitment.py\n?? revision/notes/abides_temporary_commitment_benchmark_v1_summary.md\n?? revision/paper/artifacts/abides_temporary_commitment_benchmark_v1/\n?? revision/src/agents/official_on_policy_mappo.py\n?? revision/tests/test_abides_ecology_holdout.py\n?? revision/tests/test_abides_standard_learner_holdout.py\n?? revision/tests/test_official_on_policy_mappo.py",
+  "git_dirty_status_at_export": "",
   "implementation_status": "fail",
   "output_file_sha256": {
     "README.md": "98648d76a2f03203d1bf7b30d70d628e3da7f1a075c3f05c5fd864afe31142bc",
@@ -438,7 +438,7 @@
   "protocol_fingerprint": "a31ac506e4ad0c1afeb9b07e28690cf15739366223e73d2c17f2baec3dde5dc9",
   "protocol_freeze_commit": "7253cdb9d56b7d7f120f84f85f48df95417a0eb5",
   "protocol_version": "abides_temporary_commitment_benchmark_v1",
-  "result_archival_commit": null,
+  "result_archival_commit": "f63a73022e42e0a3838bdc22ffd7f5ee3df80344",
   "scientific_result": "not_evaluated_integrity_fail",
   "software": {
     "numpy": "1.26.4",
