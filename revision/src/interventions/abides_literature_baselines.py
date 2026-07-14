@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from statistics import mean
 from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
@@ -32,6 +33,137 @@ class BudgetMetrics:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class TemporaryCommitmentDecision:
+    mechanism: str
+    active: bool
+    takeup: bool
+    reference_half_spread: float | None
+    dealer_index: int | None
+    frozen_half_spread: float | None
+    protected_fraction: float
+    remaining_periods_including_current: int
+    routing_weights: tuple[float, ...]
+    routing_total_variation: float
+    parameters: Mapping[str, Any]
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+class TemporaryCommitmentController:
+    """Public-quote state machine for the Banerjee-style ABIDES adaptation."""
+
+    def __init__(
+        self,
+        n_agents: int,
+        reference_window: int = 10,
+        qualification_steps: int = 3,
+        protected_fraction: float = 0.5,
+        duration: int = 5,
+    ) -> None:
+        if n_agents <= 0:
+            raise ValueError("n_agents must be positive")
+        if reference_window <= 0:
+            raise ValueError("reference_window must be positive")
+        if qualification_steps <= 0:
+            raise ValueError("qualification_steps must be positive")
+        if not 0.0 <= protected_fraction <= 1.0:
+            raise ValueError("protected_fraction must be in [0, 1]")
+        if duration <= 0:
+            raise ValueError("duration must be positive")
+        self.n_agents = int(n_agents)
+        self.reference_window = int(reference_window)
+        self.qualification_steps = int(qualification_steps)
+        self.protected_fraction = float(protected_fraction)
+        self.duration = int(duration)
+        self._history: list[float] = []
+        self._dealer_index: int | None = None
+        self._frozen_half_spread: float | None = None
+        self._remaining = 0
+
+    def reset(self) -> None:
+        self._history.clear()
+        self._dealer_index = None
+        self._frozen_half_spread = None
+        self._remaining = 0
+
+    def decide(
+        self,
+        half_spreads: Sequence[float],
+        tie_uniform: float,
+        enabled: bool = True,
+    ) -> TemporaryCommitmentDecision:
+        spreads = _spread_array(half_spreads)
+        if spreads.size != self.n_agents:
+            raise ValueError("half_spreads size differs from n_agents")
+        tie_value = float(tie_uniform)
+        if not 0.0 <= tie_value < 1.0:
+            raise ValueError("tie_uniform must be in [0, 1)")
+
+        reference = (
+            float(mean(self._history[-self.reference_window :]))
+            if len(self._history) >= self.reference_window
+            else None
+        )
+        takeup = False
+        if enabled and self._remaining <= 0 and reference is not None:
+            qualifying = np.flatnonzero(
+                spreads <= reference - float(self.qualification_steps)
+            )
+            if qualifying.size:
+                minimum = float(np.min(spreads[qualifying]))
+                lowest = qualifying[spreads[qualifying] == minimum]
+                slot = min(int(tie_value * len(lowest)), len(lowest) - 1)
+                self._dealer_index = int(lowest[slot])
+                self._frozen_half_spread = float(spreads[self._dealer_index])
+                self._remaining = self.duration
+                takeup = True
+
+        active = bool(enabled and self._remaining > 0)
+        remaining = int(self._remaining if active else 0)
+        if active:
+            assert self._dealer_index is not None
+            assert self._frozen_half_spread is not None
+            weights = eligible_routing_weights(
+                self.n_agents,
+                [self._dealer_index],
+                self.protected_fraction,
+            )
+            dealer_index = self._dealer_index
+            frozen_half_spread = self._frozen_half_spread
+        else:
+            weights = uniform_routing_weights(self.n_agents)
+            dealer_index = None
+            frozen_half_spread = None
+
+        decision = TemporaryCommitmentDecision(
+            mechanism="banerjee_temporary_commitment",
+            active=active,
+            takeup=takeup,
+            reference_half_spread=reference,
+            dealer_index=dealer_index,
+            frozen_half_spread=frozen_half_spread,
+            protected_fraction=self.protected_fraction,
+            remaining_periods_including_current=remaining,
+            routing_weights=tuple(float(value) for value in weights),
+            routing_total_variation=routing_total_variation(weights),
+            parameters={
+                "reference_window": self.reference_window,
+                "qualification_steps": self.qualification_steps,
+                "protected_fraction": self.protected_fraction,
+                "duration": self.duration,
+            },
+        )
+        self._history.append(float(np.mean(spreads)))
+        if active:
+            self._remaining -= 1
+            if self._remaining == 0:
+                self._dealer_index = None
+                self._frozen_half_spread = None
+        return decision
 
 
 def _spread_array(half_spreads: Sequence[float]) -> np.ndarray:
@@ -452,6 +584,99 @@ def calibrate_domain_baselines(
         "spread_only_budget_matched": {
             "selected": spread_results[0],
             "candidates": spread_results,
+        },
+        "record_count": len(records),
+        "episode_count": len(episodes),
+        "selection_uses_efficacy_outcomes": False,
+    }
+
+
+def calibrate_temporary_commitment(
+    records: Sequence[Mapping[str, Any]], config: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Budget-match commitment intensity using passive public quotes only."""
+
+    if not records:
+        raise ValueError("passive calibration records are empty")
+    reject_efficacy_fields(records, config["forbidden_calibration_fields"])
+    epsilon = float(config["active_routing_tv_epsilon"])
+    reference = summarize_budget(
+        [
+            soft_rank_routing_weights(
+                record["half_spreads"],
+                float(record["risk_signal_strength"]),
+                float(config["routing_target_kappa"]),
+                float(config["routing_routable_fraction"]),
+            )
+            for record in records
+        ],
+        epsilon,
+    )
+    tolerances = config["budget_tolerances"]
+    mechanism = config["banerjee_temporary_commitment"]
+    episodes = _episode_groups(records)
+    candidates = []
+    for protected_fraction in mechanism["protected_fraction_candidates"]:
+        for duration in mechanism["duration_candidates"]:
+            weights = []
+            takeups = 0
+            for episode in episodes:
+                controller = TemporaryCommitmentController(
+                    n_agents=len(episode[0]["half_spreads"]),
+                    reference_window=int(mechanism["reference_window"]),
+                    qualification_steps=int(mechanism["qualification_steps"]),
+                    protected_fraction=float(protected_fraction),
+                    duration=int(duration),
+                )
+                for record in episode:
+                    decision = controller.decide(
+                        record["half_spreads"],
+                        tie_uniform=float(record.get("tie_uniform", 0.0)),
+                    )
+                    weights.append(decision.routing_weights)
+                    takeups += int(decision.takeup)
+            metrics = summarize_budget(weights, epsilon)
+            status, ratio = budget_match_status(
+                metrics,
+                reference,
+                float(tolerances["maximum_active_rate_difference"]),
+                float(tolerances["minimum_mean_tv_ratio"]),
+                float(tolerances["maximum_mean_tv_ratio"]),
+            )
+            candidates.append(
+                {
+                    "parameters": {
+                        "reference_window": int(mechanism["reference_window"]),
+                        "qualification_steps": int(
+                            mechanism["qualification_steps"]
+                        ),
+                        "protected_fraction": float(protected_fraction),
+                        "duration": int(duration),
+                    },
+                    "metrics": metrics.to_dict(),
+                    "takeup_count": takeups,
+                    "mean_tv_ratio": ratio,
+                    "budget_match_status": status,
+                    "budget_distance": budget_distance(
+                        metrics,
+                        reference,
+                        float(tolerances["maximum_active_rate_difference"]),
+                    ),
+                }
+            )
+    candidates.sort(
+        key=lambda row: (
+            float(row["budget_distance"]),
+            float(row["parameters"]["protected_fraction"]),
+            int(row["parameters"]["duration"]),
+        )
+    )
+    return {
+        "reference_budget": reference.to_dict(),
+        "literature_form": dict(mechanism["literature_form"]),
+        "budget_matched": {
+            "selected": candidates[0],
+            "candidates": candidates,
         },
         "record_count": len(records),
         "episode_count": len(episodes),

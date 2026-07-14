@@ -32,6 +32,7 @@ class QuoteInstructionMsg(Message):
     half_spread: int
     quantity: int
     cancel_existing: bool = True
+    order_tag_prefix: Optional[str] = None
 
 
 @dataclass
@@ -46,6 +47,8 @@ class FlowInstructionMsg(Message):
     quantity: int
     eligible_agent_ids: Tuple[int, ...] = ()
     route_kind: str = "lit"
+    required_order_tag_prefix: Optional[str] = None
+    fallback_to_lit: bool = True
 
 
 class CoreGymAgent(Agent, ABC):
@@ -113,19 +116,29 @@ class ControlledMarketMaker(TradingAgent):
         self.last_instruction = message
         if message.cancel_existing:
             self.cancel_all_orders()
+        bid_tag = (
+            f"ace_bid_d{message.decision_id}"
+            if message.order_tag_prefix is None
+            else f"{message.order_tag_prefix}_bid"
+        )
+        ask_tag = (
+            f"ace_ask_d{message.decision_id}"
+            if message.order_tag_prefix is None
+            else f"{message.order_tag_prefix}_ask"
+        )
         self.place_limit_order(
             self.symbol,
             message.quantity,
             Side.BID,
             message.reference_price - message.half_spread,
-            tag=f"ace_bid_d{message.decision_id}",
+            tag=bid_tag,
         )
         self.place_limit_order(
             self.symbol,
             message.quantity,
             Side.ASK,
             message.reference_price + message.half_spread,
-            tag=f"ace_ask_d{message.decision_id}",
+            tag=ask_tag,
         )
 
     def order_executed(self, order: Order) -> None:
@@ -179,8 +192,9 @@ class MarketOrderTaker(TradingAgent):
                 quantity=message.quantity,
                 side=side,
                 eligible_agent_ids=message.eligible_agent_ids,
-                fallback_to_lit=True,
+                fallback_to_lit=message.fallback_to_lit,
                 route_kind=message.route_kind,
+                required_order_tag_prefix=message.required_order_tag_prefix,
                 tag=f"ace_flow_d{message.decision_id}",
             )
             self.orders[order.order_id] = deepcopy(order)
@@ -301,6 +315,10 @@ class MultiMarketMakerCoordinator(CoreGymAgent):
                         int(agent_id) for agent_id in flow.get("eligible_agent_ids", ())
                     ),
                     route_kind=str(flow.get("route_kind", "lit")),
+                    required_order_tag_prefix=flow.get(
+                        "required_order_tag_prefix"
+                    ),
+                    fallback_to_lit=bool(flow.get("fallback_to_lit", True)),
                 ),
                 delay=int(flow.get("delay_ns", str_to_ns("1ms"))),
             )

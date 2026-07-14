@@ -13,10 +13,12 @@ sys.path.insert(0, str(REVISION_ROOT))
 
 from src.interventions.abides_literature_baselines import (  # noqa: E402
     BudgetMetrics,
+    TemporaryCommitmentController,
     brero_threshold_decision,
     brero_threshold_eligibility,
     budget_match_status,
     calibrate_domain_baselines,
+    calibrate_temporary_commitment,
     eligible_routing_weights,
     routing_total_variation,
     soft_rank_routing_weights,
@@ -167,3 +169,83 @@ def test_frozen_passive_calibration_preserves_unmatched_external_result() -> Non
         ]
         == "unmatched"
     )
+
+
+def test_temporary_commitment_uses_lagged_public_quotes_and_deterministic_ties() -> None:
+    controller = TemporaryCommitmentController(n_agents=4)
+    for _ in range(10):
+        assert not controller.decide([5, 5, 5, 5], 0.0).active
+
+    takeup = controller.decide([2, 2, 4, 5], 0.75)
+    assert takeup.active
+    assert takeup.takeup
+    assert takeup.reference_half_spread == 5.0
+    assert takeup.dealer_index == 1
+    assert takeup.frozen_half_spread == 2.0
+    assert takeup.remaining_periods_including_current == 5
+    assert takeup.routing_total_variation > 0.0
+    assert sum(takeup.routing_weights) == pytest.approx(1.0)
+
+
+def test_temporary_commitment_freezes_quote_for_exact_duration_without_overlap() -> None:
+    controller = TemporaryCommitmentController(n_agents=4, duration=5)
+    for _ in range(10):
+        controller.decide([5, 5, 5, 5], 0.0)
+    first = controller.decide([2, 4, 4, 4], 0.0)
+    continuation = [
+        controller.decide([7, 1, 7, 7], 0.0) for _ in range(4)
+    ]
+    assert first.dealer_index == 0
+    assert [row.dealer_index for row in continuation] == [0, 0, 0, 0]
+    assert [row.frozen_half_spread for row in continuation] == [2.0] * 4
+    assert [row.remaining_periods_including_current for row in continuation] == [
+        4,
+        3,
+        2,
+        1,
+    ]
+    expired = controller.decide([7, 7, 7, 7], 0.0)
+    assert not expired.active
+    assert expired.dealer_index is None
+    assert expired.routing_weights == (0.25, 0.25, 0.25, 0.25)
+
+
+def test_temporary_commitment_calibration_grid_is_frozen_and_budget_only() -> None:
+    config = load_config("abides_temporary_commitment_calibration_v1.json")
+    mechanism = config["banerjee_temporary_commitment"]
+    assert mechanism["literature_form"] == {
+        "reference_window": 10,
+        "qualification_steps": 3,
+        "protected_fraction": 0.5,
+        "duration": 5,
+    }
+    assert mechanism["protected_fraction_candidates"] == [0.1, 0.25, 0.5, 0.75]
+    assert mechanism["duration_candidates"] == [1, 3, 5, 10, 20]
+    formal = load_config("abides_temporary_commitment_benchmark_v1.json")
+    assert not formal["formal_execution_allowed"]
+    assert formal["budget_matched_parameters"] is None
+
+
+def test_temporary_commitment_calibration_is_deterministic() -> None:
+    config = load_config("abides_temporary_commitment_calibration_v1.json")
+    records = []
+    for episode in range(2):
+        for step in range(30):
+            spreads = [5.0] * 10
+            if step in (10, 20):
+                spreads[0] = 2.0
+            records.append(
+                {
+                    "episode_id": f"episode-{episode}",
+                    "step": step,
+                    "half_spreads": spreads,
+                    "risk_signal_strength": 0.6 if step % 5 == 0 else 0.0,
+                    "lagged_contract_severity": 0.5,
+                }
+            )
+    first = calibrate_temporary_commitment(records, config)
+    second = calibrate_temporary_commitment(records, config)
+    assert first == second
+    assert first["selection_uses_efficacy_outcomes"] is False
+    assert len(first["budget_matched"]["candidates"]) == 20
+    assert first["record_count"] == 60

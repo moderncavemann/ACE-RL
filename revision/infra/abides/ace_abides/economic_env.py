@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Literal, Mapping, Optional, Sequence, Tuple
 import numpy as np
 
 from abides_literature_baselines import (
+    TemporaryCommitmentController,
     brero_threshold_decision,
     eligible_routing_weights,
     flow_hhi,
@@ -197,6 +198,12 @@ class EconomicCoordinator(CoreGymAgent):
         self.raw_state: Dict[str, Any] = {}
         self.last_reward_completed_step = 0
         self.public_shock_history: List[int] = []
+        self.temporary_commitment_controller: Optional[
+            TemporaryCommitmentController
+        ] = None
+        self.temporary_commitment_parameters: Optional[Tuple[int, int, float, int]] = None
+        self.temporary_commitment_id: Optional[int] = None
+        self.temporary_commitment_reference_price: Optional[int] = None
 
     def kernel_starting(self, start_time: NanosecondTime) -> None:
         assert self.kernel is not None
@@ -318,7 +325,92 @@ class EconomicCoordinator(CoreGymAgent):
         target_probabilities: Optional[np.ndarray] = None
         routing_threshold: Optional[float] = None
         mechanism_parameters: Dict[str, Any] = {}
-        if mechanism_kind == "brero_threshold_buybox":
+        protected_order_tag_prefix: Optional[str] = None
+        protected_decision = None
+        if mechanism_kind == "banerjee_temporary_commitment":
+            reference_window = int(routing_mechanism.get("reference_window", 10))
+            qualification_steps = int(
+                routing_mechanism.get("qualification_steps", 3)
+            )
+            protected_fraction = float(
+                routing_mechanism.get("protected_fraction", 0.5)
+            )
+            duration = int(routing_mechanism.get("duration", 5))
+            parameters = (
+                reference_window,
+                qualification_steps,
+                protected_fraction,
+                duration,
+            )
+            if self.temporary_commitment_controller is None:
+                self.temporary_commitment_controller = TemporaryCommitmentController(
+                    self.config.n_agents,
+                    reference_window=reference_window,
+                    qualification_steps=qualification_steps,
+                    protected_fraction=protected_fraction,
+                    duration=duration,
+                )
+                self.temporary_commitment_parameters = parameters
+            elif self.temporary_commitment_parameters != parameters:
+                raise RuntimeError(
+                    "temporary commitment parameters changed within an episode"
+                )
+            protected_decision = self.temporary_commitment_controller.decide(
+                half_spreads,
+                tie_uniform=float(path_step.flow_events[0].target_uniform),
+                enabled=routing_enabled,
+            )
+            if protected_decision.takeup:
+                self.temporary_commitment_id = self.step_id
+                self.temporary_commitment_reference_price = self.fundamental
+            if protected_decision.active:
+                if self.temporary_commitment_id is None:
+                    raise RuntimeError("active commitment has no contract id")
+                if self.temporary_commitment_reference_price is None:
+                    raise RuntimeError("active commitment has no frozen reference price")
+                assert protected_decision.dealer_index is not None
+                assert protected_decision.frozen_half_spread is not None
+                protected_order_tag_prefix = (
+                    f"ace_protected_c{self.temporary_commitment_id}"
+                )
+                self.send_message(
+                    self.controlled_agent_ids[protected_decision.dealer_index],
+                    QuoteInstructionMsg(
+                        decision_id=self.step_id,
+                        reference_price=self.temporary_commitment_reference_price,
+                        half_spread=int(protected_decision.frozen_half_spread),
+                        quantity=self.config.quote_quantity,
+                        cancel_existing=False,
+                        order_tag_prefix=protected_order_tag_prefix,
+                    ),
+                    delay=str_to_ns("3ms"),
+                )
+                target_indices = np.asarray(
+                    [protected_decision.dealer_index], dtype=int
+                )
+                planned_routing_weights = np.asarray(
+                    protected_decision.routing_weights, dtype=float
+                )
+                effective_alpha = protected_decision.protected_fraction
+                routing_threshold = protected_decision.reference_half_spread
+            else:
+                target_indices = np.asarray([], dtype=int)
+                planned_routing_weights = uniform_routing_weights(
+                    self.config.n_agents
+                )
+                effective_alpha = 0.0
+            mechanism_parameters = {
+                **dict(protected_decision.parameters),
+                "takeup": bool(protected_decision.takeup),
+                "dealer_index": protected_decision.dealer_index,
+                "frozen_half_spread": protected_decision.frozen_half_spread,
+                "frozen_reference_price": self.temporary_commitment_reference_price,
+                "remaining_periods_including_current": (
+                    protected_decision.remaining_periods_including_current
+                ),
+                "protected_order_tag_prefix": protected_order_tag_prefix,
+            }
+        elif mechanism_kind == "brero_threshold_buybox":
             order_statistic_k = int(routing_mechanism["order_statistic_k"])
             margin_ticks = int(routing_mechanism["margin_ticks"])
             routable_fraction = float(
@@ -391,6 +483,24 @@ class EconomicCoordinator(CoreGymAgent):
 
         target_count = 0
         total_quantity = 0
+        protected_event_indices: set[int] = set()
+        if (
+            mechanism_kind == "banerjee_temporary_commitment"
+            and protected_decision is not None
+            and protected_decision.active
+        ):
+            protected_count = int(
+                round(effective_alpha * len(path_step.flow_events))
+            )
+            protected_event_indices = set(
+                sorted(
+                    range(len(path_step.flow_events)),
+                    key=lambda index: (
+                        path_step.flow_events[index].route_uniform,
+                        index,
+                    ),
+                )[:protected_count]
+            )
         flow_start_delay = str_to_ns("10ms")
         flow_spacing = max(
             1,
@@ -402,7 +512,15 @@ class EconomicCoordinator(CoreGymAgent):
         for event_index, event in enumerate(path_step.flow_events):
             destination_index = event.base_agent_index
             route_kind = f"base_s{self.step_id}"
-            if target_indices.size and event.route_uniform < effective_alpha:
+            route_to_target = bool(
+                target_indices.size
+                and (
+                    event_index in protected_event_indices
+                    if mechanism_kind == "banerjee_temporary_commitment"
+                    else event.route_uniform < effective_alpha
+                )
+            )
+            if route_to_target:
                 if target_probabilities is None:
                     target_slot = min(
                         int(event.target_uniform * len(target_indices)),
@@ -430,6 +548,16 @@ class EconomicCoordinator(CoreGymAgent):
                     quantity=event.quantity,
                     eligible_agent_ids=(self.controlled_agent_ids[destination_index],),
                     route_kind=route_kind,
+                    required_order_tag_prefix=(
+                        protected_order_tag_prefix
+                        if route_kind.startswith("targeted_")
+                        and mechanism_kind == "banerjee_temporary_commitment"
+                        else None
+                    ),
+                    fallback_to_lit=not (
+                        route_kind.startswith("targeted_")
+                        and mechanism_kind == "banerjee_temporary_commitment"
+                    ),
                 ),
                 delay=flow_start_delay + event_index * flow_spacing,
             )
@@ -446,6 +574,7 @@ class EconomicCoordinator(CoreGymAgent):
             delay=self.config.decision_interval_ns - str_to_ns("2ms"),
         )
         self.last_step_info = {
+            "decision_step": self.step_id,
             "gate_active": gate_active,
             "active_routing": bool(planned_routing_tv > 1e-12),
             "routing_enabled": routing_enabled,
@@ -465,9 +594,17 @@ class EconomicCoordinator(CoreGymAgent):
             ],
             "modal_half_spread": modal_half_spread,
             "targeted_event_count": target_count,
+            "planned_protected_event_count": len(protected_event_indices),
             "planned_flow_quantity": total_quantity,
             "avg_half_spread": float(np.mean(half_spreads)),
         }
+        if (
+            protected_decision is not None
+            and protected_decision.active
+            and protected_decision.remaining_periods_including_current == 1
+        ):
+            self.temporary_commitment_id = None
+            self.temporary_commitment_reference_price = None
         self.step_id += 1
         self.set_wakeup(
             self.decision_start + self.step_id * self.config.decision_interval_ns
@@ -540,6 +677,27 @@ class EconomicCoordinator(CoreGymAgent):
             if len(self.public_shock_history) >= 2
             else 0.0
         )
+        exchange = self.kernel.agents[self.exchange_id]
+        if not isinstance(exchange, ExchangeAgent):
+            raise TypeError("economic exchange agent type changed")
+        routed_book = exchange.order_books[self.symbol]
+        if not isinstance(routed_book, RoutedOrderBook):
+            raise TypeError("economic market lost its routed order book")
+        decision_step = self.last_step_info.get("decision_step")
+        step_routes = (
+            []
+            if decision_step is None
+            else [
+                row
+                for row in routed_book.routed_executions
+                if str(row["route_kind"]).endswith(f"_s{int(decision_step)}")
+            ]
+        )
+        protected_routes = [
+            row
+            for row in step_routes
+            if row.get("required_order_tag_prefix") is not None
+        ]
         observations = []
         for index, entry in enumerate(controlled):
             observations.append(
@@ -578,6 +736,21 @@ class EconomicCoordinator(CoreGymAgent):
                 ),
                 "mean_adverse_selection_component": float(np.mean(adverse_selection)),
                 "mean_inventory_penalty": float(np.mean(penalty)),
+                "routed_execution_quantity": float(
+                    sum(float(row["quantity"]) for row in step_routes)
+                ),
+                "protected_execution_quantity": float(
+                    sum(float(row["quantity"]) for row in protected_routes)
+                ),
+                "protected_execution_prices": [
+                    int(row["price"]) for row in protected_routes
+                ],
+                "protected_matched_order_tags": [
+                    str(row["matched_order_tag"]) for row in protected_routes
+                ],
+                "protected_routing_fallback_count": int(
+                    sum(bool(row["used_fallback"]) for row in protected_routes)
+                ),
                 "flow_shares": self.last_flow_shares.tolist(),
                 "avg_half_spread": float(np.mean(self.last_half_spreads)),
                 "diagnostic_current_risk": (

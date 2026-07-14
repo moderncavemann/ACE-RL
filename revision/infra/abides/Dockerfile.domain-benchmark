@@ -8,6 +8,8 @@ COPY revision/infra/abides/ace_abides /opt/ace-abides/ace_abides
 COPY revision/infra/abides/worker.py /opt/ace-abides/worker.py
 COPY revision/infra/abides/smoke_domain_benchmark.py \
     /opt/ace-abides/smoke_domain_benchmark.py
+COPY revision/infra/abides/smoke_temporary_commitment.py \
+    /opt/ace-abides/smoke_temporary_commitment.py
 
 LABEL org.opencontainers.image.title="ACE-RL ABIDES domain benchmark v1"
 ENV PYTHONPATH=/opt/ace-abides
