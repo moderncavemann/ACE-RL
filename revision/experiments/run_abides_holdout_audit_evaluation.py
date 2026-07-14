@@ -51,8 +51,8 @@ from src.envs.abides_docker_env import (  # noqa: E402
 from src.interventions.abides_gate import ABIDESTwoStageGateModel  # noqa: E402
 
 
-EVALUATOR_VERSION = "abides_holdout_audit_evaluation_v1"
-OUTPUT_DIR = REPO / "revision/experiments/outputs/abides_holdout_audit_evaluation_v1"
+EVALUATOR_VERSION = "abides_holdout_audit_evaluation_v2"
+OUTPUT_DIR = REPO / "revision/experiments/outputs/abides_holdout_audit_evaluation_v2"
 CELL_CONFIGS = {
     "ecology_e1": REPO / "revision/configs/abides_ecology_e1_response_v1.json",
     "ecology_e2": REPO / "revision/configs/abides_ecology_e2_response_v1.json",
@@ -117,6 +117,27 @@ def write_jsonl_gz(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
                 for row in rows:
                     text.write(canonical_json(row) + "\n")
     temporary.replace(path)
+
+
+def normalize_compact_record(record: Mapping[str, Any]) -> dict[str, Any]:
+    """Map compact-runner flow instrumentation into the common audit schema."""
+    normalized = dict(record)
+    info = dict(record["info"])
+    flow_shares = [float(value) for value in info.get("flow_shares", [])]
+    if not flow_shares:
+        raise RuntimeError("compact audit record has no realized flow shares")
+    uniform = 1.0 / len(flow_shares)
+    info["routing_weights"] = flow_shares
+    info["routing_total_variation"] = 0.5 * sum(
+        abs(value - uniform) for value in flow_shares
+    )
+    info["routing_mechanism_parameters"] = {
+        "routing_effective_alpha": float(info.get("routing_effective_alpha", 0.0)),
+        "routing_severity": float(info.get("routing_severity", 0.0)),
+        "audit_weights_source": "realized_flow_shares",
+    }
+    normalized["info"] = info
+    return normalized
 
 
 def assert_nested_close(actual: Any, expected: Any, path: str = "root") -> None:
@@ -213,6 +234,7 @@ def evaluate_task(
             for method, rollout in rollouts.items():
                 records = list(rollout["records"])
                 all_records[method].extend(records)
+                audit_records = [normalize_compact_record(record) for record in records]
                 model_hash = (
                     str(source_result["base_model_digest"])
                     if method == "no_intervention"
@@ -224,17 +246,19 @@ def evaluate_task(
                     int(evaluation_seed),
                     method,
                     model_hash,
-                    records,
+                    audit_records,
                 )
                 row["holdout"] = cell
                 row["learner"] = LEARNER_LABEL
                 per_path.append(row)
-                for record in records:
+                for record in audit_records:
                     step = audit_step_record(
                         int(policy_seed), int(evaluation_seed), method, record
                     )
                     step["holdout"] = cell
                     step["learner"] = LEARNER_LABEL
+                    step["flow_shares"] = list(record["info"]["flow_shares"])
+                    step["routing_weights_source"] = "realized_flow_shares"
                     step_rows.append(step)
 
     recomputed = {
