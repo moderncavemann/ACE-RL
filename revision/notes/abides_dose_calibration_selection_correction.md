@@ -21,8 +21,20 @@ passive calibration selection order:
 4. continue matching the spread-only comparator on activation and routing TV;
 5. additionally require pairwise activation difference at most `0.02`.
 
-The candidate grids, dose targets, passive paths, formal evaluation paths,
-routing settings, source policies, and all scientific outcome definitions are
-unchanged. The original numerical selections are recorded here rather than
-silently discarded. The corrected artifact must be committed and hashed
-before formal sensitivity execution.
+At the selection-order correction stage, the candidate grids, dose targets,
+passive paths, formal evaluation paths, routing settings, source policies, and
+all scientific outcome definitions remained unchanged. The original numerical
+selections are recorded here rather than silently discarded. The corrected
+artifact must be committed and hashed before formal sensitivity execution.
+
+## Comparator Feasibility Correction
+
+The corrected risk selection produced a valid `0.10` risk arm at realized
+activation `0.081`, but no spread-only candidate in the original scale grid
+could simultaneously satisfy the unchanged nominal activation, pairwise
+activation, and `[0.9, 1.1]` routing-TV ratio tolerances. The nearest selected
+scale `0.50` had TV ratio `0.833`. Before any response training, the comparator
+calibration grid was therefore interpolated between `0.50` and `0.75` with
+scales `0.55`, `0.60`, `0.65`, and `0.70`. This is a budget-feasibility repair,
+not an efficacy search: no spread, reward, or formal evaluation outcome was
+available, and all matching tolerances remain unchanged.
