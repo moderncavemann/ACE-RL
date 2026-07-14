@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
@@ -11,6 +13,16 @@ from src.envs.abides_docker_env import ABIDESDockerDealerEnv
 
 GateDecision = Callable[[Mapping[str, Any], np.ndarray, int], bool]
 ContractDecision = Callable[[Mapping[str, Any], int], float]
+
+
+def canonical_digest(value: Any) -> str:
+    payload = json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def actor_observations(
@@ -156,6 +168,12 @@ def rollout_episode(
             action_uniforms = np.random.default_rng(
                 np.random.SeedSequence([int(seed), int(step), int(action_namespace)])
             ).random(10)
+        action_uniform_digest = canonical_digest(
+            [] if action_uniforms is None else action_uniforms.tolist()
+        )
+        pre_state_digest = canonical_digest(
+            {"observations": state["observations"], "info": state["info"]}
+        )
         actions, logp, values = trainer.act(
             obs,
             critic,
@@ -192,9 +210,13 @@ def rollout_episode(
                 "gate_signal": (
                     0.0 if announced_strength is None else announced_strength
                 ),
+                "pre_state_digest": pre_state_digest,
+                "action_uniform_digest": action_uniform_digest,
                 "pre_info": dict(state["info"]),
                 "pre_observations": state["observations"],
                 "info": dict(next_state["info"]),
+                "rewards_unscaled": list(next_state["rewards"]),
+                "post_agents": list(next_state["agents"]),
                 "mean_reward_unscaled": float(np.mean(next_state["rewards"])),
             }
         )

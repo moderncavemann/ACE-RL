@@ -12,6 +12,7 @@
   "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
   "source_v5_output_dir": "revision/experiments/outputs/abides_mappo_adaptive_v5_full_main_primary_v1",
   "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "source_v5_response_episodes": 96,
   "methods": [
     "no_intervention",
     "risk_aware",
@@ -30,6 +31,7 @@
   "learning_rate": 0.0003,
   "entropy_coefficient": 0.02,
   "reward_scale": 100.0,
+  "max_activation_rate": 0.35,
   "routing_allocation_mode": "soft_rank",
   "routing_target_kappa": 4.0,
   "routing_routable_fraction": 0.5,
@@ -52,6 +54,7 @@
     "inventory_penalty": 0.002
   },
   "gate_artifact": "revision/configs/abides_two_stage_gate_v1.json",
+  "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
   "response_environment_seed_namespace": 629900000,
   "response_action_namespace": 549117,
   "evaluation_action_namespace": 549217,

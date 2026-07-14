@@ -63,6 +63,7 @@
   "learning_rate": 0.0003,
   "entropy_coefficient": 0.02,
   "reward_scale": 100.0,
+  "max_activation_rate": 0.35,
   "routing_allocation_mode": "soft_rank",
   "routing_target_kappa": 4.0,
   "routing_routable_fraction": 0.5,

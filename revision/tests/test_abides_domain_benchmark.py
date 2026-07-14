@@ -1,10 +1,19 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 
 REVISION_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REVISION_ROOT))
+sys.path.insert(0, str(REVISION_ROOT / "experiments"))
+
+from experiments.run_abides_domain_benchmark import (  # noqa: E402
+    NEW_METHODS,
+    action_uniforms_equal,
+    load_mechanism_parameters,
+)
 
 
 def load_config(name: str) -> dict:
@@ -60,3 +69,24 @@ def test_smoke_is_separate_and_cannot_be_paper_evidence() -> None:
     assert smoke["output_dir"] != formal["output_dir"]
     assert set(smoke["evaluation_seeds"]).isdisjoint(formal["evaluation_seeds"])
     assert smoke["response_episodes"] < formal["response_episodes"]
+
+
+def test_smoke_parameters_cover_each_new_adapter() -> None:
+    smoke = load_config("abides_domain_benchmark_smoke_v1.json")
+    assert tuple(smoke["new_adapter_methods"]) == NEW_METHODS
+    assert set(load_mechanism_parameters(smoke)) == set(NEW_METHODS)
+    assert smoke["engineering_smoke"] is True
+
+
+def test_action_uniform_comparator_requires_exact_step_digests() -> None:
+    matching = {
+        "left": {
+            "records": [{"action_uniform_digest": "a"}, {"action_uniform_digest": "b"}]
+        },
+        "right": {
+            "records": [{"action_uniform_digest": "a"}, {"action_uniform_digest": "b"}]
+        },
+    }
+    assert action_uniforms_equal(matching)
+    matching["right"]["records"][1]["action_uniform_digest"] = "changed"
+    assert not action_uniforms_equal(matching)
