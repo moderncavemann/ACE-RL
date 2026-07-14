@@ -34,6 +34,9 @@ jobs:
           python -m pip install numpy==1.26.4 scipy==1.13.1 matplotlib==3.9.2 pytest==7.4.4
           python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
 
+      - name: Fetch pinned official MAPPO source
+        run: python revision/experiments/setup_official_on_policy.py
+
       - name: Run revision tests
         run: python -m pytest -q revision/tests
 
@@ -46,8 +49,12 @@ jobs:
       - name: Recompute dose and routing sensitivity
         run: python revision/experiments/verify_abides_dose_routing_sensitivity.py
 
+      - name: Recompute temporary commitment audit
+        run: python revision/experiments/verify_abides_temporary_commitment.py
+
       - name: Verify deterministic paper exports
         run: |
           python revision/experiments/export_abides_audit_bundle.py --check
           python revision/experiments/export_abides_collusion_audit_bundle.py --check
           python revision/experiments/export_abides_dose_routing_audit_bundle.py --check
+          python revision/experiments/export_abides_temporary_commitment_audit_bundle.py --check

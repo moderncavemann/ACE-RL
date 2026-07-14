@@ -1,0 +1,244 @@
+{
+  "budget_calibration": {
+    "banerjee_temporary_commitment": {
+      "budget_match_status": "not_applicable_literature_form",
+      "duration": 5,
+      "protected_fraction": 0.5,
+      "qualification_steps": 3,
+      "reference_window": 10
+    },
+    "banerjee_temporary_commitment_budget_matched": {
+      "budget_match_status": "unmatched",
+      "calibration_active_routing_rate": 0.22835,
+      "calibration_mean_routing_total_variation": 0.051378749999999994,
+      "calibration_mean_tv_ratio": 0.9119098157289097,
+      "duration": 1,
+      "protected_fraction": 0.25,
+      "qualification_steps": 3,
+      "reference_window": 10
+    }
+  },
+  "implementation_status": "fail",
+  "per_path_row_count": {
+    "actual": 1000,
+    "expected": 1000,
+    "pass": true
+  },
+  "per_seed_row_count": {
+    "actual": 20,
+    "expected": 20,
+    "pass": true
+  },
+  "runner_checks": {
+    "evaluation_action_uniforms_equal": true,
+    "evaluation_paths_equal": true,
+    "external_baselines_no_latent_risk_access": true,
+    "gate_off_exact": true,
+    "identical_initial_adapter_digest": true,
+    "per_path_row_count": true,
+    "required_policy_seed_count": true,
+    "response_converged": false,
+    "response_episodes_complete": true,
+    "routing_weights_valid_every_step": true,
+    "source_v5_digests_present": true,
+    "step_record_hashes_present": true,
+    "temporary_commitment_exercised": true,
+    "temporary_commitment_integrity": true,
+    "training_action_uniforms_equal": true,
+    "training_paths_equal": true,
+    "volume_conserved": true,
+    "volume_conserved_every_step": true
+  },
+  "runner_scientific_result": "not_evaluated_integrity_fail",
+  "scientific_result": "not_evaluated_integrity_fail",
+  "statistics": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20260714,
+    "contrasts": {
+      "banerjee_temporary_commitment": {
+        "exact_sign_test": {
+          "negative": 20,
+          "non_ties": 20,
+          "p_value_two_sided": 1.9073486328125e-06,
+          "positive": 0,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 1.307976124058577e-22,
+        "t_interval": {
+          "ci_high": -1.002316624488971,
+          "ci_low": -1.0767778978295162,
+          "mean": -1.0395472611592436,
+          "n": 20,
+          "negative": 20,
+          "p_value_two_sided": 6.539880620292885e-23,
+          "positive": 0,
+          "se": 0.017787964066566044,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -0.9971648804736462,
+          "ci_low": -1.0811048595102388,
+          "mean": -1.0395834520004423,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "banerjee_temporary_commitment_budget_matched": {
+        "exact_sign_test": {
+          "negative": 16,
+          "non_ties": 20,
+          "p_value_two_sided": 0.01181793212890625,
+          "positive": 4,
+          "ties": 0
+        },
+        "holm_adjusted_p_value": 0.0006505461269909886,
+        "t_interval": {
+          "ci_high": -0.012593539414196228,
+          "ci_low": -0.039237038924489515,
+          "mean": -0.02591528916934287,
+          "n": 20,
+          "negative": 16,
+          "p_value_two_sided": 0.0006505461269909886,
+          "positive": 4,
+          "se": 0.0063648335656194596,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": -0.008923724846783243,
+          "ci_low": -0.04354690767773627,
+          "mean": -0.025897800288540735,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      },
+      "matched_random": {
+        "exact_sign_test": {
+          "negative": 0,
+          "non_ties": 20,
+          "p_value_two_sided": 1.9073486328125e-06,
+          "positive": 20,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.08726020393454839,
+          "ci_low": 0.07956473538012512,
+          "mean": 0.08341246965733676,
+          "n": 20,
+          "negative": 0,
+          "p_value_two_sided": 7.757293468724173e-21,
+          "positive": 20,
+          "se": 0.0018383612310177001,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.09225279194597243,
+          "ci_low": 0.07454371787472984,
+          "mean": 0.08339014928612844,
+          "replicates": 10000,
+          "rng_seed": 20260714
+        }
+      }
+    },
+    "method_means": {
+      "banerjee_temporary_commitment": {
+        "activation_rate": 0.60615,
+        "all_customer_cost_tick_units_per_episode": 10407.3,
+        "all_state_execution_half_spread": 5.20365,
+        "dealer_reward_units_per_episode": 5557.39658,
+        "high_execution_half_spread": 5.0814456957838265,
+        "high_risk_activation_rate": 0.6686017580439164,
+        "high_risk_steps": 31.5,
+        "low_customer_cost_tick_units_per_episode": 7196.96,
+        "low_execution_half_spread": 5.243461209691483,
+        "low_risk_steps": 68.5,
+        "mean_flow_hhi": 0.26803625000000003,
+        "mean_inventory_std": 13.098017662981823,
+        "mean_reward": 5.55739658,
+        "mean_routing_total_variation": 0.27276750000000005,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "banerjee_temporary_commitment_budget_matched": {
+        "activation_rate": 0.24975,
+        "all_customer_cost_tick_units_per_episode": 12505.555,
+        "all_state_execution_half_spread": 6.2527775,
+        "dealer_reward_units_per_episode": 7871.01314,
+        "high_execution_half_spread": 6.271359374519432,
+        "high_risk_activation_rate": 0.254562063851206,
+        "high_risk_steps": 31.5,
+        "low_customer_cost_tick_units_per_episode": 8584.875,
+        "low_execution_half_spread": 6.257093181681384,
+        "low_risk_steps": 68.5,
+        "mean_flow_hhi": 0.156374,
+        "mean_inventory_std": 9.333305652609146,
+        "mean_reward": 7.87101314,
+        "mean_routing_total_variation": 0.056193749999999994,
+        "mean_signal_strength": 1.0,
+        "mean_volume": 20.0
+      },
+      "matched_random": {
+        "activation_rate": 0.19325,
+        "all_customer_cost_tick_units_per_episode": 12714.795,
+        "all_state_execution_half_spread": 6.3573975,
+        "dealer_reward_units_per_episode": 8060.03396,
+        "high_execution_half_spread": 6.420450010934266,
+        "high_risk_activation_rate": 0.13139973368692312,
+        "high_risk_steps": 31.5,
+        "low_customer_cost_tick_units_per_episode": 8699.105,
+        "low_execution_half_spread": 6.366420940508063,
+        "low_risk_steps": 68.5,
+        "mean_flow_hhi": 0.16487500000000002,
+        "mean_inventory_std": 9.748855090642133,
+        "mean_reward": 8.06003396,
+        "mean_routing_total_variation": 0.06142715800662696,
+        "mean_signal_strength": 0.15324317381912508,
+        "mean_volume": 20.0
+      },
+      "no_intervention": {
+        "activation_rate": 0.0,
+        "all_customer_cost_tick_units_per_episode": 13050.245,
+        "all_state_execution_half_spread": 6.5251225,
+        "dealer_reward_units_per_episode": 8442.7002,
+        "high_execution_half_spread": 6.539502713101881,
+        "high_risk_activation_rate": 0.0,
+        "high_risk_steps": 31.5,
+        "low_customer_cost_tick_units_per_episode": 8953.735,
+        "low_execution_half_spread": 6.5307956739479565,
+        "low_risk_steps": 68.5,
+        "mean_flow_hhi": 0.14527500000000002,
+        "mean_inventory_std": 8.750825989071473,
+        "mean_reward": 8.4427002,
+        "mean_routing_total_variation": 0.0,
+        "mean_signal_strength": 0.0,
+        "mean_volume": 20.0
+      },
+      "risk_aware": {
+        "activation_rate": 0.19545,
+        "all_customer_cost_tick_units_per_episode": 12666.495,
+        "all_state_execution_half_spread": 6.3332475,
+        "dealer_reward_units_per_episode": 8027.57416,
+        "high_execution_half_spread": 6.408775684463356,
+        "high_risk_activation_rate": 0.1051393441051885,
+        "high_risk_steps": 31.5,
+        "low_customer_cost_tick_units_per_episode": 8597.88,
+        "low_execution_half_spread": 6.283008470850726,
+        "low_risk_steps": 68.5,
+        "mean_flow_hhi": 0.16392675,
+        "mean_inventory_std": 9.484202544651021,
+        "mean_reward": 8.02757416,
+        "mean_routing_total_variation": 0.06254381055876532,
+        "mean_signal_strength": 0.15324317381912508,
+        "mean_volume": 20.0
+      }
+    },
+    "secondary_holm_family": [
+      "banerjee_temporary_commitment",
+      "banerjee_temporary_commitment_budget_matched"
+    ]
+  },
+  "step_record_count": {
+    "actual": 100000,
+    "expected": 100000,
+    "pass": true
+  }
+}

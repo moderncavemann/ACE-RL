@@ -1,0 +1,735 @@
+{
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "artifact_hashes": {
+    "calibration_artifact_sha256": "24825a4cba4e001f79f57e5c29d8a65e6cde8cf405a21a819a0e5152f897bd83",
+    "docker_image_id": "sha256:d8a74525288147bd1f2d7af1d6fdd23bddee5b130f70cb9779efcf766532344d",
+    "gate_artifact_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7",
+    "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+    "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c"
+  },
+  "calibration_artifact_sha256": "24825a4cba4e001f79f57e5c29d8a65e6cde8cf405a21a819a0e5152f897bd83",
+  "calibration_environment_seeds": [
+    535000,
+    535001,
+    535002,
+    535003,
+    535004,
+    535005,
+    535006,
+    535007,
+    535008,
+    535009
+  ],
+  "completed_policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "completed_resume_verified": true,
+  "docker_image": "ace-rl-abides-ace:temporary-commitment-v1",
+  "docker_image_id": "sha256:d8a74525288147bd1f2d7af1d6fdd23bddee5b130f70cb9779efcf766532344d",
+  "evaluation_seeds": [
+    539000,
+    539001,
+    539002,
+    539003,
+    539004,
+    539005,
+    539006,
+    539007,
+    539008,
+    539009
+  ],
+  "execution_commit": "7253cdb9d56b7d7f120f84f85f48df95417a0eb5",
+  "execution_records": {
+    "530000": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.1428707526198787,
+          "banerjee_temporary_commitment_budget_matched": 0.011777548428073104
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1291.2829550411552,
+      "initial_adapter_digest": "48d28524a3c3fc79314f88041b0049523120a06dea9be8411a84946c28ea52f9",
+      "step_records_sha256": "df98f5f67eebe90704f8f653c89db740fa0e4bce53f179ffba9011f3d1faf6b1",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 379
+    },
+    "530001": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.1135677993013644,
+          "banerjee_temporary_commitment_budget_matched": 0.021248809145760106
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1309.5318941669539,
+      "initial_adapter_digest": "0e68e186c15475bac0883aeb55d86200ce6d953a9d2a612c8922e2f9630d9a0e",
+      "step_records_sha256": "7b5e30672ef7402c796bce4a6cfb9c7e948ab4ae9c1c5f1859198e466232078d",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 369
+    },
+    "530002": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.05129803112099118,
+          "banerjee_temporary_commitment_budget_matched": 0.013250238170847695
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1301.6823914167471,
+      "initial_adapter_digest": "9122a476aeb9b95f628b0386d320cdc3468d4b9c231483505b05fceb89427e28",
+      "step_records_sha256": "b2fc29cfcebd0747d31e05d628d74417f9dde4cf909dc56fb9a21fa306aaab17",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 407
+    },
+    "530003": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.09191409971419517,
+          "banerjee_temporary_commitment_budget_matched": 0.02179660209590395
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1311.4068328747526,
+      "initial_adapter_digest": "824ccf5722edb9c797f139085eb6534c1c1a8eb724d37758b1d153f09fc078a3",
+      "step_records_sha256": "1efc29ba3b8ae0098ef760df88809b0d7550a3f4d8cb6560daaf70c6b2b1702b",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 359
+    },
+    "530004": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.042465862178469926,
+          "banerjee_temporary_commitment_budget_matched": 0.010169895204827029
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1307.0812689168379,
+      "initial_adapter_digest": "e857b78cf588162c677e87aac4d2c7b4886f1bbeacfdfac6c1825b2d62b92322",
+      "step_records_sha256": "f2746ea0d162b42f5db9dad52385e0ba8f842d4c90057d51c6bb101bb4d87dd5",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 410
+    },
+    "530005": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.02755636710066689,
+          "banerjee_temporary_commitment_budget_matched": 0.009939663385202024
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1311.2875557090156,
+      "initial_adapter_digest": "e7b7cc0e99b16021277612bf274b4025044815f15fb6f5b701630efe6af750aa",
+      "step_records_sha256": "09a6d4f95393cca1a9589633ad0def93cb8cf0d0b03da6a572663d92e5c8398c",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 478
+    },
+    "530006": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.050801841854556606,
+          "banerjee_temporary_commitment_budget_matched": 0.019803906001905958
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1311.4663439998403,
+      "initial_adapter_digest": "f7d145b9f556456e5cad4ea5a3d46d8fff4e59d43466664c8627fc6199d1e82a",
+      "step_records_sha256": "42732cc32810b0b398e5a560fff0a1c9ad78ed0633137a643394636882a776c5",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 352
+    },
+    "530007": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.024106859320419893,
+          "banerjee_temporary_commitment_budget_matched": 0.01927199110828859
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1306.4548839163035,
+      "initial_adapter_digest": "e4e8fd84b0130236ed3f0eebacbcdd418af77e136d9581188109e872b27da0f6",
+      "step_records_sha256": "ba870a0c46557511002e297cfe269d0301ffed38c1a58d23f6e6801d7afd8f3e",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 376
+    },
+    "530008": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.18540012702445274,
+          "banerjee_temporary_commitment_budget_matched": 0.02528183550333374
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1301.58593645785,
+      "initial_adapter_digest": "f7548b52872d09a98510c40bcab4a548728927e71eadcf9f1dd6c915cca5159f",
+      "step_records_sha256": "8b6e38a127e0dde06d99eab67384bb5e324c39de648fbe8a8c6126ec93b11f98",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 392
+    },
+    "530009": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.01346856144807873,
+          "banerjee_temporary_commitment_budget_matched": 0.006398856779930462
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1308.5788175826892,
+      "initial_adapter_digest": "6ecd56c2c72d30f267c7a885b789b448bcd9b769fc8de8eb00edbab9eccc412e",
+      "step_records_sha256": "9980c3fd43a8642d860e9f812ef7e212196f3dc1fbc2459f0d0bffce1c760296",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 379
+    },
+    "530010": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.032716735471578495,
+          "banerjee_temporary_commitment_budget_matched": 0.012889012384883713
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1303.3632243340835,
+      "initial_adapter_digest": "10f49d00b346b5a61b15b52d60a0edd932e978e8ac4c4d55d837cf74f9f4ae2f",
+      "step_records_sha256": "7f754dd668809cce0bb873aa849943ffb336ee5c4de2851305e466fb371d1a28",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 263
+    },
+    "530011": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.11140838361384553,
+          "banerjee_temporary_commitment_budget_matched": 0.008943315338203028
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1307.09708004212,
+      "initial_adapter_digest": "2e64811c26985e7fa5cca002bdb0692c4fe12fc4f6d0c53af9c6f231460cb262",
+      "step_records_sha256": "76a6793baebf059e5bdb5408de3ce3c43319a8498d2933ab48e28bf3e8b433cb",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 408
+    },
+    "530012": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.05094474436329044,
+          "banerjee_temporary_commitment_budget_matched": 0.02486106700539903
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1274.2707919161767,
+      "initial_adapter_digest": "3cdde5d1b2e0da17e7d2cd5beae0afcd8e50f73db554c5cafb66e63731269008",
+      "step_records_sha256": "b10e2808b9320a9b86b6665666965f6964b72740f45734d086a3fa2e29d63c67",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 323
+    },
+    "530013": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.0295530327087965,
+          "banerjee_temporary_commitment_budget_matched": 0.013424896792632701
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1311.0626576249488,
+      "initial_adapter_digest": "31d44913ce0bc55840e740eb397631b6c5b5b7983f4f790524e3d9343ca10e94",
+      "step_records_sha256": "298e23ef25476609fbf649699cde7a4b2b231dd8cbf474c034b7aebaa5b67954",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 380
+    },
+    "530014": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.23587646872022816,
+          "banerjee_temporary_commitment_budget_matched": 0.03490393775801781
+        },
+        "stable": false,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1307.9272016673349,
+      "initial_adapter_digest": "582741f5dc8a3aac3c563b87d55c3dbd0e8f6cead2c078df288f187aca13ea6b",
+      "step_records_sha256": "2d2466eebd1d50ea8b1ab69233ea35a0499aa7646a1fddf2b80d15c21aefd116",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 374
+    },
+    "530015": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.0464671324229915,
+          "banerjee_temporary_commitment_budget_matched": 0.007879485550969179
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1317.8013899168,
+      "initial_adapter_digest": "8114eb799de724c8b1314af457962ee90d591b9c5dd196a381c50ba458515f2c",
+      "step_records_sha256": "a2cc77b29025f01c11f82c3c938c4d935f8afb8d1f6d160cf525db7f147c33cb",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 342
+    },
+    "530016": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.06480628771038432,
+          "banerjee_temporary_commitment_budget_matched": 0.007176881549698422
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1308.953082041815,
+      "initial_adapter_digest": "828183f16ed9438ba3f6e5e28590be0c85bb84e955993f7913a783daf5f10f1d",
+      "step_records_sha256": "d4050f3282f124d384de4ae587ea2542f84dde89f5e3e9a991e79aef4b19fe43",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 367
+    },
+    "530017": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.14172356303588352,
+          "banerjee_temporary_commitment_budget_matched": 0.026714830104795695
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1305.5368195418268,
+      "initial_adapter_digest": "cfd7e480a82c3393e182882aa2229035a85c40e49633c1260d42967714b7c2c2",
+      "step_records_sha256": "a404fe18ec9ffa58dfd6f5beba8043f0526ad2eb50fae9d19ecd602c183b4d77",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 442
+    },
+    "530018": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.14489917434106037,
+          "banerjee_temporary_commitment_budget_matched": 0.006228167672277074
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1319.768265957944,
+      "initial_adapter_digest": "f4fa48adc4e19a8000883611d9ef58d2f615bd88a16c77b2e5f29d755bae2f3f",
+      "step_records_sha256": "c365cd77d5aefd8261ce1098340bc8d3eb632d93a6a48730b0da4ed66251833d",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 337
+    },
+    "530019": {
+      "completed_episodes": 96,
+      "convergence": {
+        "maximum_allowed": 0.15,
+        "spread_ranges": {
+          "banerjee_temporary_commitment": 0.09278342330898681,
+          "banerjee_temporary_commitment_budget_matched": 0.006279771355985453
+        },
+        "stable": true,
+        "status": "evaluated"
+      },
+      "elapsed_seconds": 1310.642131625209,
+      "initial_adapter_digest": "a6cc46ad22c55ab68e3f1cd642f8527fbba163e91d4a0978728a50fe831878c3",
+      "step_records_sha256": "b1f08a888796c25c1ecd96624b67d0e4e199264153c447c04217d6a77e366f6b",
+      "temporary_commitment_integrity": true,
+      "temporary_commitment_takeups": 356
+    }
+  },
+  "failures": [],
+  "finished_at": "2026-07-14T11:53:47.139876+00:00",
+  "formal_config_sha256": "84942f80bb5dbb68385fdee2ac06ba84bfff76aaaafdf504cb63f20b2e16f21c",
+  "git_dirty_status_at_export": "M revision/configs/abides_standard_learner_holdout_v1.json\n M revision/notes/abides_standard_learner_holdout_v1_protocol.md\n?? revision/configs/abides_ecology_e1_base_v1.json\n?? revision/configs/abides_ecology_e1_response_v1.json\n?? revision/configs/abides_ecology_e2_base_v1.json\n?? revision/configs/abides_ecology_e2_response_v1.json\n?? revision/experiments/export_abides_temporary_commitment_audit_bundle.py\n?? revision/experiments/run_abides_standard_learner_holdout.py\n?? revision/experiments/setup_official_on_policy.py\n?? revision/experiments/verify_abides_temporary_commitment.py\n?? revision/notes/abides_temporary_commitment_benchmark_v1_summary.md\n?? revision/paper/artifacts/abides_temporary_commitment_benchmark_v1/\n?? revision/src/agents/official_on_policy_mappo.py\n?? revision/tests/test_abides_ecology_holdout.py\n?? revision/tests/test_abides_standard_learner_holdout.py\n?? revision/tests/test_official_on_policy_mappo.py",
+  "implementation_status": "fail",
+  "output_file_sha256": {
+    "README.md": "98648d76a2f03203d1bf7b30d70d628e3da7f1a075c3f05c5fd864afe31142bc",
+    "checks.json": "992292acc1560c33615667f580b2002b9a1a747f6200b599a18a36867c9553e0",
+    "per_path.csv": "e159fcc39b5b49b010f0747ba0c6c0e76d6e897349489fc4b203a5d383ce3865",
+    "per_seed.csv": "217d77e76ca760cc490c7267e4a8d2219e8460949db830cf1bb1b0fb992068ce",
+    "step_records.jsonl.gz": "a3d87701c3b0063857312de31efe25dff5606326bdc29092d089d5d5d921d3d4"
+  },
+  "pending_policy_seeds": [],
+  "policy_seeds": [
+    530000,
+    530001,
+    530002,
+    530003,
+    530004,
+    530005,
+    530006,
+    530007,
+    530008,
+    530009,
+    530010,
+    530011,
+    530012,
+    530013,
+    530014,
+    530015,
+    530016,
+    530017,
+    530018,
+    530019
+  ],
+  "protocol_fingerprint": "a31ac506e4ad0c1afeb9b07e28690cf15739366223e73d2c17f2baec3dde5dc9",
+  "protocol_freeze_commit": "7253cdb9d56b7d7f120f84f85f48df95417a0eb5",
+  "protocol_version": "abides_temporary_commitment_benchmark_v1",
+  "result_archival_commit": null,
+  "scientific_result": "not_evaluated_integrity_fail",
+  "software": {
+    "numpy": "1.26.4",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 08:22:19) [Clang 14.0.6 ]",
+    "scipy": "1.13.1",
+    "torch": "2.8.0"
+  },
+  "source_base_fingerprint": "8a409007a978ab74a7a9ddb94757e2c7b681ac57e2e0d3449c684b1b779afb51",
+  "source_model_digests": {
+    "530000": {
+      "base": "56acb05fe9a8f3041ae4057727ccbb9bc65ccc64533c4b822042fde7dabfcce7",
+      "new": {
+        "banerjee_temporary_commitment": "ab0e108424e8e9b2b90f9b1f814f42bf1bb207e2d9518fc1d9b152c45e642df7",
+        "banerjee_temporary_commitment_budget_matched": "2728221d3e6b612e653ff5c46869fc61dd7a855ecddf04007fdeaf5ff7cf7886"
+      },
+      "v5": {
+        "always_on": "31e302e98179a9a71648944852fd8ad482cba44c4ab565dc150f84ad6cb0d158",
+        "matched_random": "55e899df7d7031487df44035c6a18055db00042f6f51a8bc25d3c231224719c2",
+        "no_routing": "9c4b79317d6f8e0a87d5416aee314faa77d7a7e7e70ea66f4723ca875177217f",
+        "risk_aware": "f70a55a988067d38be85d6fa2695b5e2f056795d73de385692e8c47e11b94cc9",
+        "spread_only_threshold": "7ec693b9d27ed6510f4df7095e961595e04291239f77d513d638a0a225f72968"
+      }
+    },
+    "530001": {
+      "base": "0dfe6ed10b8c95b8abc410240d5aa60a6897e6368efeb14203a66e6c768f5872",
+      "new": {
+        "banerjee_temporary_commitment": "8cff4e12875ffdb05034f4a4c06f18396252174e41837d1260360fc3c6df816e",
+        "banerjee_temporary_commitment_budget_matched": "f16cd02b1b7233eca89cf4888381be314710eccce4231ae7a34c93fc1639ae8e"
+      },
+      "v5": {
+        "always_on": "2f1cc3a766f6903100658c45f8fb920a9f26a5c1687ef7cfc8f63ce9eddeea4a",
+        "matched_random": "08edbf156d155c05812e2996e593bb98f3a28a70531e5a1b27ed7a89e56ded08",
+        "no_routing": "509cf608a340424c9ba074c21cd1d6296f3df569a97647828f015eafdf3f7b00",
+        "risk_aware": "04d2341972fe1c9a0ba0f531753c5b0c55db7db12dbe9e4077bb13fc7539d3d1",
+        "spread_only_threshold": "830482bb65683c1a9b0fb03e22fd3431df01a4d94b22713e87fb7fd761f7025f"
+      }
+    },
+    "530002": {
+      "base": "2e344c95877d7f579ef83b20ae2224d55770ccf17c86b99a8213847867127f83",
+      "new": {
+        "banerjee_temporary_commitment": "035eb2b4185823bab7d97b9c4ea586c0488f920530fe82a1db366c4b4efbaafb",
+        "banerjee_temporary_commitment_budget_matched": "081c5b504539bc5edca108bb7f1aab5d50754799ce409594b090519da112fe2d"
+      },
+      "v5": {
+        "always_on": "194059cc6f9a97d80d6361a43dd1c33f83088f580720bafdf1127242320d51d7",
+        "matched_random": "2a41992c326e84241abe7b1fa01369504cc3dd5069eb6209d68de4e5a0272a0f",
+        "no_routing": "6f98e9ea4141fa4e6a1787a71e4299bd044f5b82be690dfe016cc92a080eca8a",
+        "risk_aware": "0fd19522986b2d92e16b8bfd111346a288ed45d66226f30683ce3eaa9b420216",
+        "spread_only_threshold": "dd5d0aeabd033015c6602a734229b5f8f7e6d3b3b9af09afc8b76e27e69eefb0"
+      }
+    },
+    "530003": {
+      "base": "640b9a29b9efd7a6cc4bd46e7a59259da5ff11fc550a13f3a7a2e5074b407a1b",
+      "new": {
+        "banerjee_temporary_commitment": "31de19a47ffeb14bf7bd88b0f42630c898e89376d3299cb52ec9a4784f78b902",
+        "banerjee_temporary_commitment_budget_matched": "589a805d7013b72c76120f9c0a8d7c6f80d6f656e6e05933a77b916586399f03"
+      },
+      "v5": {
+        "always_on": "c1c5ddc2a5321fc6c1f99017e39a0a63c721a658ccd76733fb27131d942f47fe",
+        "matched_random": "0948223c2ed3cdc2e84c3c7c096018c5879c1a9f3973ab8d3e7a65232c9672ab",
+        "no_routing": "35b92cd3ef36876ebca89ad2a86a1ab4b8681d500e661d58aadd71b0dd57b621",
+        "risk_aware": "9faa5b0e7398509cad706bb6e15108fe83fa92acce7adebaf62f1909cec937f0",
+        "spread_only_threshold": "1a87b20592861981229fc5df87254b8d5719fc664650148ccc5c4f799c8ee8b9"
+      }
+    },
+    "530004": {
+      "base": "582ddb6459b876d2683d678d8d1fc3c0640ddd29c5988beba216b7b6677db7d3",
+      "new": {
+        "banerjee_temporary_commitment": "0fd7668724ae4ecc4c3497fa1f463ffe35c74921100581fea7b72903ed27aa31",
+        "banerjee_temporary_commitment_budget_matched": "bf04d6bba528cf8ed7df985151326a19844325abe5fb97af7467593309413795"
+      },
+      "v5": {
+        "always_on": "60ec87b9fac9586412199beb19dca403092938fa694a2b33da45e19fa0337cfa",
+        "matched_random": "6e821f9a01fb576e603207e58d0d3f54d9c56c5eeda8e1643b77c2b113022187",
+        "no_routing": "ea5220f7fe0404ccc4bc3d32c1e6de3d4be0deb29759969686de053bc4984090",
+        "risk_aware": "eed379563758e223949be965b5ac991f00eb360873036d0e258dbf259aa41dba",
+        "spread_only_threshold": "d26475a997033a1263fd2a9a70a5d796b35ee7ceab12fdcede0e634707ee67c0"
+      }
+    },
+    "530005": {
+      "base": "16a03e411f2b972a948b33499dc1a6c0d7a3d5e66e47b105306e23aacc3603b5",
+      "new": {
+        "banerjee_temporary_commitment": "778f5f3004e13d693a85131953398eb2b9d9cdf150fb9e062b6fc3db843b90b4",
+        "banerjee_temporary_commitment_budget_matched": "e8f9373cb48064e5959cc7abdae24e03e095df07bed9e238c6da96c64f40243f"
+      },
+      "v5": {
+        "always_on": "4cf86d489fdd5d010aa8672dee63e522735349c61cff48121317834bce11dbff",
+        "matched_random": "e27dfb52bdffaae2cb959e495ea90650e189a0850e4b4ee4fa47442793f59d33",
+        "no_routing": "25f952b871121dec290432fcf1125da93c612953f1945b92a3b9ca785ee5ce02",
+        "risk_aware": "185f67dd68ecc8c54daf8e48ebeb3758450b24a687fac2affbb802d2ed3629f3",
+        "spread_only_threshold": "0e80fda34c679908d3427034c06d184d672b3353074d6234813fcddd98f37a20"
+      }
+    },
+    "530006": {
+      "base": "4bfa8bc6b8c6ae2aa4198c9f9d996189206f8354a806578fa020933d42bbc1d9",
+      "new": {
+        "banerjee_temporary_commitment": "13e365419091dd5a770814273f0a668e5750b4c492e22c218ef036f09b7ba532",
+        "banerjee_temporary_commitment_budget_matched": "b0bd51cc57ef5620c215604e3e67472a8187a0ff6febd3d1cfd50349b9643f6d"
+      },
+      "v5": {
+        "always_on": "855766b2763315ec5d743d9ae11e9fe087a31230d540205da1042e546eaccc25",
+        "matched_random": "87eb8037fa676bb7ecfe15750eb4adc4b9e6ec9579b94bd510fbae720deac6f6",
+        "no_routing": "4186424dc2c640319b1771073e3ec74c8da59c24681088cdc7de90d54c8494f3",
+        "risk_aware": "63a200e5bda100a2ec477e08c5ca6ec77202e5e2431d04c0653bd7dffd25b6bf",
+        "spread_only_threshold": "d8dc60ee567a4818cef682fbb44552ec29aac4a0370c0ba11de26a8f7b082feb"
+      }
+    },
+    "530007": {
+      "base": "efdf7b19694132654f6ffd0f2c2195af6b52793834525ac2535fb66aaa30c8d3",
+      "new": {
+        "banerjee_temporary_commitment": "aa46d706bfeda160be5178bdd8aa3693e6c04d758809611e1a6c0cb490abbce5",
+        "banerjee_temporary_commitment_budget_matched": "52fad037eddc2e872a9d1230041415a30d0ae51772e5d012cf2e44eea35a2a84"
+      },
+      "v5": {
+        "always_on": "8eb9124027de93a42fe11fe23eef459b80dbf5499b4853a0c3239a4f7e1e4863",
+        "matched_random": "28df4785d9f84ebde558a2c8beee8f36fb7a0bb17ff426fdc0aed3adb2b14e7e",
+        "no_routing": "75b57e3009cc5856350a6b68366d3b198bf0bc35d7945098ddc8816ab512ac92",
+        "risk_aware": "ca243b56bda3a1dbd39a024bf1bf4f24f1f046f08586ebca93a4356556598675",
+        "spread_only_threshold": "f0543d710360630fc8eccc8aa0033d91af7846752ccfb0769dc7a910462b8a4a"
+      }
+    },
+    "530008": {
+      "base": "5865e4759064449e4c0fd13d544f29688d3f4be671526a3619ab79e7184686b2",
+      "new": {
+        "banerjee_temporary_commitment": "94f1eabcd0e767761f6d623386075cbce599d0953c5e9c9fba40ea54a5ab4adb",
+        "banerjee_temporary_commitment_budget_matched": "c00668c8fd45e4be1e4c00585b350c1f3cdf8c1d55c2a345cc8016223c8893c2"
+      },
+      "v5": {
+        "always_on": "3b6b102d2462be388e610cad471d0f16ae35451368b1fb7786cc902258bd0e34",
+        "matched_random": "c492564d77b84dc2472d3621c671ea76ac67cb194eb13cea850445ec277d0c25",
+        "no_routing": "7202c7614178c46b0d38961c74a7bacf1989c25f3d36f10a9dad8701af2e05d0",
+        "risk_aware": "5d3285ff9d92abc65e32aab51c3dd25959c0a83ec564eef6f0de9f3667ba3923",
+        "spread_only_threshold": "2865b4c11b94a25917a7892b6b07f74c99db82ca52ead8eabda3653246f37eb8"
+      }
+    },
+    "530009": {
+      "base": "d5965a545567cc48fcce808fd52d81290b1192f4bff2a6632995351f7926bf2e",
+      "new": {
+        "banerjee_temporary_commitment": "c39b57442e57fa824f2d373f96b0f0aac25e2806c6f80566e2fd5e0a54679fc0",
+        "banerjee_temporary_commitment_budget_matched": "57e26101ebdbe3982b96ccf3940fdd82afb09ce1e791e71449aeb22ecd1597f4"
+      },
+      "v5": {
+        "always_on": "1e17ee7701f27d278df1bd34d921d7323d18be45b0610cec04e556dbfaa27e8b",
+        "matched_random": "5e7c71770b18555a67a59f5a8517847eab089663bf8a34f51edacfecb31b3371",
+        "no_routing": "2c7ab4688f4e7e41ec7164737154c824841187f15bee77930c93110d15372c41",
+        "risk_aware": "e2ebaa85102ce7902e11570aca45d407dc58db721ec302b64e29fcd15abb55fa",
+        "spread_only_threshold": "d58664cfb7c546a2c3d0eb5880660a19eb01514f9e4d823c0fb2aaa50809742b"
+      }
+    },
+    "530010": {
+      "base": "97b2788bf2d1bed5659219a90dc857231a2b9c6e07a19fb5cc5e63fb78979da5",
+      "new": {
+        "banerjee_temporary_commitment": "537740bac8141e91088b60244e8644e20e0efcff0a6cb417038b951a5bb32e64",
+        "banerjee_temporary_commitment_budget_matched": "d294abc9c7f06b98e96422c6bf4bb23962931500171adaad5977e9ba71ccdd84"
+      },
+      "v5": {
+        "always_on": "960ae3875823cb08c42a1ed6796d3604522e11eae15974597332f88838720912",
+        "matched_random": "3353656e616d66de470f7ad9f18211bb3aa8fac235fb32ef4df9ff74c87a299e",
+        "no_routing": "e5360179110be9586c9989c5e99c51e7590b9144f857d91596015bc8eae3f1e9",
+        "risk_aware": "25d0b4387634aade9ce13d0290857c32627c73820e2553c43aac89f2295520fe",
+        "spread_only_threshold": "e9729921862d134c00a7ec5cf7f2ac11ac213bacb2121719b3c6f349aa1d60e2"
+      }
+    },
+    "530011": {
+      "base": "c8eea239629e1c3f0f83032082b8ee13274c5fb08b18db56e066771612bd3e3d",
+      "new": {
+        "banerjee_temporary_commitment": "e244fd9a8a8996c93b48eb5b6ba092f26e64e6f01793ec6a93c6258c348b122d",
+        "banerjee_temporary_commitment_budget_matched": "2f0ca5abea3cf886bf135ac6188bc18f03a49dc106fc4e028f43d1bcb61e9324"
+      },
+      "v5": {
+        "always_on": "4e25e0907877719bac6a709b7b64b553a77fb71d7771fe7f33bd27048163eab5",
+        "matched_random": "86a574a567674bcccfdb9564ee0d04ea876295396f68cda8d9634942854c8168",
+        "no_routing": "d83057435e399b40a0ba69cdb456ae017be59089f0ee511298964c6e5aae8fae",
+        "risk_aware": "203d6f38b74fe883912ec34b3e887a7ce00b21d62a2eaf36c7b0814102c770b3",
+        "spread_only_threshold": "1989cac534170427ad70573888ee04c23a5b9357f3b167759881b76e387c4a18"
+      }
+    },
+    "530012": {
+      "base": "6ab2005c36c425396eeaf4ef3d7ee3c7076e2932d6efacc66224e1984bda91a7",
+      "new": {
+        "banerjee_temporary_commitment": "e0321ee9cf0db87b16bc251eb34f63400615419938ea40871071bb004b327ca9",
+        "banerjee_temporary_commitment_budget_matched": "14664c9c7a6fb8675802f18e7fee36d3ccfa3082064ad96df8a9b6f074856b43"
+      },
+      "v5": {
+        "always_on": "a5b3d13c841644bcf9f325174b4020246ae4ad0046eb43e67e208df0060ff42b",
+        "matched_random": "970e0926bf1ad216fb8ffae9ec4adb6b8f78cf73cef896250884ebd0e7d25a9b",
+        "no_routing": "1781ad2ea53f4378b385b84e2e2e0cf491636148129c7722e7c55a1097bcce3f",
+        "risk_aware": "e218a08577fdf5e4e41706eb43fe6a499c0bc64f013ecd001811ef023515e5e3",
+        "spread_only_threshold": "3bd569ba4fa73575a9532470a95e0c598b9d15a75585b1faa373522203f80ebc"
+      }
+    },
+    "530013": {
+      "base": "9d3a5f5ad95d52d5861eb89935d708f0e3325cfc0a85abde82164299f50042d7",
+      "new": {
+        "banerjee_temporary_commitment": "9534500b45fbeca2734af525e2ea800efa05b6dece6a8353bc51412c03932fd0",
+        "banerjee_temporary_commitment_budget_matched": "353294cb881e5ed9bf500a361871f06acd326430d02160b10b993be454bad9de"
+      },
+      "v5": {
+        "always_on": "75f20f6db2c1f60410abca2fb9441169ded7c76708e55e8f2b1f2e570b390556",
+        "matched_random": "2d2c0e35eac2a90c7e6425df7a244b7739cb4804c69ecfda96222ebf50c373a4",
+        "no_routing": "2e1f51b5ca5a26ba6243af06e3b62e5747d7ed02e3129b12a9fa4b9c04fad13d",
+        "risk_aware": "275c523dc355a58984b8342fada1b6a21d6f5f2808d861362a74edb52ca00e5e",
+        "spread_only_threshold": "d021b64da2d2c5690f6175161b78a02a76806c82f8f472149a34786eef064c10"
+      }
+    },
+    "530014": {
+      "base": "9c3a453f50f99cc19dacafd810d79e3c0c773fd938e00f7fe19f5ba6215f9c03",
+      "new": {
+        "banerjee_temporary_commitment": "77ecb576e191cbd1acc020c418fb92c18accd2824eb2e99423a370ed8ecc4938",
+        "banerjee_temporary_commitment_budget_matched": "dcd574c825b8b90bee8495ae6e3a441f86e853f1c8c440d035f035fe8b52f390"
+      },
+      "v5": {
+        "always_on": "d5fe3db66fbd2d011a59a8a4c5cbeb6bf4a8be6f79b8c1c26f72eba14c04aedb",
+        "matched_random": "4dc49e09b07ab0096a27f7c0bab36b2b9c97b8f3f0c03b2cbef050c28895a17c",
+        "no_routing": "aa4a6fe397dc92373f4722bf9ab820b236daf9816424db41259f43a94b4c852b",
+        "risk_aware": "eea50508d9c75ed7804da1783bb8238bee2fb0853b83910a04b0442310ab144a",
+        "spread_only_threshold": "7f40d037aa80ce32ad3b317688ba98d2f45680b74aa6c7d2a8e28914ca86f3cb"
+      }
+    },
+    "530015": {
+      "base": "c4f56e13e6c2760c0729b3be80bb1c991ea316ee7903f89e20f9180e20b74012",
+      "new": {
+        "banerjee_temporary_commitment": "8e96b63ccc734e426a832d5ccb7425e3662fd4af6a229d52ed636cb686787728",
+        "banerjee_temporary_commitment_budget_matched": "05737a8de103b4aefaea7663edf388b9bdacf480859f96578fedb6f095f2e2aa"
+      },
+      "v5": {
+        "always_on": "927cb9eb8606cfc0fa6b1ddde17463da7fc46e549da9440184e44d31cd72a6d5",
+        "matched_random": "7bfb11aea6d214b5ecad87a24e6d121cd54fb8cd369e252b6ad2295b1acc7ee2",
+        "no_routing": "8500f1656a5449ca6734e2b057300da55ac941b4979f2796efaab164ed9fd16f",
+        "risk_aware": "c66db28c7764040176023c170f0700a1744d1fe13fc17ea82a373d359299f6a9",
+        "spread_only_threshold": "03bd80b8ff21e8b553b0e694a199a0124b5ef1e0ddff6f445593bb32e9e410eb"
+      }
+    },
+    "530016": {
+      "base": "af9dacd484b203e4518e956479a8c4e94d0f0e4d8674c38219b1b82bfe9949e5",
+      "new": {
+        "banerjee_temporary_commitment": "63e010289dd7016ff360f6fb2e22adfdfcb29068481613777dbd5b2f84b48444",
+        "banerjee_temporary_commitment_budget_matched": "90494363c8b25aba3faaf68ea9d75a6ef86379aa803ff62f534c24bb030a7b91"
+      },
+      "v5": {
+        "always_on": "07a7dc50b033e746aad2b2bf73a3440bce3682e337f29e2806c900e512d3d8cc",
+        "matched_random": "6fb43db3053b2e6dac0e106c066246f136d2d20be04e213abd08a1da7f7f3cfc",
+        "no_routing": "834f93ae834c07e192ec8d4cdcb599016303602887f085f8f78e82d411cb3427",
+        "risk_aware": "5c736c2d77ccb6b90721002bffd8f38903608ad9ce72ef1990547ec3de487b3d",
+        "spread_only_threshold": "a531ada75ce857450274308f9908a47fb702fb6f18cb73e2af62b7c5e71a5cca"
+      }
+    },
+    "530017": {
+      "base": "ab653bc738a77ba6f4cc93f99018c3e214ec1c2addffc0fb393643716ef37b46",
+      "new": {
+        "banerjee_temporary_commitment": "a8f9b63c24d3f7f6d25f4f6bc7ad2e14cea97df9ae311d4d5592a70e844a08af",
+        "banerjee_temporary_commitment_budget_matched": "d6590e4361c252115d9152f8cbae5f77e76d3d75cc0fd7e675fa1c0b2c2634ad"
+      },
+      "v5": {
+        "always_on": "a3f53a72e535d231a0b8a6560e1faa4510e29fd560ee27f7f28d7313b335fd0d",
+        "matched_random": "443aebad1faa8c321d634a397a7e1dbbd5b9e621f55e3406a7be32557858174c",
+        "no_routing": "59af8fc0f1c253654a265c69fc4ea17e93bb42d8d7227262e91c11d965ebbe00",
+        "risk_aware": "745035689c433b3abdc8dee3f92d246a3cd7171bd30203b020e329559264efe9",
+        "spread_only_threshold": "593defa42a3e401f5cbfd3898e39485e112e8d9d5aeeb7f34610433b30db7f35"
+      }
+    },
+    "530018": {
+      "base": "6318e10613d613e032c653d2b72848dae90d239d56e44b94cf1745fb3727147d",
+      "new": {
+        "banerjee_temporary_commitment": "9403c9468c8a16001907804338c48e31196342508c3dfb1866114fefd87fd09a",
+        "banerjee_temporary_commitment_budget_matched": "f9e806f11e25d29bcd8ba2296cc05eb9daa78956095b2e3bedbce2322d47a607"
+      },
+      "v5": {
+        "always_on": "b74b6a80342e5db3cfeeaa351c9c4ff46fe0575f7f5136c5072ad8bef5175dc2",
+        "matched_random": "a9178defb7797f7544ef5bf7fdb0a06509a3fce3065e1961ce740793e129d41d",
+        "no_routing": "f64fe106b9e91366534ff3eb8602785893ca996c008153384e720b8792253c57",
+        "risk_aware": "bd352a999f7391d2de43b78d62beafdb5ddda73ff31f041f27da31ffeba8d5cc",
+        "spread_only_threshold": "9215c2fd23ad415b837af94c735e35cf3c64a17670a519d53ba6d70129ed2a46"
+      }
+    },
+    "530019": {
+      "base": "ea722485cb4d2649023655c7e9d774d43f59f1e4b8c07d625f9f0a6239bd5301",
+      "new": {
+        "banerjee_temporary_commitment": "188359e0bd9d12dcd318e1ccdeb7f08731801a9618c486a47232b88ad33367d8",
+        "banerjee_temporary_commitment_budget_matched": "2654f128cfe675102c5ee02d5d3e9fb8b60f81ef89876e3f96ed00806d05f174"
+      },
+      "v5": {
+        "always_on": "625a650694445382332d9d2f827e07970277f37ce8da0921868c3066f316d5cd",
+        "matched_random": "8d84d87845f08ea6f23e2d99b1b0b47df2cf836bff44cb1e5632128a79fbf3d6",
+        "no_routing": "bc61a777e2d46417acba8b623b6a329009118842dfb07ecd368040716e0d363d",
+        "risk_aware": "1769b0acff63137e4c74bd869bbd4dd9c6eeac7f0566b21d0669f8cf6165a211",
+        "spread_only_threshold": "d07dfb5ef9808c699352f686409c716ca89ac03f6492ce536668f4148d5d4a32"
+      }
+    }
+  },
+  "source_v5_fingerprint": "8636827cb45cdb774a1351183858aaa0edc058b90f3d4a269c51c74ca467674c",
+  "started_at": "2026-07-14T11:31:31.638785+00:00"
+}
