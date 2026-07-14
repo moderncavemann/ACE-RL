@@ -25,3 +25,15 @@ Both cells are always reported. Two favorable cells support robustness within
 the tested ecologies; one favorable cell defines a boundary; two failures
 restrict the claim to the original v5 ecology. Results cannot be pooled to
 hide a cell-level reversal.
+
+## Audit Replay
+
+The formal response runner's seed result stores the pre-registered aggregate
+and convergence checks. Audit-grade per-path and per-step data are generated
+afterward by loading the frozen final checkpoints and replaying exactly the
+same ten evaluation paths without training. The audit evaluator must reproduce
+each seed's formal aggregate before accepting its records. It uses all six
+methods, all ten policy seeds in both cells, deterministic gzip output, and a
+source fingerprint that includes the frozen config, formal manifest, summary,
+and every seed-result hash. This replay cannot change policies, paths, methods,
+or the formal efficacy result.
