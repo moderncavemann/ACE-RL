@@ -252,7 +252,23 @@ def calibrate(config: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> d
                 -float(row["probability_cutoff"]),
             )
         )
-        selected_risk = risk_candidates[0]
+        within_tolerance = [
+            row
+            for row in risk_candidates
+            if abs(float(row["activation_rate"]) - target)
+            <= float(calibration["maximum_activation_error"])
+        ]
+        selected_risk = (
+            sorted(
+                within_tolerance,
+                key=lambda row: (
+                    -float(row["probability_cutoff"]),
+                    abs(float(row["activation_rate"]) - target),
+                ),
+            )[0]
+            if within_tolerance
+            else risk_candidates[0]
+        )
         risk_tv = float(selected_risk["mean_routing_total_variation"])
         spread_candidates = []
         for threshold in calibration["spread_severity_threshold_grid"]:
@@ -286,12 +302,18 @@ def calibrate(config: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> d
         spread_activation_error = abs(
             float(selected_spread["activation_rate"]) - target
         )
+        pair_activation_difference = abs(
+            float(selected_spread["activation_rate"])
+            - float(selected_risk["activation_rate"])
+        )
         tv_ratio = float(selected_spread["tv_ratio_to_risk"])
         passed = bool(
             risk_activation_error
             <= float(calibration["maximum_activation_error"])
             and spread_activation_error
             <= float(calibration["maximum_activation_error"])
+            and pair_activation_difference
+            <= float(calibration["maximum_pair_activation_difference"])
             and float(calibration["minimum_tv_ratio"])
             <= tv_ratio
             <= float(calibration["maximum_tv_ratio"])
@@ -304,6 +326,7 @@ def calibrate(config: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> d
             "spread_only_budget_matched": selected_spread,
             "risk_activation_error": risk_activation_error,
             "spread_activation_error": spread_activation_error,
+            "pair_activation_difference": pair_activation_difference,
             "budget_match_status": "matched" if passed else "unmatched",
         }
         all_candidates[key] = {
