@@ -1,0 +1,38 @@
+% Packages and styles required by the ICAIF visual assets.
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,calc,fit,positioning}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\definecolor{aceInk}{HTML}{24313A}
+\definecolor{aceNavy}{HTML}{35566B}
+\definecolor{aceTeal}{HTML}{2A8178}
+\definecolor{aceGold}{HTML}{D59B38}
+\definecolor{aceCoral}{HTML}{C95D4B}
+\definecolor{aceBlue}{HTML}{3E78A8}
+\definecolor{acePaleBlue}{HTML}{EAF1F5}
+\definecolor{acePaleTeal}{HTML}{E8F3F1}
+\definecolor{acePaleGold}{HTML}{FBF2DF}
+\definecolor{acePaleCoral}{HTML}{F8E9E6}
+\definecolor{aceRule}{HTML}{A9B3B8}
+\definecolor{aceRow}{HTML}{EEF5F3}
+
+\tikzset{
+  ace box/.style={
+    draw=aceRule,
+    rounded corners=1.5pt,
+    line width=0.55pt,
+    align=center,
+    inner xsep=5pt,
+    inner ysep=4pt,
+    text=aceInk,
+    font=\sffamily\scriptsize
+  },
+  ace arrow/.style={-{Latex[length=2.2mm,width=1.5mm]},line width=0.75pt,draw=aceInk},
+  ace dashed/.style={-{Latex[length=2mm,width=1.4mm]},line width=0.65pt,dashed,draw=aceCoral},
+  ace group/.style={draw=aceRule,rounded corners=2pt,fill=black!1,inner sep=6pt},
+  ace tag/.style={font=\sffamily\tiny\bfseries,text=white,rounded corners=1pt,inner xsep=3pt,inner ysep=1.2pt}
+}

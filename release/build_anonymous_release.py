@@ -135,6 +135,16 @@ SOURCE_FILES = {
     # Current external-baseline correspondence note. Keep its original path
     # because the public regression test treats that path as part of the API.
     "revision/notes/literature_baseline_mapping_v1.md",
+    # Current paper-facing LaTeX figures and tables.
+    "revision/paper/latex/icaif26_assets/README.md",
+    "revision/paper/latex/icaif26_assets/figure_framework.tex",
+    "revision/paper/latex/icaif26_assets/figure_paired_seeds.tex",
+    "revision/paper/latex/icaif26_assets/figure_sensitivity.tex",
+    "revision/paper/latex/icaif26_assets/preamble.tex",
+    "revision/paper/latex/icaif26_assets/preview.tex",
+    "revision/paper/latex/icaif26_assets/table_behavioral_boundary.tex",
+    "revision/paper/latex/icaif26_assets/table_main_results.tex",
+    "revision/paper/latex/icaif26_assets/table_transfer_results.tex",
 }
 
 EXPERIMENT_DOCS = {

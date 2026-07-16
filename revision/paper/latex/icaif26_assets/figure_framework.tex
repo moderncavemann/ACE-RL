@@ -1,0 +1,92 @@
+\begin{figure*}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % Offline calibration layer.
+  \node[ace box,fill=acePaleBlue,minimum width=3.0cm,minimum height=1.18cm]
+    (passive) at (2.0,5.35) {\textbf{Passive trajectories}\\
+      public history $\mathcal{H}^{\mathrm{pub}}$\\latent $z$ for supervision};
+  \node[ace box,fill=acePaleBlue,minimum width=3.0cm,minimum height=1.18cm]
+    (fit) at (5.55,5.35) {\textbf{Fit and freeze}\\
+      disjoint train/validation\\$(\boldsymbol\beta,\tau,\rho,B_{\max})$};
+  \draw[ace arrow] (passive) -- (fit);
+
+  % Runtime timeline. Keep labels inside nodes so the temporal order remains
+  % readable at two-column print scale.
+  \node[ace box,fill=acePaleTeal,minimum width=2.45cm,minimum height=1.35cm]
+    (history) at (1.55,3.00) {\textbf{Lagged public state}\\
+      volatility $v_t$\\absolute return $a_t$};
+  \node[ace box,fill=acePaleTeal,minimum width=2.45cm,minimum height=1.35cm]
+    (signal) at (4.55,3.00) {\textbf{Proxy and pacing}\\
+      $p_t\rightarrow\widetilde u_t\rightarrow u_t$\\no current quotes};
+  \node[ace box,fill=acePaleGold,minimum width=2.35cm,minimum height=1.35cm]
+    (announce) at (7.45,3.00) {\textbf{Announce $u_t$}\\
+      standing rule visible\\before current action};
+  \node[ace box,fill=acePaleGold,minimum width=2.35cm,minimum height=1.35cm]
+    (dealers) at (10.25,3.00) {\textbf{Adaptive dealers}\\
+      observe $u_t$\\choose spreads $\mathbf{s}_t$};
+  \node[ace box,fill=acePaleGold,minimum width=2.45cm,minimum height=1.35cm]
+    (routing) at (13.15,3.00) {\textbf{Soft-rank routing}\\
+      observe current $\mathbf{s}_t$\\compute weights $\mathbf{w}_t$};
+  \node[ace box,fill=acePaleCoral,minimum width=2.65cm,minimum height=1.35cm]
+    (exchange) at (16.35,3.00) {\textbf{ABIDES exchange}\\
+      route fixed volume $Q$\\fills, rewards, next state};
+
+  \draw[ace arrow] (history) -- (signal);
+  \draw[ace arrow,draw=aceTeal] (signal) -- (announce);
+  \draw[ace arrow,draw=aceTeal] (announce) -- (dealers);
+  \draw[ace arrow] (dealers) -- (routing);
+  \draw[ace arrow,draw=aceGold] (routing) -- (exchange);
+  \draw[ace dashed] (fit.south) to[out=-90,in=90]
+    node[right,font=\sffamily\tiny,text=aceCoral]{frozen parameters} (signal.north);
+
+  % Causal controls and post-hoc interpretation.
+  \node[ace box,fill=white,minimum width=4.25cm,minimum height=0.95cm]
+    (timingctl) at (4.3,0.95) {\textbf{Timing controls}\\
+      matched random: same signal multiset $\mid$
+      circular shift: displaced alignment};
+  \node[ace box,fill=white,minimum width=2.9cm,minimum height=0.95cm]
+    (routectl) at (11.9,0.95) {\textbf{Channel control}\\
+      same $u_t$, no reallocation};
+  \node[ace box,fill=white,minimum width=3.15cm,minimum height=0.95cm]
+    (posthoc) at (15.75,0.95) {\textbf{Post-hoc boundary}\\
+      low/high-risk outcomes; $z_t$\\never enters runtime};
+  \draw[ace dashed] (timingctl.north) -- (signal.south);
+  \draw[ace dashed] (routectl.north) -- (routing.south);
+  \draw[ace dashed] (exchange.south) -- (posthoc.north);
+
+  \node[ace box,fill=aceInk,text=white,draw=aceInk,minimum width=16.55cm,
+    minimum height=0.58cm,font=\sffamily\scriptsize] (audit) at (9.15,-0.30)
+    {\textbf{Paired audit layer:} common exogenous paths and action uniforms
+     $\mid$ fixed $Q$ and demand conservation
+     $\mid$ per-step signal, quote, routing, fill, reward, and hash records};
+
+  \begin{scope}[on background layer]
+    \node[ace group,fit=(passive)(fit),fill=acePaleBlue!35] (offlinegroup) {};
+    \node[ace group,fit=(history)(signal)(announce)(dealers)(routing)(exchange),
+      fill=black!0.5] (runtimegroup) {};
+  \end{scope}
+  \node[anchor=south west,font=\sffamily\scriptsize\bfseries,text=aceNavy]
+    at ([yshift=2pt]offlinegroup.north west) {OFFLINE CALIBRATION};
+  \node[anchor=south west,font=\sffamily\scriptsize\bfseries,text=aceTeal]
+    at ([yshift=2pt]runtimegroup.north west) {RUNTIME DECISION $t$};
+  \node[ace tag,fill=aceTeal,anchor=south] at ([yshift=2pt]announce.north)
+    {PRE-QUOTE};
+  \node[ace tag,fill=aceGold,anchor=south] at ([yshift=2pt]routing.north)
+    {POST-QUOTE};
+\end{tikzpicture}%
+}
+\caption{Risk-aware routing and information timing. Latent simulator risk is
+used only to fit the public-risk proxy and to stratify outcomes post hoc. At
+runtime, the platform computes and announces $u_t$ from lagged public history
+before dealers quote; only then does it use current quotes to reallocate a
+bounded share of fixed customer volume through soft-rank routing. Matched
+random and circular shift isolate timing, no routing isolates the economic
+channel, and all arms retain paired step-level audit records.}
+\label{fig:framework}
+\Description{The diagram separates offline proxy calibration from runtime
+information flow. At runtime, lagged public state produces a pre-quote signal,
+dealers quote after observing it, and post-quote soft-rank routing reallocates
+fixed customer volume through ABIDES. Timing and routing controls feed into a
+paired audit layer.}
+\end{figure*}

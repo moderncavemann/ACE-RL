@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Forced-undercut diagnostic (20 policies, 400 events).}
+\label{tab:behavioral-boundary}
+\scriptsize
+\setlength{\tabcolsep}{2.7pt}
+\begin{tabular}{@{}p{0.43\columnwidth}rr@{}}
+\toprule
+Requirement & Estimate [95\% $t$-CI] & Decision \\
+\midrule
+Rival spread compression & 0.000083 [-0.000012, 0.000179] & Not supported \\
+Continuation flow loss & 0 [0, 0] & Not supported \\
+Continuation reward loss & 0.02750 [-0.00139, 0.05639] & Not supported \\
+High-spread recovery by $H$ & 96.25\% [94.41\%, 98.09\%] & Supported \\
+\midrule
+\multicolumn{3}{@{}l@{}}{\textbf{Boundary:} high-spread coordination only; no punishment claim.} \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -51,6 +51,8 @@ boundaries.
 - `revision/paper/artifacts/`: primitive and derived audit data with source
   repository provenance metadata removed for double-blind review.
 - `revision/paper/figures/`: paper-facing figures.
+- `revision/paper/latex/icaif26_assets/`: current LaTeX/TikZ/PGFPlots visual
+  assets and an ACM-layout preview source.
 - `docs/protocols/`: frozen protocols for the retained experiment families.
 - `scripts/verify_release.py`: anonymous release integrity and identity scan.
 

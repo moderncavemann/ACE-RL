@@ -1,0 +1,85 @@
+\begin{figure*}[t]
+\centering
+\begin{minipage}[t]{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,height=4.55cm,
+  title={(a) Announced-signal dose},
+  title style={font=\small},
+  xlabel={Target activation rate},
+  ylabel={Comparator $-$ risk-aware (ticks)},
+  xmin=0.075,xmax=0.325,ymin=-0.012,ymax=0.066,
+  xtick={0.10,0.20,0.30},
+  ytick distance=0.02,
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  grid=major,grid style={black!8},
+  axis line style={aceRule},
+  legend style={font=\scriptsize,draw=none,fill=white,at={(0.03,0.97)},anchor=north west}
+]
+\addplot[black!55,densely dotted,forget plot] coordinates {(0.075,0) (0.325,0)};
+\addplot+[aceBlue,thick,mark=*,mark options={fill=aceBlue},
+  error bars/y dir=both,error bars/y explicit]
+  coordinates {(0.10,-0.00463) +- (0,0.00294)
+               (0.20, 0.00947) +- (0,0.00341)
+               (0.30, 0.00469) +- (0,0.00468)};
+\addlegendentry{Matched random}
+\addplot+[aceCoral,thick,dashed,mark=square*,mark options={fill=aceCoral},
+  error bars/y dir=both,error bars/y explicit]
+  coordinates {(0.10,0.00843) +- (0,0.00224)
+               (0.20,0.02342) +- (0,0.00319)
+               (0.30,0.05995) +- (0,0.00366)};
+\addlegendentry{Spread-only}
+\node[font=\sffamily\tiny,text=aceCoral,anchor=south west]
+  at (axis cs:0.105,-0.0040) {retained reversal};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,height=4.55cm,
+  title={(b) Routing contract},
+  title style={font=\small},
+  ylabel={Random $-$ risk-aware (ticks)},
+  xmin=0.5,xmax=5.5,ymin=-0.003,ymax=0.029,
+  xtick={1,2,3,4,5},
+  xticklabels={
+    \shortstack{$\kappa=2$\\$\phi=.50$},
+    \shortstack{$\kappa=4$\\$\phi=.25$},
+    \shortstack{$\kappa=4$\\$\phi=.50$},
+    \shortstack{$\kappa=4$\\$\phi=.75$},
+    \shortstack{$\kappa=8$\\$\phi=.50$}},
+  tick label style={font=\scriptsize},
+  xticklabel style={align=center},
+  label style={font=\scriptsize},
+  grid=major,grid style={black!8},
+  axis line style={aceRule}
+]
+\addplot[black!55,densely dotted,forget plot] coordinates {(0.5,0) (5.5,0)};
+\addplot+[only marks,aceTeal,mark=*,mark size=2.2pt,
+  mark options={fill=aceTeal},error bars/y dir=both,error bars/y explicit]
+  coordinates {(1,0.00433) +- (0,0.00365)
+               (2,0.00170) +- (0,0.00204)
+               (3,0.00947) +- (0,0.00341)
+               (4,0.01954) +- (0,0.00644)
+               (5,0.01043) +- (0,0.00322)};
+\node[font=\sffamily\tiny,text=aceTeal,anchor=south]
+  at (axis cs:3,0.0136) {frozen center};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\caption{Claim-relevant sensitivity of the paired execution-spread contrast.
+Error bars are 95\% policy-seed Student-$t$ intervals; positive values favor
+risk-aware timing. At dose 0.10, matched random reverses the mean ordering.
+The routing result is locally favorable, but the $(\kappa,\phi)=(4,0.25)$
+interval crosses zero. Wider paired two-way bootstrap intervals are retained
+in the supplement.}
+\label{fig:sensitivity}
+\Description{Two-panel sensitivity plot. The left panel compares matched
+random and spread-only controls across three announced-signal doses. The right
+panel reports matched-random minus risk-aware contrasts for five routing
+parameter cells.}
+\end{figure*}
