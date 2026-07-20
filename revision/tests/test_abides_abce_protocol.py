@@ -19,7 +19,11 @@ from experiments.run_abides_abce_primary_followup import (  # noqa: E402
     pending_policy_seeds,
     source_bundle_sha256,
 )
-from experiments.run_abides_abce_pipeline import validate_smoke  # noqa: E402
+from experiments.run_abides_abce_pipeline import (  # noqa: E402
+    current_git_commit,
+    validate_official_smoke,
+    validate_smoke,
+)
 from src.agents.abides_mappo import rollout_episode  # noqa: E402
 from src.interventions.abides_abce import (  # noqa: E402
     circular_schedule,
@@ -204,6 +208,9 @@ def test_pipeline_smoke_gate_accepts_integer_convergence_count(tmp_path: Path) -
     config_path = tmp_path / "smoke.json"
     config_path.write_text(json.dumps(config), encoding="utf-8")
     output.mkdir()
+    (output / "manifest.json").write_text(
+        json.dumps({"git_commit": current_git_commit()}), encoding="utf-8"
+    )
     (output / "summary.json").write_text(
         json.dumps(
             {
@@ -226,3 +233,41 @@ def test_pipeline_smoke_gate_accepts_integer_convergence_count(tmp_path: Path) -
         path.write_text("{}\n", encoding="utf-8")
     receipt = validate_smoke(config_path)
     assert receipt["converged_policy_seed_count"] == 2
+
+
+def test_pipeline_requires_current_commit_official_risk_only_smoke(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "official"
+    output = Path(f"{base}_formal_smoke_v2")
+    config = {
+        "output_dir": str(base),
+        "learners": ["official_full_policy_MAPPO", "official_IPPO"],
+        "policy_seeds": [560000],
+    }
+    manifest = {
+        "git_commit": current_git_commit(),
+        "stage": "formal",
+        "engineering_smoke": True,
+        "config": {"include_lagged_spread_severity": False},
+    }
+    (output / "formal").mkdir(parents=True)
+    (output / "formal" / "manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (output / "summary.json").write_text(
+        json.dumps(
+            {
+                "implementation_status": "pass",
+                "checks": {"task_count": True},
+                "learner_results": {learner: {} for learner in config["learners"]},
+            }
+        ),
+        encoding="utf-8",
+    )
+    for learner in config["learners"]:
+        path = output / "formal" / learner / "seed_560000" / "result.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{}\n", encoding="utf-8")
+    receipt = validate_official_smoke(config)
+    assert receipt["task_count"] == 2

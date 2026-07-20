@@ -79,8 +79,14 @@ def validate_smoke(config_path: Path) -> dict[str, Any]:
     config = load_json(config_path)
     output = REPO / str(config["output_dir"])
     summary_path = output / "summary.json"
+    manifest_path = output / "manifest.json"
     if not summary_path.is_file():
         raise RuntimeError("two-seed ABCE engineering smoke has not completed")
+    if not manifest_path.is_file():
+        raise RuntimeError("two-seed ABCE engineering smoke has no manifest")
+    manifest = load_json(manifest_path)
+    if manifest.get("git_commit") != current_git_commit():
+        raise RuntimeError("two-seed ABCE smoke was not run from the current commit")
     summary = load_json(summary_path)
     if summary.get("implementation_status") != "pass" or not all(
         bool(value) for value in summary.get("checks", {}).values()
@@ -100,6 +106,41 @@ def validate_smoke(config_path: Path) -> dict[str, Any]:
         "summary_sha256": sha256_file(summary_path),
         "policy_seed_count": len(results),
         "converged_policy_seed_count": converged,
+    }
+
+
+def validate_official_smoke(config: Mapping[str, Any]) -> dict[str, Any]:
+    output = REPO / f"{config['output_dir']}_formal_smoke_v2"
+    summary_path = output / "summary.json"
+    manifest_path = output / "formal" / "manifest.json"
+    if not summary_path.is_file() or not manifest_path.is_file():
+        raise RuntimeError("official MAPPO/IPPO engineering smoke has not completed")
+    manifest = load_json(manifest_path)
+    if (
+        manifest.get("git_commit") != current_git_commit()
+        or manifest.get("stage") != "formal"
+        or manifest.get("engineering_smoke") is not True
+        or manifest.get("config", {}).get("include_lagged_spread_severity") is not False
+    ):
+        raise RuntimeError("official MAPPO/IPPO smoke provenance is invalid")
+    summary = load_json(summary_path)
+    if summary.get("implementation_status") != "pass" or not all(
+        bool(value) for value in summary.get("checks", {}).values()
+    ):
+        raise RuntimeError("official MAPPO/IPPO engineering smoke failed integrity")
+    if set(summary.get("learner_results", {})) != set(config["learners"]):
+        raise RuntimeError("official MAPPO/IPPO smoke learner grid is incomplete")
+    policy_seed = int(config["policy_seeds"][0])
+    result_paths = [
+        output / "formal" / str(learner) / f"seed_{policy_seed}" / "result.json"
+        for learner in config["learners"]
+    ]
+    if not all(path.is_file() for path in result_paths):
+        raise RuntimeError("official MAPPO/IPPO smoke result grid is incomplete")
+    return {
+        "summary_sha256": sha256_file(summary_path),
+        "task_count": len(result_paths),
+        "learners": list(config["learners"]),
     }
 
 
@@ -394,6 +435,7 @@ def preflight(
     ):
         ensure_tracked(path)
     smoke = validate_smoke(smoke_config_path)
+    official_smoke = validate_official_smoke(official)
     if not bool(primary.get("formal")) or primary.get("freeze_status") != "frozen_pre_outcome":
         raise RuntimeError("ABCE primary config is not frozen for formal execution")
     if official.get("freeze_status") != "frozen_pre_outcome" or not bool(
@@ -422,6 +464,7 @@ def preflight(
     )
     return {
         "smoke": smoke,
+        "official_smoke": official_smoke,
         "docker_image_id": image_id,
         "official_artifacts": official_artifacts,
         "docker_parity": docker_parity,
