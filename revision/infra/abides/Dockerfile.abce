@@ -1,0 +1,15 @@
+FROM ace-rl-abides-ace:adaptive-v3
+
+ARG ACE_RL_ABCE_SOURCE_SHA256=unfrozen
+
+# The adaptive-v3 parent remains immutable. ABCE adds only the preregistered
+# allocation variants and trace fields required by the follow-up protocol.
+COPY revision/src/interventions/abides_literature_baselines.py \
+    /opt/ace-abides/abides_literature_baselines.py
+COPY revision/infra/abides/ace_abides /opt/ace-abides/ace_abides
+COPY revision/infra/abides/worker.py /opt/ace-abides/worker.py
+
+LABEL org.opencontainers.image.title="ACE-RL ABCE v1" \
+      org.opencontainers.image.ace_rl_abce_source_sha256="${ACE_RL_ABCE_SOURCE_SHA256}"
+
+ENV PYTHONPATH=/opt/ace-abides

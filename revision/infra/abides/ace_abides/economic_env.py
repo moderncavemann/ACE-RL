@@ -322,6 +322,13 @@ class EconomicCoordinator(CoreGymAgent):
         eligible_indices = np.flatnonzero(
             half_spreads <= modal_half_spread - self.config.routing_undercut_delta_ticks
         )
+        base_routing_weights = uniform_routing_weights(self.config.n_agents)
+        quote_ranks = np.searchsorted(
+            np.unique(half_spreads), half_spreads, side="left"
+        ) + 1
+        target_scores = np.zeros(self.config.n_agents, dtype=float)
+        pre_permutation_routing_weights: Optional[np.ndarray] = None
+        identity_permutation = np.arange(self.config.n_agents, dtype=int)
         target_probabilities: Optional[np.ndarray] = None
         routing_threshold: Optional[float] = None
         mechanism_parameters: Dict[str, Any] = {}
@@ -435,10 +442,9 @@ class EconomicCoordinator(CoreGymAgent):
                 else 0.0
             )
             mechanism_parameters = dict(decision.parameters)
-        elif (
-            mechanism_kind == "soft_rank"
-            and self.config.routing_allocation_mode == "soft_rank"
-        ):
+        elif mechanism_kind in {"soft_rank", "identity_permuted_soft_rank"}:
+            if self.config.routing_allocation_mode != "soft_rank":
+                raise ValueError("soft-rank mechanism requires soft-rank market mode")
             effective_alpha = (
                 self.config.routing_routable_fraction * contract_strength
                 if routing_enabled
@@ -446,15 +452,64 @@ class EconomicCoordinator(CoreGymAgent):
             )
             target_indices = np.arange(self.config.n_agents, dtype=int)
             centered = half_spreads - float(np.min(half_spreads))
-            weights = np.exp(-self.config.routing_target_kappa * centered)
-            target_probabilities = weights / float(np.sum(weights))
-            planned_routing_weights = soft_rank_routing_weights(
+            target_scores = np.exp(-self.config.routing_target_kappa * centered)
+            unpermuted_probabilities = target_scores / float(np.sum(target_scores))
+            pre_permutation_routing_weights = soft_rank_routing_weights(
                 half_spreads,
                 contract_strength,
                 self.config.routing_target_kappa,
                 self.config.routing_routable_fraction,
                 enabled=routing_enabled,
             )
+            if mechanism_kind == "identity_permuted_soft_rank":
+                permutation_raw = routing_mechanism.get("identity_permutation")
+                if permutation_raw is None:
+                    raise ValueError(
+                        "identity-permuted soft rank requires a dealer permutation"
+                    )
+                identity_permutation = np.asarray(permutation_raw, dtype=int)
+                if (
+                    identity_permutation.shape != (self.config.n_agents,)
+                    or set(identity_permutation.tolist())
+                    != set(range(self.config.n_agents))
+                ):
+                    raise ValueError("identity permutation is not a dealer bijection")
+                target_probabilities = np.empty(self.config.n_agents, dtype=float)
+                target_probabilities[identity_permutation] = unpermuted_probabilities
+                planned_routing_weights = np.empty(
+                    self.config.n_agents, dtype=float
+                )
+                planned_routing_weights[
+                    identity_permutation
+                ] = pre_permutation_routing_weights
+            else:
+                target_probabilities = unpermuted_probabilities
+                planned_routing_weights = pre_permutation_routing_weights.copy()
+            mechanism_parameters = {
+                "target_kappa": self.config.routing_target_kappa,
+                "routable_fraction": self.config.routing_routable_fraction,
+                "identity_permutation": identity_permutation.tolist(),
+            }
+        elif mechanism_kind == "hard_best":
+            effective_alpha = (
+                self.config.routing_routable_fraction * contract_strength
+                if routing_enabled
+                else 0.0
+            )
+            minimum = float(np.min(half_spreads))
+            target_indices = np.flatnonzero(half_spreads == minimum)
+            target_scores[target_indices] = 1.0
+            planned_routing_weights = eligible_routing_weights(
+                self.config.n_agents,
+                target_indices,
+                effective_alpha,
+                enabled=routing_enabled,
+            )
+            mechanism_parameters = {
+                "routable_fraction": self.config.routing_routable_fraction,
+                "best_half_spread": minimum,
+                "tie_count": int(len(target_indices)),
+            }
         elif eligible_indices.size:
             if mechanism_kind != "soft_rank":
                 raise ValueError(f"unsupported routing mechanism: {mechanism_kind}")
@@ -478,8 +533,22 @@ class EconomicCoordinator(CoreGymAgent):
             target_indices = np.asarray([], dtype=int)
             planned_routing_weights = uniform_routing_weights(self.config.n_agents)
 
+        if pre_permutation_routing_weights is None:
+            pre_permutation_routing_weights = np.asarray(
+                planned_routing_weights, dtype=float
+            ).copy()
         planned_routing_tv = routing_total_variation(planned_routing_weights)
         planned_flow_hhi = flow_hhi(planned_routing_weights)
+        route_uniform_digest = sha256(
+            repr(
+                [float(event.route_uniform) for event in path_step.flow_events]
+            ).encode("ascii")
+        ).hexdigest()
+        target_uniform_digest = sha256(
+            repr(
+                [float(event.target_uniform) for event in path_step.flow_events]
+            ).encode("ascii")
+        ).hexdigest()
 
         target_count = 0
         total_quantity = 0
@@ -584,9 +653,17 @@ class EconomicCoordinator(CoreGymAgent):
             "routing_mechanism": mechanism_kind,
             "routing_mechanism_parameters": mechanism_parameters,
             "routing_threshold": routing_threshold,
+            "base_routing_weights": base_routing_weights.tolist(),
+            "quote_ranks": quote_ranks.astype(int).tolist(),
+            "target_scores": target_scores.tolist(),
+            "pre_permutation_routing_weights": (
+                pre_permutation_routing_weights.tolist()
+            ),
             "routing_weights": planned_routing_weights.tolist(),
+            "identity_permutation": identity_permutation.tolist(),
             "routing_total_variation": planned_routing_tv,
             "planned_flow_hhi": planned_flow_hhi,
+            "planned_max_dealer_share": float(np.max(planned_routing_weights)),
             "eligible_agent_count": int(target_indices.size),
             "eligible_agent_indices": target_indices.tolist(),
             "eligible_agent_ids": [
@@ -597,6 +674,16 @@ class EconomicCoordinator(CoreGymAgent):
             "planned_protected_event_count": len(protected_event_indices),
             "planned_flow_quantity": total_quantity,
             "avg_half_spread": float(np.mean(half_spreads)),
+            "quote_dispersion": float(np.std(half_spreads)),
+            "best_quote_tie_count": int(
+                np.sum(half_spreads == float(np.min(half_spreads)))
+            ),
+            "route_uniform_digest": route_uniform_digest,
+            "target_uniform_digest": target_uniform_digest,
+            "decision_timestamp_ns": int(
+                self.decision_start
+                + self.step_id * self.config.decision_interval_ns
+            ),
         }
         if (
             protected_decision is not None
@@ -654,10 +741,10 @@ class EconomicCoordinator(CoreGymAgent):
                 }
             )
 
+        inventory = np.asarray(
+            [entry["inventory"] for entry in controlled], dtype=float
+        )
         if self.completed_steps > self.last_reward_completed_step:
-            inventory = np.asarray(
-                [entry["inventory"] for entry in controlled], dtype=float
-            )
             penalty = self.config.inventory_penalty * np.square(inventory)
             self.last_rewards = wealth - self.previous_wealth - penalty
             self.previous_wealth = wealth.copy()
@@ -698,6 +785,38 @@ class EconomicCoordinator(CoreGymAgent):
             for row in step_routes
             if row.get("required_order_tag_prefix") is not None
         ]
+        targeted_routes = [
+            row
+            for row in step_routes
+            if str(row.get("route_kind", "")).startswith("targeted_")
+        ]
+        fallback_routes = [row for row in step_routes if bool(row["used_fallback"])]
+        controlled_index = {
+            int(agent_id): index
+            for index, agent_id in enumerate(self.controlled_agent_ids)
+        }
+        execution_records = [
+            {
+                "route_kind": str(row["route_kind"]),
+                "eligible_dealer_indices": [
+                    controlled_index[int(agent_id)]
+                    for agent_id in row["eligible_agent_ids"]
+                    if int(agent_id) in controlled_index
+                ],
+                "matched_dealer_index": controlled_index.get(
+                    int(row["matched_agent_id"])
+                ),
+                "side": str(row.get("side", "unknown")),
+                "quantity": int(row["quantity"]),
+                "price": int(row["price"]),
+                "reference_mid": int(self.previous_fundamental),
+                "execution_half_spread": abs(
+                    int(row["price"]) - int(self.previous_fundamental)
+                ),
+                "used_fallback": bool(row["used_fallback"]),
+            }
+            for row in step_routes
+        ]
         observations = []
         for index, entry in enumerate(controlled):
             observations.append(
@@ -727,6 +846,22 @@ class EconomicCoordinator(CoreGymAgent):
                 "fundamental": self.fundamental,
                 "public_volatility": public_volatility,
                 "realized_flow_quantity": total_execution_quantity,
+                "planned_to_realized_volume_exact": bool(
+                    abs(
+                        total_execution_quantity
+                        - float(info.get("planned_flow_quantity", 0.0))
+                    )
+                    <= 1e-12
+                ),
+                "fill_ratio": (
+                    total_execution_quantity
+                    / float(info.get("planned_flow_quantity", 1.0))
+                    if float(info.get("planned_flow_quantity", 0.0)) > 0.0
+                    else 0.0
+                ),
+                "fallback_rate": (
+                    len(fallback_routes) / len(step_routes) if step_routes else 0.0
+                ),
                 "mean_reward": float(np.mean(self.last_rewards)),
                 "mean_spread_revenue": float(np.mean(spread_revenue)),
                 "mean_execution_half_spread": (
@@ -736,9 +871,21 @@ class EconomicCoordinator(CoreGymAgent):
                 ),
                 "mean_adverse_selection_component": float(np.mean(adverse_selection)),
                 "mean_inventory_penalty": float(np.mean(penalty)),
+                "reward_by_dealer": self.last_rewards.tolist(),
+                "spread_revenue_by_dealer": spread_revenue.tolist(),
+                "adverse_selection_by_dealer": adverse_selection.tolist(),
+                "inventory_penalty_by_dealer": penalty.tolist(),
+                "inventory_by_dealer": inventory.tolist(),
+                "customer_execution_cost_tick_units": total_spread_revenue,
                 "routed_execution_quantity": float(
                     sum(float(row["quantity"]) for row in step_routes)
                 ),
+                "realized_targeted_event_count": len(targeted_routes),
+                "realized_targeted_quantity": float(
+                    sum(float(row["quantity"]) for row in targeted_routes)
+                ),
+                "routing_fallback_count": len(fallback_routes),
+                "execution_records": execution_records,
                 "protected_execution_quantity": float(
                     sum(float(row["quantity"]) for row in protected_routes)
                 ),
@@ -752,6 +899,10 @@ class EconomicCoordinator(CoreGymAgent):
                     sum(bool(row["used_fallback"]) for row in protected_routes)
                 ),
                 "flow_shares": self.last_flow_shares.tolist(),
+                "realized_flow_hhi": float(
+                    np.sum(np.square(self.last_flow_shares))
+                ),
+                "realized_max_dealer_share": float(np.max(self.last_flow_shares)),
                 "avg_half_spread": float(np.mean(self.last_half_spreads)),
                 "diagnostic_current_risk": (
                     self.path[self.step_id].risk_state

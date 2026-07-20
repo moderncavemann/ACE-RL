@@ -34,6 +34,7 @@ from run_abides_domain_benchmark import (  # noqa: E402
     path_metrics,
 )
 from run_abides_learned_gate_screen import paired_summary  # noqa: E402
+from run_abides_abce_primary_followup import formal_worktree_violations  # noqa: E402
 from run_abides_mappo_adaptive_pilot import (  # noqa: E402
     atomic_torch_save,
     validate_common_path,
@@ -72,6 +73,11 @@ from src.interventions.abides_gate import (  # noqa: E402
     ABIDESPacedSignalController,
     ABIDESTwoStageGateModel,
 )
+from src.utils.abides_audit import (  # noqa: E402
+    exact_sign_test,
+    t_interval,
+    two_way_paired_bootstrap,
+)
 
 
 METHODS = (
@@ -80,6 +86,10 @@ METHODS = (
     "matched_random",
     "brero_threshold_buybox_budget_matched",
 )
+BRERO_METHOD_LABELS = {
+    "brero_threshold_buybox_budget_matched",
+    "brero_threshold_buybox_adaptation",
+}
 LEARNER_MODES = {
     "official_full_policy_MAPPO": True,
     "official_IPPO": False,
@@ -318,6 +328,7 @@ def train_base(
     fingerprint: str,
     seed_function: Callable[[Mapping[str, Any], int, int], int],
     action_namespace: int,
+    progress_path: Path | None = None,
 ) -> tuple[OfficialMAPPO, list[dict[str, Any]]]:
     completed = 0
     history: list[dict[str, Any]] = []
@@ -359,6 +370,16 @@ def train_base(
                     "saved_at": utc_now(),
                 },
             )
+            if progress_path is not None:
+                append_logbook(
+                    progress_path,
+                    {
+                        "event": "base_checkpoint",
+                        "completed_episodes": completed,
+                        "target_episodes": episodes,
+                        "checkpoint_sha256": sha256_file(checkpoint),
+                    },
+                )
     return learner, history
 
 
@@ -574,7 +595,11 @@ def rollout_response_methods(
         train,
         update_seed,
         announced_signal_decision=paced_learned_decision(
-            gate_model, controller, include_severity=True
+            gate_model,
+            controller,
+            include_severity=bool(
+                config.get("include_lagged_spread_severity", True)
+            ),
         ),
     )
     strengths = [float(row["gate_signal"]) for row in risk["records"]]
@@ -586,6 +611,7 @@ def rollout_response_methods(
         "train": train,
         "update_seed": update_seed,
     }
+    brero_method = str(config["methods"][3])
     rollouts = {
         "risk_aware": risk,
         "matched_random": rollout_episode(
@@ -600,9 +626,9 @@ def rollout_response_methods(
             announced_signal_schedule=[0.0] * steps,
             **common,
         ),
-        "brero_threshold_buybox_budget_matched": rollout_episode(
+        brero_method: rollout_episode(
             env,
-            learners["brero_threshold_buybox_budget_matched"],
+            learners[brero_method],
             announced_signal_schedule=[1.0] * steps,
             routing_mechanism=brero_mechanism(config["brero_parameters"]),
             **common,
@@ -657,7 +683,7 @@ def evaluate_response(
         paths.append(path_equal)
         doses.append(dose_exact)
         uniforms.append(uniforms_equal)
-        for method in METHODS:
+        for method in config["methods"]:
             records = rollouts[method]["records"]
             row = path_metrics(
                 str(config["protocol_version"]),
@@ -743,6 +769,7 @@ def formal_task(
             fingerprint,
             base_environment_seed,
             int(config["base_action_namespace"]),
+            task_dir / "progress.jsonl",
         )
         base_evaluation = evaluate_single(
             env,
@@ -753,7 +780,7 @@ def formal_task(
             "no_intervention",
         )
         if learners is None:
-            learners = {method: learner.clone() for method in METHODS}
+            learners = {method: learner.clone() for method in config["methods"]}
             initial_digests = {item.model_digest() for item in learners.values()}
             if len(initial_digests) != 1:
                 raise RuntimeError("official response methods did not start identically")
@@ -810,6 +837,15 @@ def formal_task(
                         "saved_at": utc_now(),
                     },
                 )
+                append_logbook(
+                    task_dir / "progress.jsonl",
+                    {
+                        "event": "response_checkpoint",
+                        "completed_episodes": response_completed,
+                        "target_episodes": int(config["response_episodes"]),
+                        "checkpoint_sha256": sha256_file(checkpoint),
+                    },
+                )
         final = evaluate_response(
             env,
             learners,
@@ -844,6 +880,15 @@ def formal_task(
         "elapsed_seconds": time.perf_counter() - started,
     }
     atomic_write_json(result_path, result)
+    append_logbook(
+        task_dir / "progress.jsonl",
+        {
+            "event": "task_complete",
+            "learner": learner_mode,
+            "policy_seed": policy_seed,
+            "result_sha256": sha256_file(result_path),
+        },
+    )
     return result
 
 
@@ -851,7 +896,7 @@ def aggregate_formal(
     config: Mapping[str, Any], results: Sequence[Mapping[str, Any]]
 ) -> dict[str, Any]:
     by_learner = {}
-    for learner_mode in config["learners"]:
+    for learner_index, learner_mode in enumerate(config["learners"]):
         learner_results = [row for row in results if row["learner"] == learner_mode]
         per_path = [
             path
@@ -859,7 +904,7 @@ def aggregate_formal(
             for path in result["final_evaluation"]["per_path"]
         ]
         method_summary = {}
-        for method in METHODS:
+        for method in config["methods"]:
             rows = [row for row in per_path if row["method"] == method]
             method_summary[method] = {
                 key: float(mean(float(row[key]) for row in rows))
@@ -889,6 +934,16 @@ def aggregate_formal(
         by_learner[learner_mode] = {
             "method_summary": method_summary,
             "matched_random_minus_risk_aware": paired_summary(seed_differences),
+            "matched_random_minus_risk_aware_inference": {
+                "t_interval": t_interval(seed_differences),
+                "exact_sign_test": exact_sign_test(seed_differences),
+                "two_way_bootstrap": two_way_paired_bootstrap(
+                    per_path,
+                    "matched_random",
+                    int(config["bootstrap_replicates"]),
+                    int(config["bootstrap_seed"]) + learner_index,
+                ),
+            },
             "per_path": per_path,
         }
     expected = len(config["learners"]) * len(config["policy_seeds"])
@@ -929,14 +984,14 @@ def aggregate_formal(
         ),
         "per_path_row_count": all(
             len(row["final_evaluation"]["per_path"])
-            == len(config["response_evaluation_seeds"]) * len(METHODS)
+            == len(config["response_evaluation_seeds"]) * len(config["methods"])
             for row in results
         ),
         "step_record_hashes_present": all(row["step_records_sha256"] for row in results),
         "volume_conserved": all(
             abs(summary["method_summary"][method]["mean_volume"] - 20.0) < 1e-9
             for summary in by_learner.values()
-            for method in METHODS
+            for method in config["methods"]
         ),
     }
     return {
@@ -960,6 +1015,31 @@ def run_formal(config: dict[str, Any], fingerprint: str) -> dict[str, Any]:
     ]
     results = []
     failures = []
+    output = REPO / str(config["output_dir"])
+
+    def persist_formal_state(status: str) -> None:
+        completed = {
+            (str(row["learner"]), int(row["policy_seed"])) for row in results
+        }
+        atomic_write_json(
+            output / "run_state.json",
+            {
+                "status": status,
+                "completed_tasks": [
+                    {"learner": learner, "policy_seed": seed}
+                    for learner, seed in sorted(completed)
+                ],
+                "pending_tasks": [
+                    {"learner": learner, "policy_seed": seed}
+                    for learner, seed in tasks
+                    if (learner, seed) not in completed
+                ],
+                "failures": failures,
+                "updated_at": utc_now(),
+            },
+        )
+
+    persist_formal_state("running")
     with ProcessPoolExecutor(max_workers=min(int(config["workers"]), len(tasks))) as pool:
         futures = {
             pool.submit(formal_task, config, learner, seed, fingerprint): (
@@ -981,14 +1061,16 @@ def run_formal(config: dict[str, Any], fingerprint: str) -> dict[str, Any]:
                         "traceback": traceback.format_exc(),
                     }
                 )
-    output = REPO / str(config["output_dir"])
+            persist_formal_state("running")
     atomic_write_json(output / "failures.json", {"failures": failures})
     if failures:
+        persist_formal_state("incomplete")
         raise RuntimeError(f"official formal task failures: {len(failures)}")
     results.sort(key=lambda row: (str(row["learner"]), int(row["policy_seed"])))
     summary = aggregate_formal(config, results)
     atomic_write_json(output / "rows.json", results)
     atomic_write_json(output / "summary.json", summary)
+    persist_formal_state(str(summary["implementation_status"]))
     return summary
 
 
@@ -999,8 +1081,13 @@ def validate_config(config: Mapping[str, Any], stage: str) -> dict[str, Any]:
     gate_path = REPO / str(config["gate_artifact"])
     if sha256_file(gate_path) != str(config["gate_artifact_sha256"]):
         raise RuntimeError("standard learner gate hash mismatch")
-    if tuple(config["methods"]) != METHODS:
-        raise RuntimeError(f"standard learner methods must remain {METHODS}")
+    methods = tuple(config["methods"])
+    if (
+        methods[:3] != METHODS[:3]
+        or len(methods) != 4
+        or methods[3] not in BRERO_METHOD_LABELS
+    ):
+        raise RuntimeError("standard learner method grid changed")
     if set(config["learners"]) != set(LEARNER_MODES):
         raise RuntimeError("standard learner modes changed")
     seed_sets = [
@@ -1013,11 +1100,50 @@ def validate_config(config: Mapping[str, Any], stage: str) -> dict[str, Any]:
     for index, left in enumerate(seed_sets):
         if any(left & right for right in seed_sets[index + 1 :]):
             raise RuntimeError("standard learner seed roles overlap")
+    image_id = resolve_docker_image_id(str(config["docker_image"]))
+    expected_image_id = config.get("docker_image_id")
+    if expected_image_id is not None and image_id != str(expected_image_id):
+        raise RuntimeError(
+            f"standard learner Docker image changed: expected "
+            f"{expected_image_id}, got {image_id}"
+        )
     artifacts = {
         "official_source": source,
         "gate_artifact_sha256": str(config["gate_artifact_sha256"]),
-        "docker_image_id": resolve_docker_image_id(str(config["docker_image"])),
+        "docker_image_id": image_id,
     }
+    if "adapter_source_bundle_sha256" in config:
+        label = subprocess.check_output(
+            [
+                "docker",
+                "inspect",
+                "--type",
+                "image",
+                "--format",
+                '{{ index .Config.Labels "org.opencontainers.image.ace_rl_abce_source_sha256" }}',
+                image_id,
+            ],
+            text=True,
+        ).strip()
+        if label != str(config["adapter_source_bundle_sha256"]):
+            raise RuntimeError("standard learner Docker source label changed")
+        artifacts["adapter_source_bundle_sha256"] = label
+    if "parent_docker_image_id" in config:
+        parent_id = resolve_docker_image_id(str(config["parent_docker_image"]))
+        if parent_id != str(config["parent_docker_image_id"]):
+            raise RuntimeError("standard learner parent Docker image changed")
+        artifacts["parent_docker_image_id"] = parent_id
+    for path_key, hash_key in (
+        ("protocol_file", "protocol_file_sha256"),
+        ("execution_amendment_file", "execution_amendment_file_sha256"),
+    ):
+        if path_key not in config and hash_key not in config:
+            continue
+        path = REPO / str(config[path_key])
+        actual = sha256_file(path)
+        if actual != str(config[hash_key]):
+            raise RuntimeError(f"standard learner frozen artifact changed: {path}")
+        artifacts[hash_key] = actual
     if stage == "formal":
         artifact_path = REPO / str(config["selection_artifact"])
         if sha256_file(artifact_path) != str(config["selection_artifact_sha256"]):
@@ -1081,9 +1207,9 @@ def main() -> None:
             config["base_episodes"] = 2
             config["response_episodes"] = 2
     artifacts = validate_config(config, args.stage if not args.engineering_smoke else "validation")
-    dirty = subprocess.check_output(
-        ["git", "status", "--porcelain"], cwd=REPO, text=True
-    ).strip()
+    dirty = formal_worktree_violations(
+        str(config.get("managed_artifact_output", "")) or None
+    )
     if dirty and not (args.allow_dirty or args.engineering_smoke):
         raise RuntimeError("official learner run requires a clean committed worktree")
     fingerprint = protocol_fingerprint(config)
@@ -1094,7 +1220,11 @@ def main() -> None:
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
         if manifest_path.exists():
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            if manifest["protocol_fingerprint"] != fingerprint:
+            if (
+                manifest["protocol_fingerprint"] != fingerprint
+                or manifest.get("git_commit") != current_git_commit()
+                or manifest.get("artifacts") != artifacts
+            ):
                 raise RuntimeError("official learner manifest fingerprint mismatch")
         else:
             manifest = {

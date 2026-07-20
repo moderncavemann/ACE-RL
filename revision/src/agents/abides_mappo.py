@@ -12,7 +12,7 @@ from src.agents.mappo import MAPPOConfig, MAPPOTrainer
 from src.envs.abides_docker_env import ABIDESDockerDealerEnv
 
 GateDecision = Callable[[Mapping[str, Any], np.ndarray, int], bool]
-ContractDecision = Callable[[Mapping[str, Any], int], float]
+ContractDecision = Callable[[Mapping[str, Any], int], float | Mapping[str, Any]]
 
 
 def canonical_digest(value: Any) -> str:
@@ -121,6 +121,10 @@ def rollout_episode(
     deterministic: bool = False,
     defer_update: bool = False,
     routing_mechanism: Mapping[str, Any] | None = None,
+    dealer_signal_schedule: Sequence[float] | None = None,
+    dealer_signal_decision: ContractDecision | None = None,
+    signal_audit_schedule: Sequence[Mapping[str, Any]] | None = None,
+    routing_mechanism_schedule: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if gate_schedule is not None and gate_decision is not None:
         raise ValueError("provide either gate_schedule or gate_decision, not both")
@@ -132,6 +136,8 @@ def rollout_episode(
         raise ValueError(
             "provide either announced signal schedule or decision, not both"
         )
+    if dealer_signal_schedule is not None and dealer_signal_decision is not None:
+        raise ValueError("provide either dealer signal schedule or decision, not both")
     if gate_schedule is not None and len(gate_schedule) != episode_steps:
         raise ValueError("gate schedule length must match episode_steps")
     if (
@@ -139,6 +145,28 @@ def rollout_episode(
         and len(announced_signal_schedule) != episode_steps
     ):
         raise ValueError("announced signal schedule length must match episode_steps")
+    for name, schedule in (
+        ("dealer signal", dealer_signal_schedule),
+        ("signal audit", signal_audit_schedule),
+        ("routing mechanism", routing_mechanism_schedule),
+    ):
+        if schedule is not None and len(schedule) != episode_steps:
+            raise ValueError(f"{name} schedule length must match episode_steps")
+    if routing_mechanism is not None and routing_mechanism_schedule is not None:
+        raise ValueError(
+            "provide either a static routing mechanism or a mechanism schedule"
+        )
+
+    def contract_value(
+        value: float | Mapping[str, Any],
+    ) -> tuple[float, dict[str, Any]]:
+        if isinstance(value, Mapping):
+            audit = dict(value)
+            raw = audit.get("applied_signal", audit.get("strength"))
+            if raw is None:
+                raise ValueError("contract decision mapping has no applied signal")
+            return float(np.clip(float(raw), 0.0, 1.0)), audit
+        return float(np.clip(float(value), 0.0, 1.0)), {}
 
     state = env.reset(seed=seed)
     obs_rows = []
@@ -150,17 +178,36 @@ def rollout_episode(
     records = []
     for step in range(episode_steps):
         announced_strength: float | None = None
+        signal_audit: dict[str, Any] = (
+            {}
+            if signal_audit_schedule is None
+            else dict(signal_audit_schedule[step])
+        )
         if announced_signal_schedule is not None:
             announced_strength = float(
                 np.clip(float(announced_signal_schedule[step]), 0.0, 1.0)
             )
         elif announced_signal_decision is not None:
-            announced_strength = float(
-                np.clip(float(announced_signal_decision(state, step)), 0.0, 1.0)
+            announced_strength, decision_audit = contract_value(
+                announced_signal_decision(state, step)
             )
+            signal_audit = {**decision_audit, **signal_audit}
+        dealer_strength = announced_strength
+        if dealer_signal_schedule is not None:
+            dealer_strength = float(
+                np.clip(float(dealer_signal_schedule[step]), 0.0, 1.0)
+            )
+        elif dealer_signal_decision is not None:
+            dealer_strength, dealer_audit = contract_value(
+                dealer_signal_decision(state, step)
+            )
+            signal_audit = {
+                **signal_audit,
+                "dealer_signal_decision": dealer_audit,
+            }
         obs = actor_observations(
             state,
-            gate_signal=0.0 if announced_strength is None else announced_strength,
+            gate_signal=0.0 if dealer_strength is None else dealer_strength,
         )
         critic = centralized_critic_observations(state, obs, episode_steps)
         action_uniforms = None
@@ -174,6 +221,8 @@ def rollout_episode(
         pre_state_digest = canonical_digest(
             {"observations": state["observations"], "info": state["info"]}
         )
+        actor_observation_digest = canonical_digest(obs.tolist())
+        critic_observation_digest = canonical_digest(critic.tolist())
         actions, logp, values = trainer.act(
             obs,
             critic,
@@ -188,12 +237,17 @@ def rollout_episode(
             active = bool(gate_decision(state, actions, step))
         else:
             active = False
+        step_routing_mechanism = (
+            routing_mechanism
+            if routing_mechanism_schedule is None
+            else routing_mechanism_schedule[step]
+        )
         next_state = env.step(
             actions,
             gate_active=active,
             routing_enabled=routing_enabled,
             routing_strength=announced_strength,
-            routing_mechanism=routing_mechanism,
+            routing_mechanism=step_routing_mechanism,
         )
         rewards = np.asarray(next_state["rewards"], dtype=float) / reward_scale
         obs_rows.append(obs)
@@ -210,11 +264,27 @@ def rollout_episode(
                 "gate_signal": (
                     0.0 if announced_strength is None else announced_strength
                 ),
+                "platform_applied_signal": (
+                    0.0 if announced_strength is None else announced_strength
+                ),
+                "dealer_observed_signal": (
+                    0.0 if dealer_strength is None else dealer_strength
+                ),
+                "signal_audit": signal_audit,
                 "pre_state_digest": pre_state_digest,
+                "actor_observation_digest": actor_observation_digest,
+                "critic_observation_digest": critic_observation_digest,
                 "action_uniform_digest": action_uniform_digest,
                 "pre_info": dict(state["info"]),
                 "pre_observations": state["observations"],
                 "info": dict(next_state["info"]),
+                "post_observations": next_state["observations"],
+                "post_state_digest": canonical_digest(
+                    {
+                        "observations": next_state["observations"],
+                        "info": next_state["info"],
+                    }
+                ),
                 "rewards_unscaled": list(next_state["rewards"]),
                 "post_agents": list(next_state["agents"]),
                 "mean_reward_unscaled": float(np.mean(next_state["rewards"])),
@@ -259,5 +329,8 @@ def rollout_episode(
         ),
         "mean_gate_signal": float(
             np.mean([record["gate_signal"] for record in records])
+        ),
+        "mean_dealer_observed_signal": float(
+            np.mean([record["dealer_observed_signal"] for record in records])
         ),
     }

@@ -433,3 +433,43 @@ always-on achieve lower raw spread through much more aggressive intervention;
 always-on remains non-asymptotic in 8/20 seeds and is reported as a fixed-
 budget control. See
 `revision/notes/abides_mappo_adaptive_v5_full_main_v1_summary.md`.
+
+## ABCE Formal Follow-up
+
+The ABCE follow-up is frozen by
+`revision/notes/abides_abce_formal_experiment_protocol_v1.md` and its execution
+amendment. The compact primary experiment retrains all nine timing/allocation
+arms from the same frozen seed-specific base checkpoints, response paths, and
+action-uniform namespaces. The separate official-learner holdout uses the
+pinned upstream MAPPO implementation in both MAPPO and IPPO modes with the
+risk-only gate input. Engineering smoke outcomes are never interpreted as
+efficacy evidence.
+
+Run the two development-only implementation checks before committing the
+formal configuration:
+
+```bash
+python3 revision/experiments/run_abides_abce_primary_followup.py \
+  --config revision/configs/abides_abce_primary_followup_smoke_v1.json
+python3 revision/experiments/run_abides_standard_learner_holdout.py \
+  --config revision/configs/abides_standard_learner_exact_risk_only_holdout_v1.json \
+  --stage formal --engineering-smoke
+```
+
+After the protocol, configurations, and implementation are committed, use the
+single resume-safe formal entry point:
+
+```bash
+python3 revision/experiments/run_abides_abce_pipeline.py --preflight-only
+python3 revision/experiments/run_abides_abce_pipeline.py
+python3 revision/experiments/run_abides_abce_pipeline.py --status
+```
+
+The pipeline writes atomic per-policy checkpoints, per-task progress logs,
+stage receipts, a central JSON state file, and a human-readable logbook. A
+rerun resumes only missing work after checking the Git commit, protocol and
+config fingerprints, Docker image IDs, frozen artifacts, and completed-result
+hashes. Development tuning may use only the `510xxx/69xxxx` namespaces.
+Formal `530xxx/534xxx` and official-learner `560xxx/562xxx` outcomes cannot be
+used for parameter search; weak or reversed results invoke the preregistered
+claim-narrowing rules.

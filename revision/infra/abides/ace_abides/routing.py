@@ -294,6 +294,7 @@ class RoutedOrderBook(OrderBook):
                 "route_kind": order.route_kind,
                 "eligible_agent_ids": tuple(order.eligible_agent_ids),
                 "matched_agent_id": matched_order.agent_id,
+                "side": "BUY" if order.side.is_bid() else "SELL",
                 "quantity": matched_order.quantity,
                 "price": matched_order.fill_price,
                 "used_fallback": used_fallback,
