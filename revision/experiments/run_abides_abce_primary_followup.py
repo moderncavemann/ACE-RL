@@ -1378,7 +1378,6 @@ def persist_state(
 
 def execute(config: dict[str, Any], config_path: Path, args: argparse.Namespace) -> dict[str, Any]:
     output = REPO / str(config["output_dir"])
-    output.mkdir(parents=True, exist_ok=True)
     fingerprint = protocol_fingerprint(config)
     artifacts = validate_inputs(config, config_path)
     runtime = {
@@ -1386,6 +1385,27 @@ def execute(config: dict[str, Any], config_path: Path, args: argparse.Namespace)
         "docker_image_id": artifacts["docker_image_id"],
     }
     manifest_path = output / "manifest.json"
+    if args.preflight_only:
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if (
+                manifest.get("protocol_fingerprint") != fingerprint
+                or manifest.get("git_commit") != runtime["git_commit"]
+                or manifest.get("artifacts") != artifacts
+            ):
+                raise RuntimeError("ABCE preflight found an incompatible manifest")
+        elif any(result_path(output, int(seed)).exists() for seed in config["policy_seeds"]):
+            raise RuntimeError("ABCE preflight found results without a manifest")
+        results = load_completed(config, output, fingerprint)
+        return {
+            "status": "preflight_pass",
+            "protocol_fingerprint": fingerprint,
+            "artifacts": artifacts,
+            "pending_policy_seeds": pending_policy_seeds(
+                config["policy_seeds"], results
+            ),
+        }
+    output.mkdir(parents=True, exist_ok=True)
     if manifest_path.exists():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         if (
@@ -1421,13 +1441,6 @@ def execute(config: dict[str, Any], config_path: Path, args: argparse.Namespace)
             },
         )
         persist_state(config, output, results, failures, "running")
-        if args.preflight_only:
-            return {
-                "status": "preflight_pass",
-                "protocol_fingerprint": fingerprint,
-                "artifacts": artifacts,
-                "pending_policy_seeds": pending,
-            }
         workers = min(int(args.workers or config["workers"]), max(len(pending), 1))
         if pending:
             with ProcessPoolExecutor(max_workers=workers) as pool:

@@ -337,10 +337,13 @@ def run_command_stage(
                 if process.poll() is None:
                     process.terminate()
                     try:
-                        process.wait(timeout=30)
+                        process.wait(timeout=60)
                     except subprocess.TimeoutExpired:
                         process.kill()
-                        process.wait(timeout=10)
+                        try:
+                            process.wait(timeout=30)
+                        except subprocess.TimeoutExpired:
+                            pass
                 raise SystemExit(128 + signum)
 
             previous_term = signal.signal(signal.SIGTERM, terminate_child)
@@ -508,18 +511,32 @@ def main() -> None:
     artifact = (REPO / args.artifact).resolve()
     output = (REPO / args.output).resolve()
     if args.status:
+        if not (output / "pipeline_state.json").is_file():
+            print(
+                json.dumps(
+                    {
+                        "pipeline_version": PIPELINE_VERSION,
+                        "status": "not_started",
+                        "current_stage": None,
+                        "current_pid_alive": False,
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return
         state = load_json(output / "pipeline_state.json")
         pid = state.get("stages", {}).get(state.get("current_stage"), {}).get("pid")
         state["current_pid_alive"] = bool(pid) and _pid_alive(int(pid))
         print(json.dumps(state, indent=2, sort_keys=True))
         return
-    output.mkdir(parents=True, exist_ok=True)
     preflight_receipt = preflight(
         smoke_config_path, primary_config_path, official_config_path, artifact
     )
     if args.preflight_only:
         print(json.dumps({"status": "pass", **preflight_receipt}, indent=2, sort_keys=True))
         return
+    output.mkdir(parents=True, exist_ok=True)
     primary = load_json(primary_config_path)
     official = load_json(official_config_path)
     commands = pipeline_commands(primary_config_path, official_config_path, artifact)
