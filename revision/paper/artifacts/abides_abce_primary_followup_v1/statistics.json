@@ -1,0 +1,1372 @@
+{
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 2026072002,
+  "contrasts": {
+    "A_circular_minus_aligned": {
+      "definition": "circular_shifted_soft_rank - aligned_soft_rank",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "t_interval": {
+        "ci_high": 0.041526321871485083,
+        "ci_low": 0.03557331645351705,
+        "mean": 0.03854981916250107,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 1.1911920431450105e-16,
+        "positive": 20,
+        "se": 0.0014221063072423826,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.05062746158357985,
+        "ci_low": 0.026207676532009276,
+        "mean": 0.03852129318510773,
+        "replicates": 10000,
+        "rng_seed": 2026072003
+      }
+    },
+    "A_exact_random_minus_aligned": {
+      "definition": "exact_random_soft_rank - aligned_soft_rank",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "t_interval": {
+        "ci_high": 0.04358895547686862,
+        "ci_low": 0.036324463156163604,
+        "mean": 0.03995670931651611,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 2.426895500041764e-15,
+        "positive": 20,
+        "se": 0.001735405836689923,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.04710694521887833,
+        "ci_low": 0.032864958635416094,
+        "mean": 0.03989926229956255,
+        "replicates": 10000,
+        "rng_seed": 2026072002
+      }
+    },
+    "A_periodic_minus_aligned": {
+      "definition": "periodic_exact_multiset_soft_rank - aligned_soft_rank",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "t_interval": {
+        "ci_high": 0.0631696265589597,
+        "ci_low": 0.05686033235796125,
+        "mean": 0.06001497945846048,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 9.04946783526837e-20,
+        "positive": 20,
+        "se": 0.001507219706269027,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.07065375347052934,
+        "ci_low": 0.04974389764446195,
+        "mean": 0.0600464478724512,
+        "replicates": 10000,
+        "rng_seed": 2026072004
+      }
+    },
+    "B_lagged_minus_current": {
+      "definition": "lagged_revelation_soft_rank - aligned_soft_rank",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "holm_adjusted_p_value": 3.9453300562088044e-15,
+      "t_interval": {
+        "ci_high": 0.03705414600409637,
+        "ci_low": 0.03072723601186606,
+        "mean": 0.033890691007981213,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 3.9453300562088044e-15,
+        "positive": 20,
+        "se": 0.0015114279214576553,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.03749478549457116,
+        "ci_low": 0.030174103561089197,
+        "mean": 0.033905641127131424,
+        "replicates": 10000,
+        "rng_seed": 2026072005
+      }
+    },
+    "C1_identity_permuted_minus_quote_aligned": {
+      "definition": "identity_permuted_soft_rank - aligned_soft_rank",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "holm_adjusted_p_value": 1.1890251216721831e-24,
+      "t_interval": {
+        "ci_high": 0.23039128990602534,
+        "ci_low": 0.21812684286914538,
+        "mean": 0.22425906638758536,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 3.9634170722406105e-25,
+        "positive": 20,
+        "se": 0.0029298390075950097,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.2329249969613422,
+        "ci_low": 0.21577843215750034,
+        "mean": 0.22424470887290435,
+        "replicates": 10000,
+        "rng_seed": 2026072006
+      }
+    },
+    "C2_hard_best_random_minus_aligned": {
+      "definition": "hard_best_exact_random - hard_best_aligned",
+      "exact_sign_test": {
+        "negative": 0,
+        "non_ties": 20,
+        "p_value_two_sided": 1.9073486328125e-06,
+        "positive": 20,
+        "ties": 0
+      },
+      "holm_adjusted_p_value": 3.690227590705917e-15,
+      "t_interval": {
+        "ci_high": 0.04442040342781874,
+        "ci_low": 0.03711789265868717,
+        "mean": 0.040769148043252955,
+        "n": 20,
+        "negative": 0,
+        "p_value_two_sided": 1.8451137953529587e-15,
+        "positive": 20,
+        "se": 0.0017444880181265129,
+        "ties": 0
+      },
+      "two_way_bootstrap": {
+        "ci_high": 0.04786131844853745,
+        "ci_low": 0.03376579183992783,
+        "mean": 0.04075379938154321,
+        "replicates": 10000,
+        "rng_seed": 2026072007
+      }
+    }
+  },
+  "holm_family": [
+    "B_lagged_minus_current",
+    "C1_identity_permuted_minus_quote_aligned",
+    "C2_hard_best_random_minus_aligned"
+  ],
+  "method_summary": {
+    "aligned_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9378.23594,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.93687077407654
+      },
+      "all_customer_tick_units": {
+        "mean": 12702.105,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.5777763666345
+      },
+      "all_execution_half_spread": {
+        "mean": 6.3510525,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08178888818331706
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30665,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.024151441059762
+      },
+      "dealer_reward_dispersion": {
+        "mean": 254.32767950668034,
+        "n_policy_seeds": 20,
+        "sample_sd": 8.01706490160857
+      },
+      "high_customer_tick_units": {
+        "mean": 3553.1349999999998,
+        "n_policy_seeds": 20,
+        "sample_sd": 41.84496794245713
+      },
+      "high_execution_half_spread": {
+        "mean": 6.440062676226104,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07690309759528936
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.09417385839966483,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.029223506346705126,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0017755437731863178
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.09180372852953496,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.005234278429928804
+      },
+      "low_customer_tick_units": {
+        "mean": 9148.97,
+        "n_policy_seeds": 20,
+        "sample_sd": 122.61825699041873
+      },
+      "low_execution_half_spread": {
+        "mean": 6.307137276933447,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08438549075520067
+      },
+      "maximum_absolute_inventory": {
+        "mean": 39.73,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.7800809674575296
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 8.89714160861908,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.17772685550716738
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.2509,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0011969258869902414
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.06888972222222224,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0007802327067440624
+      },
+      "mean_per_dealer_reward": {
+        "mean": 937.8235940000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.393687077407627
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.840728311088158,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0729557506913481
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06221676035311287,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.001361811252294934
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.8932585087659011,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.018075835849370538
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.3524456666574585,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.082609777169932
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19545,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.003410124245305598
+      },
+      "targeted_customer_quantity": {
+        "mean": 153.40000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "circular_shifted_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9323.50144,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.63052744034874
+      },
+      "all_customer_tick_units": {
+        "mean": 12681.7,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.1931080846116
+      },
+      "all_execution_half_spread": {
+        "mean": 6.34085,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0815965540423059
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.3097,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.024711173692545597
+      },
+      "dealer_reward_dispersion": {
+        "mean": 283.29182928884103,
+        "n_policy_seeds": 20,
+        "sample_sd": 7.62059743618935
+      },
+      "high_customer_tick_units": {
+        "mean": 3490.575,
+        "n_policy_seeds": 20,
+        "sample_sd": 44.011815100277964
+      },
+      "high_execution_half_spread": {
+        "mean": 6.270063717568274,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0824746919393927
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.21535908535908535,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.0694985530744154,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.001364596961371739
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.21389599289599287,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0017918181990808884
+      },
+      "low_customer_tick_units": {
+        "mean": 9191.125,
+        "n_policy_seeds": 20,
+        "sample_sd": 120.14451769256435
+      },
+      "low_execution_half_spread": {
+        "mean": 6.345687096095948,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.082470221187755
+      },
+      "maximum_absolute_inventory": {
+        "mean": 40.864999999999995,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.8387176929223868
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 9.715450031872795,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.11557535420896865
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.25614249999999994,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0014863656665628534
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.07352416666666668,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.000993731612594038
+      },
+      "mean_per_dealer_reward": {
+        "mean": 932.350144,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.363052744034885
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.8362193892372083,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0724684731250704
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06242922340798045,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.001235328638626114
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.8924491202589866,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.01614917087439922
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.355794073024884,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08187266922054276
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19595,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.003186732363706553
+      },
+      "targeted_customer_quantity": {
+        "mean": 163.90000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "exact_random_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9339.188,
+        "n_policy_seeds": 20,
+        "sample_sd": 160.7216197145602
+      },
+      "all_customer_tick_units": {
+        "mean": 12683.970000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 160.4434056639682
+      },
+      "all_execution_half_spread": {
+        "mean": 6.341984999999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08022170283198404
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.3074,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.023716305738768352
+      },
+      "dealer_reward_dispersion": {
+        "mean": 262.3408489151113,
+        "n_policy_seeds": 20,
+        "sample_sd": 5.280092831836053
+      },
+      "high_customer_tick_units": {
+        "mean": 3487.0799999999995,
+        "n_policy_seeds": 20,
+        "sample_sd": 43.57339362017777
+      },
+      "high_execution_half_spread": {
+        "mean": 6.308563676941338,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08055545289777631
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.19440936303839526,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.05972900485056124,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0032909666532293562
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.1817794911182008,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.012533348839997845
+      },
+      "low_customer_tick_units": {
+        "mean": 9196.89,
+        "n_policy_seeds": 20,
+        "sample_sd": 117.72177234569021
+      },
+      "low_execution_half_spread": {
+        "mean": 6.347093986249962,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08123532611988356
+      },
+      "maximum_absolute_inventory": {
+        "mean": 40.80499999999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.9944450978468236
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 9.422312949053927,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.15821897460403517
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.2541375,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.00125214290003388
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.07128583333333334,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0008080199750327844
+      },
+      "mean_per_dealer_reward": {
+        "mean": 933.9188,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.072161971455998
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.8370649676475,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07168067254458381
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06293532555306855,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0010705426021655608
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.897901874366055,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0183031446871268
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.3469143923826845,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08065439027360052
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.1964,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.002779625116715147
+      },
+      "targeted_customer_quantity": {
+        "mean": 158.19999999999996,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "hard_best_aligned": {
+      "aggregate_dealer_reward": {
+        "mean": 9374.230800000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.2818081933967
+      },
+      "all_customer_tick_units": {
+        "mean": 12696.045,
+        "n_policy_seeds": 20,
+        "sample_sd": 162.92858776324758
+      },
+      "all_execution_half_spread": {
+        "mean": 6.3480225,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08146429388162377
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30674999999999997,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.02462535065205858
+      },
+      "dealer_reward_dispersion": {
+        "mean": 253.7856275642514,
+        "n_policy_seeds": 20,
+        "sample_sd": 7.8887468498379905
+      },
+      "high_customer_tick_units": {
+        "mean": 3552.875000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 41.783601353943425
+      },
+      "high_execution_half_spread": {
+        "mean": 6.43887646230114,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07671975974164504
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.09417385839966483,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.030373816710971634,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0018308963270428668
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.0925180142438207,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.004436618110809244
+      },
+      "low_customer_tick_units": {
+        "mean": 9143.170000000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 122.02917727028716
+      },
+      "low_execution_half_spread": {
+        "mean": 6.30336548184321,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08391496937960012
+      },
+      "maximum_absolute_inventory": {
+        "mean": 39.43,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.8098732844353523
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 8.855230426549081,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.2069247199445988
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.2527475,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0011398839968680076
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.07031472222222222,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0007274312263601437
+      },
+      "mean_per_dealer_reward": {
+        "mean": 937.4230800000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.32818081933968
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.8410248261150242,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07278555219776792
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06454435328185396,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.001208115088189321
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.8881185000685742,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.01874436875587833
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.349509651414719,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08228207557604408
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.1956,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.003439706229806325
+      },
+      "targeted_customer_quantity": {
+        "mean": 153.40000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "hard_best_exact_random": {
+      "aggregate_dealer_reward": {
+        "mean": 9334.27982,
+        "n_policy_seeds": 20,
+        "sample_sd": 160.33663571134758
+      },
+      "all_customer_tick_units": {
+        "mean": 12678.204999999998,
+        "n_policy_seeds": 20,
+        "sample_sd": 159.4767875371144
+      },
+      "all_execution_half_spread": {
+        "mean": 6.339102500000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0797383937685572
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30720000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.02377659176142522
+      },
+      "dealer_reward_dispersion": {
+        "mean": 261.9832357883939,
+        "n_policy_seeds": 20,
+        "sample_sd": 5.6178190100673735
+      },
+      "high_customer_tick_units": {
+        "mean": 3486.03,
+        "n_policy_seeds": 20,
+        "sample_sd": 43.56090835648522
+      },
+      "high_execution_half_spread": {
+        "mean": 6.306058010457284,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08095970960316298
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.19440936303839526,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.0618856591463008,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.003936427483458002
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.1830067638454735,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.01250688319588647
+      },
+      "low_customer_tick_units": {
+        "mean": 9192.175000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 116.78173467041641
+      },
+      "low_execution_half_spread": {
+        "mean": 6.344134629886463,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08076995669476898
+      },
+      "maximum_absolute_inventory": {
+        "mean": 40.940000000000005,
+        "n_policy_seeds": 20,
+        "sample_sd": 1.049511164404898
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 9.401042245512766,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.13738843172804047
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.2559425,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0011726347975482654
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.07264083333333335,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0007300837869261477
+      },
+      "mean_per_dealer_reward": {
+        "mean": 933.4279819999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.033663571134742
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.837413576272256,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07157133677339461
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06514539070161476,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0009792581801410561
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.8931477156553292,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.01865185368514114
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.344085823803447,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08031209831728757
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19665000000000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.002906888370749729
+      },
+      "targeted_customer_quantity": {
+        "mean": 158.19999999999996,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "identity_permuted_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9728.21302,
+        "n_policy_seeds": 20,
+        "sample_sd": 148.5611832139756
+      },
+      "all_customer_tick_units": {
+        "mean": 13053.734999999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 149.43158362344468
+      },
+      "all_execution_half_spread": {
+        "mean": 6.5268675,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07471579181172233
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30965,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.02481144684892121
+      },
+      "dealer_reward_dispersion": {
+        "mean": 267.7588074187247,
+        "n_policy_seeds": 20,
+        "sample_sd": 9.304225885152619
+      },
+      "high_customer_tick_units": {
+        "mean": 3572.95,
+        "n_policy_seeds": 20,
+        "sample_sd": 41.1997508934728
+      },
+      "high_execution_half_spread": {
+        "mean": 6.529566278309504,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07445090363518286
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.09417385839966483,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.028385178869569278,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0020638425116469177
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.09000178047758692,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.006386702828063868
+      },
+      "low_customer_tick_units": {
+        "mean": 9480.785,
+        "n_policy_seeds": 20,
+        "sample_sd": 109.02305538400202
+      },
+      "low_execution_half_spread": {
+        "mean": 6.531396343321032,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07547816820880783
+      },
+      "maximum_absolute_inventory": {
+        "mean": 39.605000000000004,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.8425993616248041
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 8.901574562493238,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.16991479909749435
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.250325,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0017863149365751822
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.06871972222222224,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0011025584208897879
+      },
+      "mean_per_dealer_reward": {
+        "mean": 972.8213020000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 14.856118321397565
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.824600286502335,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07382459556495811
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06030552762062826,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0019006790749438078
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": -0.02776713744945989,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.017192756947098185
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.53196683222567,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07512488127090214
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19065000000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.006063479980480208
+      },
+      "targeted_customer_quantity": {
+        "mean": 153.40000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "lagged_revelation_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9434.24192,
+        "n_policy_seeds": 20,
+        "sample_sd": 165.26190686001445
+      },
+      "all_customer_tick_units": {
+        "mean": 12756.745000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 164.66159068637833
+      },
+      "all_execution_half_spread": {
+        "mean": 6.378372499999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08233079534318928
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30879999999999996,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.02394203526502246
+      },
+      "dealer_reward_dispersion": {
+        "mean": 253.27406102638255,
+        "n_policy_seeds": 20,
+        "sample_sd": 6.666106086009444
+      },
+      "high_customer_tick_units": {
+        "mean": 3555.675,
+        "n_policy_seeds": 20,
+        "sample_sd": 41.75290566629999
+      },
+      "high_execution_half_spread": {
+        "mean": 6.455001089121451,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07774104956726594
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.09417385839966483,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.028100404650175465,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0020072953256834863
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.09000178047758692,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.006386702828063868
+      },
+      "low_customer_tick_units": {
+        "mean": 9201.07,
+        "n_policy_seeds": 20,
+        "sample_sd": 123.76183026918663
+      },
+      "low_execution_half_spread": {
+        "mean": 6.341027967941427,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08547128018349823
+      },
+      "maximum_absolute_inventory": {
+        "mean": 39.795,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.7444354978950944
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 8.878871952107286,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.1609352259616447
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.24972250000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0016728068910477488
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.06808472222222221,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0010501444484322605
+      },
+      "mean_per_dealer_reward": {
+        "mean": 943.4241920000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 16.526190686001442
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.8266610623930868,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07261761298690639
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06015371265665083,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.002181670787384312
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.9148924568150075,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.019018185442883875
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.3797960549101775,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0834365923120829
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19030000000000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0067597882246491535
+      },
+      "targeted_customer_quantity": {
+        "mean": 153.40000000000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    },
+    "no_routing": {
+      "aggregate_dealer_reward": {
+        "mean": 9727.157200000003,
+        "n_policy_seeds": 20,
+        "sample_sd": 147.93101913071746
+      },
+      "all_customer_tick_units": {
+        "mean": 13043.529999999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 147.93101913071717
+      },
+      "all_execution_half_spread": {
+        "mean": 6.521764999999999,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07396550956535863
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30844999999999995,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.024258422303018355
+      },
+      "dealer_reward_dispersion": {
+        "mean": 259.2982182861001,
+        "n_policy_seeds": 20,
+        "sample_sd": 4.264845139567558
+      },
+      "high_customer_tick_units": {
+        "mean": 3571.4049999999997,
+        "n_policy_seeds": 20,
+        "sample_sd": 41.46345854770011
+      },
+      "high_execution_half_spread": {
+        "mean": 6.527033578200474,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07424200496534221
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.09417385839966483,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.8476619731297836e-17
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "low_customer_tick_units": {
+        "mean": 9472.125,
+        "n_policy_seeds": 20,
+        "sample_sd": 107.25346700321879
+      },
+      "low_execution_half_spread": {
+        "mean": 6.524370878944504,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07434548940119244
+      },
+      "maximum_absolute_inventory": {
+        "mean": 39.70000000000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 7.290014651212246e-15
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 8.666709562514034,
+        "n_policy_seeds": 20,
+        "sample_sd": 1.8225036628030615e-15
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.21865000000000007,
+        "n_policy_seeds": 20,
+        "sample_sd": 5.695323946259567e-17
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.04918333333333334,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_per_dealer_reward": {
+        "mean": 972.7157200000001,
+        "n_policy_seeds": 20,
+        "sample_sd": 14.793101913071725
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.824381660650084,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07406379283243389
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.52727,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0747261604301436
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "targeted_customer_quantity": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      }
+    },
+    "periodic_exact_multiset_soft_rank": {
+      "aggregate_dealer_reward": {
+        "mean": 9349.004,
+        "n_policy_seeds": 20,
+        "sample_sd": 170.2052369570215
+      },
+      "all_customer_tick_units": {
+        "mean": 12694.52,
+        "n_policy_seeds": 20,
+        "sample_sd": 163.4996333490175
+      },
+      "all_execution_half_spread": {
+        "mean": 6.34726,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08174981667450879
+      },
+      "announced_signal_activation_rate": {
+        "mean": 0.201,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "best_quote_tie_rate": {
+        "mean": 0.30715,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.024096898686673134
+      },
+      "dealer_reward_dispersion": {
+        "mean": 258.05766483824533,
+        "n_policy_seeds": 20,
+        "sample_sd": 8.234473932881723
+      },
+      "high_customer_tick_units": {
+        "mean": 3483.6749999999993,
+        "n_policy_seeds": 20,
+        "sample_sd": 45.243317331489884
+      },
+      "high_execution_half_spread": {
+        "mean": 6.31590240581551,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0843656386588206
+      },
+      "high_risk_announced_signal_activation_rate": {
+        "mean": 0.21612207147691018,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "high_risk_mean_routing_total_variation": {
+        "mean": 0.0681976527760734,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0015045171840506733
+      },
+      "high_risk_realized_routing_activation_rate": {
+        "mean": 0.2145762543907705,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0018812299785292148
+      },
+      "low_customer_tick_units": {
+        "mean": 9210.845,
+        "n_policy_seeds": 20,
+        "sample_sd": 119.2136316604951
+      },
+      "low_execution_half_spread": {
+        "mean": 6.367152256391906,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08202782020704609
+      },
+      "maximum_absolute_inventory": {
+        "mean": 41.589999999999996,
+        "n_policy_seeds": 20,
+        "sample_sd": 1.1135056070097291
+      },
+      "mean_fallback_rate": {
+        "mean": 0.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_fill_ratio": {
+        "mean": 1.0,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0
+      },
+      "mean_inventory_std": {
+        "mean": 9.330287517430571,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.2501880176941262
+      },
+      "mean_maximum_dealer_share": {
+        "mean": 0.25535,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0018359709893362255
+      },
+      "mean_normalized_flow_hhi": {
+        "mean": 0.07179305555555557,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.0012210519051357887
+      },
+      "mean_per_dealer_reward": {
+        "mean": 934.9004000000002,
+        "n_policy_seeds": 20,
+        "sample_sd": 17.020523695702128
+      },
+      "mean_quote_dispersion": {
+        "mean": 0.8363682965995238,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.07231265755072017
+      },
+      "mean_routing_total_variation": {
+        "mean": 0.06261274644823853,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.001131130043106753
+      },
+      "mean_weight_quote_rank_correlation": {
+        "mean": 0.8957745924144774,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.018336448386241676
+      },
+      "mean_weighted_routed_quote": {
+        "mean": 6.354436673255752,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.08231007266559182
+      },
+      "realized_routing_activation_rate": {
+        "mean": 0.19605,
+        "n_policy_seeds": 20,
+        "sample_sd": 0.00323590059049702
+      },
+      "targeted_customer_quantity": {
+        "mean": 157.80000000000004,
+        "n_policy_seeds": 20,
+        "sample_sd": 2.9160058604848984e-14
+      }
+    }
+  }
+}
