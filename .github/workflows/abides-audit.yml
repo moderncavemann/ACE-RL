@@ -59,6 +59,9 @@ jobs:
       - name: Verify ABCE primary follow-up audit bundle
         run: python revision/experiments/verify_abides_abce_primary_followup_v1.py --artifact revision/paper/artifacts/abides_abce_primary_followup_v1 --bundle-only
 
+      - name: Verify exact risk-only learner holdout audit bundle
+        run: python revision/experiments/verify_abides_abce_exact_risk_only_holdout_v1.py --bundle-only
+
       - name: Verify deterministic paper exports
         run: |
           python revision/experiments/export_abides_audit_bundle.py --check

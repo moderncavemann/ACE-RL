@@ -172,9 +172,35 @@ def verify_sums(artifact: Path) -> None:
         raise RuntimeError("ABCE SHA256SUMS file set is incomplete")
 
 
-def compare_statistics(left: Mapping[str, Any], right: Mapping[str, Any]) -> None:
-    if canonical_json(left) != canonical_json(right):
-        raise RuntimeError("ABCE statistics do not recompute from per-path rows")
+def compare_statistics(left: Any, right: Any, path: str = "statistics") -> None:
+    """Compare derived statistics without requiring platform-identical float text."""
+    if isinstance(left, Mapping) and isinstance(right, Mapping):
+        if set(left) != set(right):
+            raise RuntimeError(f"ABCE statistics keys differ at {path}")
+        for key in sorted(left):
+            compare_statistics(left[key], right[key], f"{path}.{key}")
+        return
+    if isinstance(left, Sequence) and not isinstance(left, (str, bytes)):
+        if not isinstance(right, Sequence) or isinstance(right, (str, bytes)):
+            raise RuntimeError(f"ABCE statistics types differ at {path}")
+        if len(left) != len(right):
+            raise RuntimeError(f"ABCE statistics lengths differ at {path}")
+        for index, (left_item, right_item) in enumerate(zip(left, right)):
+            compare_statistics(left_item, right_item, f"{path}[{index}]")
+        return
+    if (
+        isinstance(left, (int, float))
+        and not isinstance(left, bool)
+        and isinstance(right, (int, float))
+        and not isinstance(right, bool)
+    ):
+        if not math.isclose(
+            float(left), float(right), rel_tol=1e-10, abs_tol=1e-12
+        ):
+            raise RuntimeError(f"ABCE statistics differ at {path}")
+        return
+    if left != right:
+        raise RuntimeError(f"ABCE statistics differ at {path}")
 
 
 def verify_trace(

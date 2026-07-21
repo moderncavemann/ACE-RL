@@ -1,8 +1,9 @@
 \begin{table*}[t]
 \centering
-\caption{Transfer across standard learners and pre-frozen $N=10$ market
-ecologies. The paired contrast is matched random minus risk-aware low-risk
-execution half-spread; groups are reported separately and are not pooled.}
+\caption{Exact risk-only timing under official adaptive learners. The primary
+contrast is matched random minus risk-aware low-risk execution half-spread.
+The earlier v5 fresh panel is an independent replication and is not pooled
+with the exact-method holdout.}
 \label{tab:transfer-results}
 \footnotesize
 \setlength{\tabcolsep}{3.0pt}
@@ -14,21 +15,20 @@ execution half-spread; groups are reported separately and are not pooled.}
 Setting & $n$ & Mean & 95\% $t$-CI & Positive & Exact sign $p$
 & Two-way bootstrap 95\% CI & Decision \\
 \midrule
-Official full-policy MAPPO & 10 & 0.18182 & [0.04935, 0.31428] & 8/10
-& 0.10938 & [0.07947, 0.30310] & \textbf{Supported} \\
-Official IPPO & 10 & 0.09397 & [-0.13722, 0.32516] & 7/10
-& 0.34375 & [-0.10179, 0.28988] & \emph{Inconclusive} \\
+Exact risk-only official MAPPO & 10 & 0.11386 & [0.03351, 0.19420] & 9/10
+& 0.02148 & [0.04909, 0.18541] & \textbf{Supported} \\
+Exact risk-only official IPPO & 10 & 0.12352 & [$-0.01658$, 0.26363] & 8/10
+& 0.10938 & [0.01190, 0.24761] & \emph{Inconclusive} \\
 \rowcolor{black!2}
-E1: faster risk transitions & 10 & 0.03328 & [0.02776, 0.03880] & 10/10
-& 0.00195 & [0.02238, 0.04400] & \textbf{Supported} \\
-\rowcolor{black!2}
-E2: weaker informed flow & 10 & 0.03984 & [0.03358, 0.04610] & 10/10
-& 0.00195 & [0.02939, 0.05044] & \textbf{Supported} \\
+Earlier adaptive-v5 fresh panel & 20 & 0.06166 & [0.05786, 0.06547] & 20/20
+& -- & -- & Independent replication \\
 \bottomrule
 \end{tabular*}
 \vspace{2pt}
 \parbox{\textwidth}{\scriptsize
-MAPPO is supported by both interval estimators but has two seed reversals, so
-the exact sign test alone is not significant. IPPO has three reversals and
-remains inconclusive. E1 and E2 use the path-balanced audit estimand.}
+The policy seed is the primary inference unit. MAPPO passes the frozen
+interval rule and has one reversal. IPPO has a positive mean and positive
+two-way bootstrap interval, but its primary policy-seed $t$-interval crosses
+zero; it therefore remains inconclusive. The exact learner specification
+excludes lagged spread severity.}
 \end{table*}

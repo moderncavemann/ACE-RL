@@ -1,36 +1,61 @@
 \begin{table*}[t]
 \centering
-\caption{Main effect and mechanism on the disjoint fresh panel (20 policy
-seeds, 10 paired paths per seed). Positive $\Delta$ means the comparator has
-higher (worse) low-risk execution half-spread than risk-aware routing.}
+\caption{ABCE common-panel results (20 independently adapted policy
+populations, 10 paired paths per population). Panel A reports policy-seed
+mean outcomes. Panel B reports preregistered paired contrasts
+$\Delta=Y_L(\mathrm{comparator})-Y_L(\mathrm{target})$, so positive values
+favor the target.}
 \label{tab:main-results}
-\footnotesize
-\setlength{\tabcolsep}{3.2pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrlc@{}}
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\textbf{Panel A: outcomes, selectivity, and contract mechanism}\par\vspace{2pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{clrrrrrrrr}
 \toprule
-& \multicolumn{1}{c}{Execution} & \multicolumn{2}{c}{Selectivity}
-& \multicolumn{1}{c}{Economic cost} & \multicolumn{2}{c}{Paired timing evidence} \\
-\cmidrule(lr){2-2}\cmidrule(lr){3-4}\cmidrule(lr){5-5}\cmidrule(l){6-7}
-Method &
-\shortstack{Low-risk\\spread $\downarrow$} &
-\shortstack{Signal\\activation (\%)} &
-\shortstack{High-risk\\activation $\downarrow$ (\%)} &
-\shortstack{Reward\\loss $\downarrow$ (\%)} &
-\shortstack{$\Delta$ spread vs. risk-aware\\mean [95\% policy-seed $t$-CI]} &
-\shortstack{Positive\\seeds} \\
+Axis & Contract arm &
+\shortstack{$Y_L$ low-risk\\spread $\downarrow$} &
+\shortstack{$A^{sig}$\\(\%)} &
+\shortstack{$A^{sig}_{H}$\\$\downarrow$ (\%)} &
+\shortstack{Mean routing\\TV} &
+\shortstack{Aggregate\\dealer reward} &
+\shortstack{Inventory\\SD $\downarrow$} &
+\shortstack{Max. $|I|$\\$\downarrow$} &
+\shortstack{Weight--quote\\rank $\rho$} \\
 \midrule
-No intervention & 6.53379 & 0.00 & 0.00 & 0.00 & 0.26036 [0.25357, 0.26714] & 20/20 \\
-\rowcolor{aceRow}
-\textbf{Risk-aware} & \textbf{6.27344} & 20.30 & \textbf{5.13} & 4.21 & -- & -- \\
-Matched random & 6.33510 & 20.30 & 17.95 & 3.94 & 0.06166 [0.05786, 0.06547] & 20/20 \\
-Circular shifted & 6.32778 & 20.30 & 16.48 & 4.04 & 0.05434 [0.05107, 0.05762] & 20/20 \\
-No routing & 6.53105 & 20.30 & 5.13 & 0.04 & 0.25761 [0.25106, 0.26416] & 20/20 \\
+A & \cellcolor{aceRow}\textbf{Aligned soft-rank} & \cellcolor{aceRow}\textbf{6.3071} & \cellcolor{aceRow}20.10 & \cellcolor{aceRow}\textbf{9.42} & \cellcolor{aceRow}0.0622 & \cellcolor{aceRow}9378.24 & \cellcolor{aceRow}8.90 & \cellcolor{aceRow}39.73 & \cellcolor{aceRow}0.893 \\
+A & Exact-multiset random & 6.3471 & 20.10 & 19.44 & 0.0629 & 9339.19 & 9.42 & 40.80 & 0.898 \\
+A & Circular shift & 6.3457 & 20.10 & 21.54 & 0.0624 & 9323.50 & 9.72 & 40.86 & 0.892 \\
+A & Periodic exact multiset & 6.3672 & 20.10 & 21.61 & 0.0626 & 9349.00 & 9.33 & 41.59 & 0.896 \\
+\addlinespace
+B & One-step-lagged revelation & 6.3410 & 20.10 & 9.42 & 0.0602 & 9434.24 & 8.88 & 39.80 & 0.915 \\
+C1 & Identity-permuted soft-rank & 6.5314 & 20.10 & 9.42 & 0.0603 & 9728.21 & 8.90 & 39.61 & $-0.028$ \\
+C2 & Hard-best aligned & 6.3034 & 20.10 & 9.42 & 0.0645 & 9374.23 & 8.86 & 39.43 & 0.888 \\
+C2 & Hard-best exact random & 6.3441 & 20.10 & 19.44 & 0.0651 & 9334.28 & 9.40 & 40.94 & 0.893 \\
+Ref. & No routing & 6.5244 & 20.10 & 9.42 & 0.0000 & 9727.16 & 8.67 & 39.70 & 0.000 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{5pt}
+\textbf{Panel B: confirmatory paired evidence}\par\vspace{2pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}clrrrc@{}}
+\toprule
+Claim & Comparator $-$ target & Mean $\Delta$ & 95\% policy-seed $t$-CI &
+Two-way bootstrap 95\% CI & Positive \\
+\midrule
+A & Exact random $-$ aligned & 0.03996 & [0.03632, 0.04359] & [0.03286, 0.04711] & 20/20 \\
+A & Circular $-$ aligned & 0.03855 & [0.03557, 0.04153] & [0.02621, 0.05063] & 20/20 \\
+A & Periodic $-$ aligned & 0.06001 & [0.05686, 0.06317] & [0.04974, 0.07065] & 20/20 \\
+B & Lagged $-$ current revelation & 0.03389 & [0.03073, 0.03705] & [0.03017, 0.03749] & 20/20 \\
+C1 & Identity-permuted $-$ quote-aligned & 0.22426 & [0.21813, 0.23039] & [0.21578, 0.23292] & 20/20 \\
+C2 & Hard-best random $-$ aligned & 0.04077 & [0.03712, 0.04442] & [0.03377, 0.04786] & 20/20 \\
 \bottomrule
 \end{tabular*}
 \vspace{2pt}
 \parbox{\textwidth}{\scriptsize
-Reward loss is relative to no intervention. All methods route exactly 20
-customer units per decision. Risk-aware and the two timing controls have equal
-announced activation; downstream routing total variation can differ after
-separately adapted dealers choose different quotes.}
+$A^{sig}$ is the announced-contract rate and $A^{sig}_{H}$ is its high-risk
+rate. All A arms have the exact same announced-strength multiset. C1 retains
+the allocation-weight multiset while breaking its dealer--quote identity
+mapping. All six exact sign tests have two-sided $p=1.91\times10^{-6}$; the
+prespecified B/C Holm corrections also reject. No routing is a same-panel
+mechanism reference, not a confirmatory untreated arm.}
 \end{table*}

@@ -1,0 +1,218 @@
+{
+  "artifact_version": "abides_abce_exact_risk_only_learner_holdout_v1",
+  "claim_boundary": "MAPPO is supported when its policy-seed interval excludes zero; IPPO is retained as directional and inconclusive. The Brero-style ABIDES adaptation is unmatched and descriptive only.",
+  "inference_unit": "policy_seed",
+  "learners": {
+    "official_IPPO": {
+      "classification": "positive_direction_inconclusive_interval",
+      "external_baseline_status": "unmatched_descriptive_only",
+      "matched_random_minus_risk_aware": {
+        "exact_sign_test": {
+          "negative": 2,
+          "non_ties": 10,
+          "p_value_two_sided": 0.109375,
+          "positive": 8,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.2636281380711363,
+          "ci_low": -0.016579313733137313,
+          "mean": 0.12352441216899948,
+          "n": 10,
+          "negative": 2,
+          "p_value_two_sided": 0.07723919224585357,
+          "positive": 8,
+          "se": 0.06193368356660593,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.2476144208290375,
+          "ci_low": 0.01190149229785573,
+          "mean": 0.12381474186006039,
+          "replicates": 10000,
+          "rng_seed": 2026072004
+        }
+      },
+      "method_summary": {
+        "brero_threshold_buybox_adaptation": {
+          "activation_rate": 0.8898,
+          "all_customer_cost_tick_units_per_episode": 8651.27,
+          "all_state_execution_half_spread": 4.325635,
+          "dealer_reward_units_per_episode": 7222.85664,
+          "high_execution_half_spread": 4.4778590374144915,
+          "high_risk_activation_rate": 0.8642634552783373,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 6083.84,
+          "low_execution_half_spread": 4.266015070664422,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.1838595,
+          "mean_inventory_std": 10.810083219022916,
+          "mean_reward": 7.22285664,
+          "mean_routing_total_variation": 0.24652000000000002,
+          "mean_signal_strength": 1.0,
+          "mean_volume": 20.0
+        },
+        "matched_random": {
+          "activation_rate": 0.1897,
+          "all_customer_cost_tick_units_per_episode": 12489.6,
+          "all_state_execution_half_spread": 6.2448,
+          "dealer_reward_units_per_episode": 11101.11212,
+          "high_execution_half_spread": 6.347157378791807,
+          "high_risk_activation_rate": 0.15329501982188007,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 8821.52,
+          "low_execution_half_spread": 6.212228071138377,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.16047350000000002,
+          "mean_inventory_std": 9.62609737733412,
+          "mean_reward": 11.10111212,
+          "mean_routing_total_variation": 0.056932740662205404,
+          "mean_signal_strength": 0.14948763200213586,
+          "mean_volume": 20.0
+        },
+        "no_intervention": {
+          "activation_rate": 0.0,
+          "all_customer_cost_tick_units_per_episode": 13598.77,
+          "all_state_execution_half_spread": 6.799385,
+          "dealer_reward_units_per_episode": 12227.5456,
+          "high_execution_half_spread": 6.789144994027953,
+          "high_risk_activation_rate": 0.0,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 9689.48,
+          "low_execution_half_spread": 6.80215126393099,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.145265,
+          "mean_inventory_std": 9.221688195003413,
+          "mean_reward": 12.2275456,
+          "mean_routing_total_variation": 0.0,
+          "mean_signal_strength": 0.0,
+          "mean_volume": 20.0
+        },
+        "risk_aware": {
+          "activation_rate": 0.193,
+          "all_customer_cost_tick_units_per_episode": 12447.23,
+          "all_state_execution_half_spread": 6.223615,
+          "dealer_reward_units_per_episode": 11050.54076,
+          "high_execution_half_spread": 6.532922729624681,
+          "high_risk_activation_rate": 0.05123849632924043,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 8662.43,
+          "low_execution_half_spread": 6.0887036589693775,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.16010950000000002,
+          "mean_inventory_std": 9.871410122126878,
+          "mean_reward": 11.05054076,
+          "mean_routing_total_variation": 0.05760796545176398,
+          "mean_signal_strength": 0.14948763200213586,
+          "mean_volume": 20.0
+        }
+      }
+    },
+    "official_full_policy_MAPPO": {
+      "classification": "favorable_timing_interval",
+      "external_baseline_status": "unmatched_descriptive_only",
+      "matched_random_minus_risk_aware": {
+        "exact_sign_test": {
+          "negative": 1,
+          "non_ties": 10,
+          "p_value_two_sided": 0.021484375,
+          "positive": 9,
+          "ties": 0
+        },
+        "t_interval": {
+          "ci_high": 0.19420182434209737,
+          "ci_low": 0.03351485528977574,
+          "mean": 0.11385833981593656,
+          "n": 10,
+          "negative": 1,
+          "p_value_two_sided": 0.010730906621257605,
+          "positive": 9,
+          "se": 0.03551631418251849,
+          "ties": 0
+        },
+        "two_way_bootstrap": {
+          "ci_high": 0.1854086159127912,
+          "ci_low": 0.04908963099796353,
+          "mean": 0.11343956094889229,
+          "replicates": 10000,
+          "rng_seed": 2026072003
+        }
+      },
+      "method_summary": {
+        "brero_threshold_buybox_adaptation": {
+          "activation_rate": 0.9044,
+          "all_customer_cost_tick_units_per_episode": 8702.0,
+          "all_state_execution_half_spread": 4.351,
+          "dealer_reward_units_per_episode": 7266.94164,
+          "high_execution_half_spread": 4.466455862368122,
+          "high_risk_activation_rate": 0.8830155062723121,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 6098.99,
+          "low_execution_half_spread": 4.287572842578246,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.1882745,
+          "mean_inventory_std": 11.000542294421985,
+          "mean_reward": 7.26694164,
+          "mean_routing_total_variation": 0.254605,
+          "mean_signal_strength": 1.0,
+          "mean_volume": 20.0
+        },
+        "matched_random": {
+          "activation_rate": 0.1882,
+          "all_customer_cost_tick_units_per_episode": 12728.41,
+          "all_state_execution_half_spread": 6.364205,
+          "dealer_reward_units_per_episode": 11339.32336,
+          "high_execution_half_spread": 6.431636348231321,
+          "high_risk_activation_rate": 0.1515798151435175,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 9018.62,
+          "low_execution_half_spread": 6.348261244471311,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.1598225,
+          "mean_inventory_std": 9.630531298329569,
+          "mean_reward": 11.33932336,
+          "mean_routing_total_variation": 0.0562902230488955,
+          "mean_signal_strength": 0.14948763200213586,
+          "mean_volume": 20.0
+        },
+        "no_intervention": {
+          "activation_rate": 0.0,
+          "all_customer_cost_tick_units_per_episode": 13873.7,
+          "all_state_execution_half_spread": 6.93685,
+          "dealer_reward_units_per_episode": 12502.4756,
+          "high_execution_half_spread": 6.9280696620530104,
+          "high_risk_activation_rate": 0.0,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 9883.2,
+          "low_execution_half_spread": 6.940223126759699,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.145265,
+          "mean_inventory_std": 9.221688195003413,
+          "mean_reward": 12.5024756,
+          "mean_routing_total_variation": 0.0,
+          "mean_signal_strength": 0.0,
+          "mean_volume": 20.0
+        },
+        "risk_aware": {
+          "activation_rate": 0.19060000000000002,
+          "all_customer_cost_tick_units_per_episode": 12740.57,
+          "all_state_execution_half_spread": 6.370285,
+          "dealer_reward_units_per_episode": 11347.2086,
+          "high_execution_half_spread": 6.687588107913462,
+          "high_risk_activation_rate": 0.05071218053976675,
+          "high_risk_steps": 28.8,
+          "low_customer_cost_tick_units_per_episode": 8868.41,
+          "low_execution_half_spread": 6.234402904655374,
+          "low_risk_steps": 71.2,
+          "mean_flow_hhi": 0.1600445,
+          "mean_inventory_std": 9.79034771871797,
+          "mean_reward": 11.3472086,
+          "mean_routing_total_variation": 0.057520094285613825,
+          "mean_signal_strength": 0.14948763200213586,
+          "mean_volume": 20.0
+        }
+      }
+    }
+  },
+  "primary_contrast": "matched_random - risk_aware low-risk execution half-spread"
+}

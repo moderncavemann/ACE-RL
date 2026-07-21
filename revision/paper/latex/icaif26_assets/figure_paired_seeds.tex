@@ -5,23 +5,24 @@
 \begin{tikzpicture}
 \begin{axis}[
   width=\linewidth,height=4.15cm,
-  title={(a) Official full-policy MAPPO},
+  title={(a) Exact risk-only official MAPPO},
   title style={font=\small},
   xlabel={Policy seed index},ylabel={Random $-$ risk-aware (ticks)},
-  xmin=0.5,xmax=10.5,ymin=-0.48,ymax=0.66,
+  xmin=0.5,xmax=10.5,ymin=-0.22,ymax=0.57,
   xtick={1,...,10},
   tick label style={font=\scriptsize},label style={font=\scriptsize},
   grid=major,grid style={black!8},axis line style={aceRule}
 ]
 \addplot[black!55,densely dotted,forget plot] coordinates {(0.5,0) (10.5,0)};
 \addplot[aceTeal,only marks,mark=*,mark size=2.2pt]
-  coordinates {(1,0.334204) (3,0.111397) (4,0.596206) (5,0.055117)
-               (6,0.170774) (7,0.161647) (8,0.142740) (9,0.282864)};
+  coordinates {(1,0.021152) (2,0.149134) (3,0.227575) (4,0.038535)
+               (5,0.223389) (6,0.006326) (8,0.077586) (9,0.324178)
+               (10,0.078053)};
 \addplot[aceCoral,only marks,mark=x,mark size=3pt,very thick]
-  coordinates {(2,-0.008178) (10,-0.028606)};
-\addplot[aceNavy,dashed,thick,forget plot] coordinates {(0.5,0.18182) (10.5,0.18182)};
+  coordinates {(7,-0.007346)};
+\addplot[aceNavy,dashed,thick,forget plot] coordinates {(0.5,0.113858) (10.5,0.113858)};
 \node[font=\sffamily\tiny,text=aceNavy,anchor=south east]
-  at (axis cs:10.4,0.18182) {mean $=0.18182$};
+  at (axis cs:10.4,0.113858) {mean $=0.11386$};
 \end{axis}
 \end{tikzpicture}
 \end{minipage}\hfill
@@ -30,33 +31,31 @@
 \begin{tikzpicture}
 \begin{axis}[
   width=\linewidth,height=4.15cm,
-  title={(b) Official IPPO},
+  title={(b) Exact risk-only official IPPO},
   title style={font=\small},
   xlabel={Policy seed index},ylabel={Random $-$ risk-aware (ticks)},
-  xmin=0.5,xmax=10.5,ymin=-0.48,ymax=0.66,
+  xmin=0.5,xmax=10.5,ymin=-0.22,ymax=0.57,
   xtick={1,...,10},
   tick label style={font=\scriptsize},label style={font=\scriptsize},
   grid=major,grid style={black!8},axis line style={aceRule}
 ]
 \addplot[black!55,densely dotted,forget plot] coordinates {(0.5,0) (10.5,0)};
 \addplot[aceBlue,only marks,mark=*,mark size=2.2pt]
-  coordinates {(1,0.600340) (3,0.245091) (4,0.420022) (5,0.026658)
-               (6,0.225665) (9,0.060219) (10,0.265123)};
+  coordinates {(1,0.316300) (2,0.053545) (5,0.052040) (6,0.146135)
+               (7,0.517810) (8,0.010733) (9,0.241499) (10,0.121231)};
 \addplot[aceCoral,only marks,mark=x,mark size=3pt,very thick]
-  coordinates {(2,-0.283608) (7,-0.180823) (8,-0.439002)};
-\addplot[aceNavy,dashed,thick,forget plot] coordinates {(0.5,0.09397) (10.5,0.09397)};
+  coordinates {(3,-0.064763) (4,-0.159285)};
+\addplot[aceNavy,dashed,thick,forget plot] coordinates {(0.5,0.123524) (10.5,0.123524)};
 \node[font=\sffamily\tiny,text=aceNavy,anchor=south east]
-  at (axis cs:10.4,0.09397) {mean $=0.09397$};
+  at (axis cs:10.4,0.123524) {mean $=0.12352$};
 \end{axis}
 \end{tikzpicture}
 \end{minipage}
-\caption{Policy-seed paired contrasts for the standard-learner holdout.
-Positive dots favor risk-aware timing; crosses mark reversals. MAPPO has two
-reversals and intervals excluding zero, while IPPO has three reversals and
-inconclusive intervals. The figure makes the supported/inconclusive decisions
-visible without hiding seed heterogeneity.}
+\caption{Policy-seed contrasts for the exact risk-only learner holdout.
+Positive dots favor risk-aware timing; crosses mark reversals. MAPPO has one
+reversal and passes the primary interval rule. IPPO has two reversals and its
+primary policy-seed interval crosses zero.}
 \label{fig:paired-seeds}
-\Description{Two paired-seed scatter plots show ten policy-seed contrasts for
-official MAPPO and IPPO. Positive points favor risk-aware timing and crosses
-mark the two MAPPO and three IPPO reversals.}
+\Description{Two policy-seed scatter plots show ten paired contrasts for
+official MAPPO and IPPO. Nine MAPPO and eight IPPO contrasts are positive.}
 \end{figure*}

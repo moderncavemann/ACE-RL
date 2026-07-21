@@ -41,17 +41,20 @@
     node[right,font=\sffamily\tiny,text=aceCoral]{frozen parameters} (signal.north);
 
   % Causal controls and post-hoc interpretation.
-  \node[ace box,fill=white,minimum width=4.25cm,minimum height=0.95cm]
-    (timingctl) at (4.3,0.95) {\textbf{Timing controls}\\
-      matched random: same signal multiset $\mid$
-      circular shift: displaced alignment};
+  \node[ace box,fill=white,minimum width=3.8cm,minimum height=0.95cm]
+    (timingctl) at (2.55,0.95) {\textbf{A: alignment controls}\\
+      exact random $\mid$ circular $\mid$ periodic};
+  \node[ace box,fill=white,minimum width=2.75cm,minimum height=0.95cm]
+    (revealctl) at (6.65,0.95) {\textbf{B: revelation}\\
+      current vs. one-step lag};
+  \node[ace box,fill=white,minimum width=4.85cm,minimum height=0.95cm]
+    (routectl) at (11.25,0.95) {\textbf{C: allocation controls}\\
+      identity permutation $\mid$ hard-best $\mid$ no routing};
   \node[ace box,fill=white,minimum width=2.9cm,minimum height=0.95cm]
-    (routectl) at (11.9,0.95) {\textbf{Channel control}\\
-      same $u_t$, no reallocation};
-  \node[ace box,fill=white,minimum width=3.15cm,minimum height=0.95cm]
-    (posthoc) at (15.75,0.95) {\textbf{Post-hoc boundary}\\
+    (posthoc) at (15.75,0.95) {\textbf{Outcome boundary}\\
       low/high-risk outcomes; $z_t$\\never enters runtime};
   \draw[ace dashed] (timingctl.north) -- (signal.south);
+  \draw[ace dashed] (revealctl.north) -- (announce.south);
   \draw[ace dashed] (routectl.north) -- (routing.south);
   \draw[ace dashed] (exchange.south) -- (posthoc.north);
 
@@ -80,13 +83,15 @@
 used only to fit the public-risk proxy and to stratify outcomes post hoc. At
 runtime, the platform computes and announces $u_t$ from lagged public history
 before dealers quote; only then does it use current quotes to reallocate a
-bounded share of fixed customer volume through soft-rank routing. Matched
-random and circular shift isolate timing, no routing isolates the economic
-channel, and all arms retain paired step-level audit records.}
+bounded share of fixed customer volume through quote-sensitive routing.
+Exact-random, circular, and periodic schedules isolate state alignment;
+one-step-lagged revelation isolates current contract visibility; identity
+permutation and no routing isolate the quote--allocation channel; hard-best
+tests a second allocation family. All arms retain paired step-level records.}
 \label{fig:framework}
 \Description{The diagram separates offline proxy calibration from runtime
 information flow. At runtime, lagged public state produces a pre-quote signal,
-dealers quote after observing it, and post-quote soft-rank routing reallocates
-fixed customer volume through ABIDES. Timing and routing controls feed into a
-paired audit layer.}
+dealers quote after observing it, and post-quote routing reallocates fixed
+customer volume through ABIDES. Alignment, revelation, and allocation controls
+feed into a paired audit layer.}
 \end{figure*}

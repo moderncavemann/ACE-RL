@@ -7,6 +7,7 @@ import argparse
 import csv
 import gzip
 import hashlib
+import io
 import json
 import re
 import shutil
@@ -31,11 +32,14 @@ SOURCE_FILES = {
     "revision/src/envs/abides_docker_env.py",
     "revision/src/interventions/__init__.py",
     "revision/src/interventions/abides_gate.py",
+    "revision/src/interventions/abides_abce.py",
     "revision/src/interventions/abides_literature_baselines.py",
     "revision/src/utils/__init__.py",
     "revision/src/utils/abides_audit.py",
+    "revision/src/utils/abides_abce_audit.py",
     # Dockerized ABIDES matching-engine integration used by the final runs.
     "revision/infra/abides/Dockerfile",
+    "revision/infra/abides/Dockerfile.abce",
     "revision/infra/abides/Dockerfile.domain-benchmark",
     "revision/infra/abides/README.md",
     "revision/infra/abides/ace_abides/__init__.py",
@@ -56,6 +60,8 @@ SOURCE_FILES = {
     # Frozen current configurations. Development v1-v4 cells are excluded. The
     # three current smoke configs are retained only as regression-test fixtures.
     "revision/configs/abides_adaptive_gate_shift_diagnostic_v1.json",
+    "revision/configs/abides_abce_primary_followup_smoke_v1.json",
+    "revision/configs/abides_abce_primary_followup_v1.json",
     "revision/configs/abides_collusion_diagnostic_v1.json",
     "revision/configs/abides_domain_baseline_calibration_v1.json",
     "revision/configs/abides_domain_baseline_calibration_v1_artifact.json",
@@ -76,6 +82,7 @@ SOURCE_FILES = {
     "revision/configs/abides_public_risk_proxies_v1/return_only.json",
     "revision/configs/abides_public_risk_proxies_v1/volatility_only.json",
     "revision/configs/abides_standard_learner_holdout_v1.json",
+    "revision/configs/abides_standard_learner_exact_risk_only_holdout_v1.json",
     "revision/configs/abides_standard_learner_holdout_v1_selection.json",
     "revision/configs/abides_temporary_commitment_benchmark_v1.json",
     "revision/configs/abides_temporary_commitment_benchmark_smoke_v1.json",
@@ -88,6 +95,8 @@ SOURCE_FILES = {
     "revision/experiments/calibrate_abides_temporary_commitment.py",
     "revision/experiments/diagnose_abides_adaptive_gate_shift.py",
     "revision/experiments/export_abides_audit_bundle.py",
+    "revision/experiments/export_abides_abce_exact_risk_only_holdout_v1.py",
+    "revision/experiments/export_abides_abce_primary_followup.py",
     "revision/experiments/export_abides_collusion_audit_bundle.py",
     "revision/experiments/export_abides_dose_routing_audit_bundle.py",
     "revision/experiments/export_abides_holdout_audit_bundle.py",
@@ -95,6 +104,8 @@ SOURCE_FILES = {
     "revision/experiments/export_abides_temporary_commitment_audit_bundle.py",
     "revision/experiments/fit_abides_public_risk_proxies.py",
     "revision/experiments/run_abides_collusion_diagnostic.py",
+    "revision/experiments/run_abides_abce_pipeline.py",
+    "revision/experiments/run_abides_abce_primary_followup.py",
     "revision/experiments/run_abides_domain_benchmark.py",
     "revision/experiments/run_abides_dose_routing_sensitivity.py",
     "revision/experiments/run_abides_holdout_audit_evaluation.py",
@@ -113,12 +124,17 @@ SOURCE_FILES = {
     "revision/experiments/train_abides_mappo_passive.py",
     "revision/experiments/validate_abides_announced_contract.py",
     "revision/experiments/verify_abides_audit_bundle.py",
+    "revision/experiments/verify_abides_abce_docker_parity.py",
+    "revision/experiments/verify_abides_abce_exact_risk_only_holdout_v1.py",
+    "revision/experiments/verify_abides_abce_primary_followup_v1.py",
     "revision/experiments/verify_abides_collusion_diagnostic.py",
     "revision/experiments/verify_abides_dose_routing_sensitivity.py",
     "revision/experiments/verify_abides_holdout_audit_bundle.py",
     "revision/experiments/verify_abides_temporary_commitment.py",
     # Tests for the current ABIDES implementation and final experiment families.
     "revision/tests/test_abides_adaptive_v5_supplement.py",
+    "revision/tests/test_abides_abce_exact_risk_only_holdout_bundle.py",
+    "revision/tests/test_abides_abce_protocol.py",
     "revision/tests/test_abides_announced_contract.py",
     "revision/tests/test_abides_audit_bundle.py",
     "revision/tests/test_abides_collusion_diagnostic.py",
@@ -137,6 +153,7 @@ SOURCE_FILES = {
     "revision/notes/literature_baseline_mapping_v1.md",
     # Current paper-facing LaTeX figures and tables.
     "revision/paper/latex/icaif26_assets/README.md",
+    "revision/paper/latex/icaif26_assets/figure_abce_trace.tex",
     "revision/paper/latex/icaif26_assets/figure_framework.tex",
     "revision/paper/latex/icaif26_assets/figure_paired_seeds.tex",
     "revision/paper/latex/icaif26_assets/figure_sensitivity.tex",
@@ -148,6 +165,8 @@ SOURCE_FILES = {
 }
 
 EXPERIMENT_DOCS = {
+    "revision/notes/abides_abce_execution_amendment_v1.md",
+    "revision/notes/abides_abce_formal_experiment_protocol_v1.md",
     "revision/notes/abides_mappo_adaptive_v5_full_main_protocol.md",
     "revision/notes/abides_mappo_adaptive_v5_supplement_protocol.md",
     "revision/notes/abides_standard_learner_holdout_v1_protocol.md",
@@ -163,6 +182,8 @@ DOC_MAP: dict[str, str] = {}
 TEST_FILES = tuple(sorted(path for path in SOURCE_FILES if "/tests/" in path))
 
 ARTIFACT_DIRS = {
+    "revision/paper/artifacts/abides_abce_exact_risk_only_learner_holdout_v1",
+    "revision/paper/artifacts/abides_abce_primary_followup_v1",
     "revision/paper/artifacts/abides_audit_bundle_v1",
     "revision/paper/artifacts/abides_collusion_diagnostic_v1",
     "revision/paper/artifacts/abides_dose_routing_sensitivity_v1",
@@ -179,7 +200,7 @@ ARTIFACT_EXCLUDED_NAMES = {
     "completion.json",
 }
 
-TEXT_NAMES = {"Dockerfile", ".gitignore", "SHA256SUMS"}
+TEXT_NAMES = {"Dockerfile", ".gitattributes", ".gitignore", "SHA256SUMS"}
 TEXT_SUFFIXES = {
     ".csv",
     ".json",
@@ -281,6 +302,32 @@ def sanitize_text(
     return text, replacements
 
 
+def sanitize_compressed_jsonl(
+    path: Path, identity_tokens: Iterable[str], commit_tokens: set[str]
+) -> int:
+    """Redact identities and internal commits inside deterministic gzip streams."""
+    with gzip.open(path, "rt", encoding="utf-8") as source:
+        if not any(
+            sanitize_text(line, identity_tokens, commit_tokens)[1] for line in source
+        ):
+            return 0
+
+    temporary = path.with_name(f".{path.name}.tmp")
+    replacements = 0
+    with gzip.open(path, "rt", encoding="utf-8") as source:
+        with temporary.open("wb") as raw:
+            with gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as compressed:
+                with io.TextIOWrapper(compressed, encoding="utf-8") as target:
+                    for line in source:
+                        sanitized, count = sanitize_text(
+                            line, identity_tokens, commit_tokens
+                        )
+                        target.write(sanitized)
+                        replacements += count
+    temporary.replace(path)
+    return replacements
+
+
 def prepare_output(output: Path, force: bool) -> None:
     if output.exists():
         if not force:
@@ -310,8 +357,6 @@ def selected_artifact_files(tracked: set[str]) -> set[str]:
 def source_to_destination(path: str) -> str:
     if path in DOC_MAP:
         return DOC_MAP[path]
-    if path in EXPERIMENT_DOCS:
-        return f"docs/protocols/{Path(path).name}"
     return path
 
 
@@ -326,6 +371,14 @@ def copy_release_files(output: Path) -> tuple[int, int]:
     copied = 0
     for relative in sorted(selected):
         destination = output / source_to_destination(relative)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, destination)
+        copied += 1
+
+    # Frozen configs and tests address protocols by their source-tree paths.
+    # Keep those machine-verifiable paths and add reviewer-facing copies.
+    for relative in sorted(EXPERIMENT_DOCS):
+        destination = output / "docs" / "protocols" / Path(relative).name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, destination)
         copied += 1
@@ -349,6 +402,10 @@ def copy_release_files(output: Path) -> tuple[int, int]:
         if count:
             path.write_text(sanitized, encoding="utf-8")
             replacements += count
+    for path in sorted(output.rglob("*.jsonl.gz")):
+        replacements += sanitize_compressed_jsonl(
+            path, identity_tokens, commit_tokens
+        )
     return copied, replacements
 
 

@@ -24,6 +24,9 @@ from experiments.run_abides_abce_pipeline import (  # noqa: E402
     validate_official_smoke,
     validate_smoke,
 )
+from experiments.verify_abides_abce_primary_followup_v1 import (  # noqa: E402
+    compare_statistics,
+)
 from src.agents.abides_mappo import rollout_episode  # noqa: E402
 from src.interventions.abides_abce import (  # noqa: E402
     circular_schedule,
@@ -271,3 +274,15 @@ def test_pipeline_requires_current_commit_official_risk_only_smoke(
         path.write_text("{}\n", encoding="utf-8")
     receipt = validate_official_smoke(config)
     assert receipt["task_count"] == 2
+
+
+def test_abce_statistics_comparison_is_float_portable_but_strict() -> None:
+    compare_statistics(
+        {"bootstrap": {"ci_low": np.nextafter(0.1, 1.0), "n": 20}},
+        {"bootstrap": {"ci_low": 0.1, "n": 20}},
+    )
+    with pytest.raises(RuntimeError, match="statistics.bootstrap.ci_low"):
+        compare_statistics(
+            {"bootstrap": {"ci_low": 0.100001, "n": 20}},
+            {"bootstrap": {"ci_low": 0.1, "n": 20}},
+        )
