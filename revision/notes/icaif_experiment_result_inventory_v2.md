@@ -100,25 +100,25 @@ emulation, median / p95 / p99 latencies are:
 
 | Control path | Median us | p95 us | p99 us |
 | --- | ---: | ---: | ---: |
-| M1 logistic core | 5.36 | 6.58 | 7.48 |
-| M1 public state to proposal | 154.54 | 177.26 | 209.80 |
-| M2 threshold and pacing | 9.69 | 10.77 | 12.03 |
-| M3 soft-rank allocation | 59.10 | 63.66 | 71.10 |
-| M3 hard-best allocation | 43.84 | 50.40 | 63.72 |
-| Contract end-to-end | 247.90 | 294.13 | 333.79 |
-| Announced no-routing end-to-end | 169.80 | 196.74 | 226.46 |
+| M1 logistic core | 5.21 | 5.98 | 7.06 |
+| M1 public state to proposal | 149.35 | 159.80 | 173.91 |
+| M2 threshold and pacing | 9.39 | 10.53 | 11.31 |
+| M3 soft-rank allocation | 56.09 | 58.63 | 63.87 |
+| M3 hard-best allocation | 41.09 | 43.79 | 46.89 |
+| Contract end-to-end | 230.45 | 244.77 | 280.50 |
+| Announced no-routing end-to-end | 161.28 | 176.69 | 207.55 |
 
-The routing increment over announced no-routing is 78.10 us at the median
-(1.46x). Against the minimal 1.58-us uniform no-contract allocation branch,
-the full contract adds 246.32 us (156.98x); this large ratio reflects the
+The routing increment over announced no-routing is 69.18 us at the median
+(1.43x). Against the minimal 1.56-us uniform no-contract allocation branch,
+the full contract adds 228.89 us (147.49x); this large ratio reflects the
 near-empty reference and should be reported with the absolute time. These are
 control-path microbenchmarks, not complete ABIDES exchange-step or production
 latencies.
 
 The compact response architecture has 14,919 base actor-critic parameters, a
 560-parameter actor adapter, and 6,257 response-trainable parameters when the
-critic is included. Peak profiler process RSS is 68.09 MB; peak container
-cgroup memory is 187.37 MB. The primary compressed trace uses 125,216,735 bytes
+critic is included. Peak profiler process RSS is 67.97 MB; peak container
+cgroup memory is 185.44 MB. The primary compressed trace uses 125,216,735 bytes
 (695.65 bytes/step), the exact-learner trace uses 12,125,886 bytes (151.57
 bytes/step), and the two managed artifacts total 139,963,734 bytes.
 

@@ -92,11 +92,11 @@ is an outcome comparator, not a risk classifier.
 
 The non-outcome efficiency profile uses the formal ABCE `linux/amd64` Docker
 image with one CPU/thread, fixed `N=10`, and 100,000 measured calls per module.
-Median / p95 / p99 contract control-path latency is 247.90 / 294.13 / 333.79
-microseconds. The announced no-routing path is 169.80 / 196.74 / 226.46
-microseconds, so the median routing increment is 78.10 microseconds (1.46x).
+Median / p95 / p99 contract control-path latency is 230.45 / 244.77 / 280.50
+microseconds. The announced no-routing path is 161.28 / 176.69 / 207.55
+microseconds, so the median routing increment is 69.18 microseconds (1.43x).
 The 560-parameter actor adapter yields 6,257 response-trainable parameters when
-the critic is included. Peak process RSS is 68.09 MB. These measurements ran
+the critic is included. Peak process RSS is 67.97 MB. These measurements ran
 under Docker architecture emulation on Apple Silicon; they are not complete
 ABIDES-step or native production latency and do not support a negligible
 overhead claim.

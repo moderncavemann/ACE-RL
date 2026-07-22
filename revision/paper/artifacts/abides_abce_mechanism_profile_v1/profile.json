@@ -1,77 +1,77 @@
 {
   "end_to_end_overhead": {
-    "median_absolute_microseconds": 246.3187,
-    "median_ratio": 156.9768870314083,
-    "p95_absolute_microseconds": 292.363545,
-    "p95_ratio": 166.8800255319149,
-    "p99_absolute_microseconds": 331.55340100000006,
-    "p99_ratio": 149.4440735805837,
+    "median_absolute_microseconds": 228.89170000000001,
+    "median_ratio": 147.490688,
+    "p95_absolute_microseconds": 243.170915,
+    "p95_ratio": 153.35270549243342,
+    "p99_absolute_microseconds": 278.40672600000033,
+    "p99_ratio": 133.82611554066173,
     "reference": "minimal uniform no-contract allocation construction"
   },
   "latency": {
     "announced_no_routing_end_to_end": {
-      "mean_microseconds": 174.41419752,
-      "median_microseconds": 169.8,
-      "p95_microseconds": 196.73854,
-      "p99_microseconds": 226.45690800000008,
+      "mean_microseconds": 163.89569036,
+      "median_microseconds": 161.2791,
+      "p95_microseconds": 176.6875,
+      "p99_microseconds": 207.54796700000003,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 14.26915169648622
+      "sample_sd_microseconds": 12.388121657143035
     },
     "contract_on_end_to_end": {
-      "mean_microseconds": 255.17674683000004,
-      "median_microseconds": 247.8979,
-      "p95_microseconds": 294.126045,
-      "p99_microseconds": 333.78692500000005,
+      "mean_microseconds": 233.21048262,
+      "median_microseconds": 230.45420000000001,
+      "p95_microseconds": 244.76702,
+      "p99_microseconds": 280.50275000000033,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 22.547952758674004
+      "sample_sd_microseconds": 12.558864321497486
     },
     "m1_logistic_core": {
-      "mean_microseconds": 5.6006595699999995,
-      "median_microseconds": 5.3625,
-      "p95_microseconds": 6.5791,
-      "p99_microseconds": 7.4792830000000015,
+      "mean_microseconds": 5.371063040000001,
+      "median_microseconds": 5.208399999999999,
+      "p95_microseconds": 5.975209999999997,
+      "p99_microseconds": 7.062583000000002,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 3.224005909641444
+      "sample_sd_microseconds": 2.2883763903445486
     },
     "m1_state_to_proposal": {
-      "mean_microseconds": 158.35481211,
-      "median_microseconds": 154.53539999999998,
-      "p95_microseconds": 177.26270499999998,
-      "p99_microseconds": 209.804283,
+      "mean_microseconds": 150.68802222999997,
+      "median_microseconds": 149.3458,
+      "p95_microseconds": 159.79642499999997,
+      "p99_microseconds": 173.90889900000002,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 13.489774197312267
+      "sample_sd_microseconds": 7.778511910267068
     },
     "m2_threshold_pacing": {
-      "mean_microseconds": 9.88998347,
-      "median_microseconds": 9.6875,
-      "p95_microseconds": 10.771309999999993,
-      "p99_microseconds": 12.029351000000005,
+      "mean_microseconds": 9.571187409999999,
+      "median_microseconds": 9.3875,
+      "p95_microseconds": 10.533299999999999,
+      "p99_microseconds": 11.312541000000001,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 0.7392668484363943
+      "sample_sd_microseconds": 0.46789158880490606
     },
     "m3_hard_best": {
-      "mean_microseconds": 45.028171070000006,
-      "median_microseconds": 43.841699999999996,
-      "p95_microseconds": 50.4,
-      "p99_microseconds": 63.72109200000001,
+      "mean_microseconds": 41.587367189999995,
+      "median_microseconds": 41.091699999999996,
+      "p95_microseconds": 43.79190499999999,
+      "p99_microseconds": 46.888459000000026,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 6.4590588750703635
+      "sample_sd_microseconds": 3.151731211785935
     },
     "m3_soft_rank": {
-      "mean_microseconds": 59.792436699999996,
-      "median_microseconds": 59.1042,
-      "p95_microseconds": 63.655654999999975,
-      "p99_microseconds": 71.10468400000002,
+      "mean_microseconds": 56.57187967000001,
+      "median_microseconds": 56.091699999999996,
+      "p95_microseconds": 58.625209999999996,
+      "p99_microseconds": 63.866783,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 7.201423239588456
+      "sample_sd_microseconds": 4.6498977789761335
     },
     "no_contract_allocation": {
-      "mean_microseconds": 1.6136151600000002,
-      "median_microseconds": 1.5792,
-      "p95_microseconds": 1.7625,
-      "p99_microseconds": 2.2335240000000027,
+      "mean_microseconds": 1.58263246,
+      "median_microseconds": 1.5625,
+      "p95_microseconds": 1.5961049999999972,
+      "p99_microseconds": 2.0960240000000026,
       "sample_batches": 10000,
-      "sample_sd_microseconds": 0.1576237472678044
+      "sample_sd_microseconds": 0.11254571141569192
     }
   },
   "measurement": {
@@ -101,18 +101,18 @@
   "protocol_version": "abides_abce_mechanism_profile_v1",
   "resource": {
     "cgroup_memory": {
-      "current_bytes": 187371520,
-      "peak_bytes": 187371520
+      "current_bytes": 185438208,
+      "peak_bytes": 185438208
     },
-    "process_peak_rss_bytes": 68091904
+    "process_peak_rss_bytes": 67973120
   },
   "routing_incremental_overhead": {
-    "median_absolute_microseconds": 78.09789999999998,
-    "median_ratio": 1.4599405182567726,
-    "p95_absolute_microseconds": 97.38750499999998,
-    "p95_ratio": 1.4950097982835493,
-    "p99_absolute_microseconds": 107.33001699999997,
-    "p99_ratio": 1.4739533801282845,
+    "median_absolute_microseconds": 69.17510000000001,
+    "median_ratio": 1.4289154639379809,
+    "p95_absolute_microseconds": 68.07952,
+    "p95_ratio": 1.3853103360452776,
+    "p99_absolute_microseconds": 72.9547830000003,
+    "p99_ratio": 1.3515080588575474,
     "reference": "announced no-routing path with M1 and M2 retained"
   },
   "runtime": {

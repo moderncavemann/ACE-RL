@@ -147,9 +147,9 @@ public volatility and absolute lagged return, never latent simulator risk.
 Spread-only remains an outcome comparator rather than a risk classifier.
 
 A frozen one-CPU `N=10` microbenchmark in the formal ABCE Docker image measures
-median contract control-path latency of 247.90 microseconds (p95 294.13, p99
-333.79). The announced no-routing path is 169.80 microseconds, giving a
-78.10-microsecond median routing increment. The actor adapter has 560
+median contract control-path latency of 230.45 microseconds (p95 244.77, p99
+280.50). The announced no-routing path is 161.28 microseconds, giving a
+69.18-microsecond median routing increment. The actor adapter has 560
 parameters; response training updates 6,257 parameters including the critic.
 Because the `linux/amd64` image runs under architecture emulation on the
 recorded Apple Silicon host, these are reproducibility/accounting measurements,

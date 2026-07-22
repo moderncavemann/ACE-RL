@@ -2,9 +2,9 @@
   "config_path": "revision/configs/abides_abce_mechanism_profile_v1.json",
   "config_sha256": "3e13db4dedb00d9123d6d2ae38b3230778060f61defc4f3acdd81fd7974e9bc8",
   "git": {
-    "commit_before_profile": "b55e445bc9e565a8bd1fd1333916d91d8a570a7b",
+    "commit_before_profile": "ea312932f68bfa840908310998d1f6e0bbff46cf",
     "status_source": "explicit host launch environment",
-    "worktree_dirty_before_profile": true
+    "worktree_dirty_before_profile": false
   },
   "outcome_data_generated": false,
   "profiler_source": {

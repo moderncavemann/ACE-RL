@@ -10,21 +10,21 @@ $N=10$. This is not full exchange-step or native production latency.}
 \toprule
 Module & Median & p95 & p99 \\
 \midrule
-M1 logistic core & 5.36 & 6.58 & 7.48 \\
-M1 state to proposal & 154.54 & 177.26 & 209.80 \\
-M2 threshold/pacing & 9.69 & 10.77 & 12.03 \\
-M3 soft-rank & 59.10 & 63.66 & 71.10 \\
-M3 hard-best & 43.84 & 50.40 & 63.72 \\
-Contract end-to-end & 247.90 & 294.13 & 333.79 \\
-Announced no-routing & 169.80 & 196.74 & 226.46 \\
+M1 logistic core & 5.21 & 5.98 & 7.06 \\
+M1 state to proposal & 149.35 & 159.80 & 173.91 \\
+M2 threshold/pacing & 9.39 & 10.53 & 11.31 \\
+M3 soft-rank & 56.09 & 58.63 & 63.87 \\
+M3 hard-best & 41.09 & 43.79 & 46.89 \\
+Contract end-to-end & 230.45 & 244.77 & 280.50 \\
+Announced no-routing & 161.28 & 176.69 & 207.55 \\
 \bottomrule
 \end{tabular}
 \vspace{2pt}
 \parbox{0.98\columnwidth}{\scriptsize
-The median routing increment over announced no-routing is 78.10 $\mu$s
-(1.46$\times$). The compact base actor-critic has 14,919 parameters; the actor
+The median routing increment over announced no-routing is 69.18 $\mu$s
+(1.43$\times$). The compact base actor-critic has 14,919 parameters; the actor
 adapter has 560, and 6,257 parameters are response-trainable including the
-critic. Peak process RSS is 68.09 MB. The formal \texttt{linux/amd64} Docker
-image ran under architecture emulation on Apple Silicon, so no negligible-
-overhead or deployment-efficiency claim is made.}
+critic. Peak process RSS is 67.97 MB. The formal \texttt{linux/amd64} Docker
+image ran under architecture emulation on Apple Silicon, so no negligible
+overhead or deployment efficiency claim is made.}
 \end{table}
