@@ -1,0 +1,148 @@
+{
+  "end_to_end_overhead": {
+    "median_absolute_microseconds": 246.3187,
+    "median_ratio": 156.9768870314083,
+    "p95_absolute_microseconds": 292.363545,
+    "p95_ratio": 166.8800255319149,
+    "p99_absolute_microseconds": 331.55340100000006,
+    "p99_ratio": 149.4440735805837,
+    "reference": "minimal uniform no-contract allocation construction"
+  },
+  "latency": {
+    "announced_no_routing_end_to_end": {
+      "mean_microseconds": 174.41419752,
+      "median_microseconds": 169.8,
+      "p95_microseconds": 196.73854,
+      "p99_microseconds": 226.45690800000008,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 14.26915169648622
+    },
+    "contract_on_end_to_end": {
+      "mean_microseconds": 255.17674683000004,
+      "median_microseconds": 247.8979,
+      "p95_microseconds": 294.126045,
+      "p99_microseconds": 333.78692500000005,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 22.547952758674004
+    },
+    "m1_logistic_core": {
+      "mean_microseconds": 5.6006595699999995,
+      "median_microseconds": 5.3625,
+      "p95_microseconds": 6.5791,
+      "p99_microseconds": 7.4792830000000015,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 3.224005909641444
+    },
+    "m1_state_to_proposal": {
+      "mean_microseconds": 158.35481211,
+      "median_microseconds": 154.53539999999998,
+      "p95_microseconds": 177.26270499999998,
+      "p99_microseconds": 209.804283,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 13.489774197312267
+    },
+    "m2_threshold_pacing": {
+      "mean_microseconds": 9.88998347,
+      "median_microseconds": 9.6875,
+      "p95_microseconds": 10.771309999999993,
+      "p99_microseconds": 12.029351000000005,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 0.7392668484363943
+    },
+    "m3_hard_best": {
+      "mean_microseconds": 45.028171070000006,
+      "median_microseconds": 43.841699999999996,
+      "p95_microseconds": 50.4,
+      "p99_microseconds": 63.72109200000001,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 6.4590588750703635
+    },
+    "m3_soft_rank": {
+      "mean_microseconds": 59.792436699999996,
+      "median_microseconds": 59.1042,
+      "p95_microseconds": 63.655654999999975,
+      "p99_microseconds": 71.10468400000002,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 7.201423239588456
+    },
+    "no_contract_allocation": {
+      "mean_microseconds": 1.6136151600000002,
+      "median_microseconds": 1.5792,
+      "p95_microseconds": 1.7625,
+      "p99_microseconds": 2.2335240000000027,
+      "sample_batches": 10000,
+      "sample_sd_microseconds": 0.1576237472678044
+    }
+  },
+  "measurement": {
+    "batch_size": 10,
+    "measured_iterations_per_callable": 100000,
+    "n_agents": 10,
+    "single_cpu": true,
+    "thread_limits": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "warmup_iterations_per_callable": 10000
+  },
+  "model_parameters": {
+    "actor_adapter": 560,
+    "adapter_actor_critic_total": 15479,
+    "base_actor_critic_total": 14919,
+    "base_actor_heads": 4550,
+    "base_actor_total": 9222,
+    "base_actor_trunk": 4672,
+    "centralized_critic": 5697,
+    "response_frozen_base_actor": 9222,
+    "response_trainable_including_critic": 6257
+  },
+  "protocol_version": "abides_abce_mechanism_profile_v1",
+  "resource": {
+    "cgroup_memory": {
+      "current_bytes": 187371520,
+      "peak_bytes": 187371520
+    },
+    "process_peak_rss_bytes": 68091904
+  },
+  "routing_incremental_overhead": {
+    "median_absolute_microseconds": 78.09789999999998,
+    "median_ratio": 1.4599405182567726,
+    "p95_absolute_microseconds": 97.38750499999998,
+    "p95_ratio": 1.4950097982835493,
+    "p99_absolute_microseconds": 107.33001699999997,
+    "p99_ratio": 1.4739533801282845,
+    "reference": "announced no-routing path with M1 and M2 retained"
+  },
+  "runtime": {
+    "configured_platform": "linux/amd64",
+    "docker_image": "ace-rl-abides-ace:abce-v1",
+    "docker_image_id": "sha256:351dd23c02b950cd986004ec2695901fe379e561375cc16f2548b041a3bcbff3",
+    "host_architecture_emulation_expected": true,
+    "machine": "x86_64",
+    "numpy": "1.22.0",
+    "python": "3.8.20",
+    "system": "Linux"
+  },
+  "scope": "pure online control-path microbenchmark; excludes ABIDES exchange step",
+  "storage": {
+    "combined_artifact_total_bytes": 139963734,
+    "exact_learner": {
+      "artifact_total_bytes": 12533447,
+      "compressed_bytes_per_step": 151.573575,
+      "compressed_step_trace_bytes": 12125886,
+      "path": "revision/paper/artifacts/abides_abce_exact_risk_only_learner_holdout_v1",
+      "step_records": 80000,
+      "step_trace_sha256": "aa9d8ed626bc55806cfb4979846a75efcc8cdd478370ebbca7c05b39570a7e45"
+    },
+    "primary": {
+      "artifact_total_bytes": 127430287,
+      "compressed_bytes_per_step": 695.6485277777778,
+      "compressed_step_trace_bytes": 125216735,
+      "path": "revision/paper/artifacts/abides_abce_primary_followup_v1",
+      "step_records": 180000,
+      "step_trace_sha256": "ab239b9b590681b6a1f0c2f176f39c7f5c2765d7a7c040cef1661dc9e4a6ff2e"
+    }
+  }
+}

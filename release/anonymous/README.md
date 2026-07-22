@@ -52,6 +52,13 @@ See [docs/RESULTS.md](docs/RESULTS.md) for the complete result inventory and
 [docs/EXPERIMENT_STATUS.md](docs/EXPERIMENT_STATUS.md) for the frozen decision
 boundaries.
 
+The supplementary cost package profiles the frozen online control path without
+retraining or generating outcomes. It reports module and end-to-end latency,
+model/adapter parameters, peak RAM, compressed trace storage, public-risk proxy
+validation, and economic effect sizes. Because the formal `linux/amd64` image
+was profiled under Docker architecture emulation on Apple Silicon, the values
+are reproducibility measurements rather than native deployment claims.
+
 ## Repository Layout
 
 - `revision/src/`: current ABIDES learner, contract, routing, and audit code.

@@ -55,6 +55,12 @@ outcomes, not a total-welfare claim. Current revelation improves low-risk
 execution over lagged revelation but lowers aggregate dealer reward by about
 56 units, so it is not presented as a costless Pareto improvement.
 
+The 0.03996-tick low-risk effect is 0.63% relative to exact random and saves
+47.92 low-risk customer tick-units per episode. High-risk announced exposure
+falls by 51.6%, aggregate dealer reward is 39.05 units higher, and inventory SD
+is 5.6% lower. Aligned all-state spread is 0.0091 ticks worse, so these values
+support selective improvement rather than all-state or total-welfare dominance.
+
 Identity permutation is the strongest channel diagnostic: it preserves the
 allocation-weight multiset and similar routing TV but changes weight-quote
 rank correlation from 0.893 to -0.028 and returns low-risk spread close to the
@@ -74,6 +80,26 @@ Groups are separate and are not pooled.
 MAPPO passes the frozen primary policy-seed interval rule. IPPO remains
 inconclusive even though its mean and two-way bootstrap interval are positive,
 because the primary t interval crosses zero.
+
+## Proxy Validation And Frozen Cost Profile
+
+The final public-risk proxy uses only lagged public volatility and absolute
+lagged return at runtime. On disjoint passive panels of 1,000 training and
+1,000 validation observations, its simulator-supervised low-risk AUC is 0.8284;
+volatility-only and return-only AUCs are 0.7573 and 0.7976. Latent simulator
+risk is an offline label and post-hoc stratum, not a runtime input. Spread-only
+is an outcome comparator, not a risk classifier.
+
+The non-outcome efficiency profile uses the formal ABCE `linux/amd64` Docker
+image with one CPU/thread, fixed `N=10`, and 100,000 measured calls per module.
+Median / p95 / p99 contract control-path latency is 247.90 / 294.13 / 333.79
+microseconds. The announced no-routing path is 169.80 / 196.74 / 226.46
+microseconds, so the median routing increment is 78.10 microseconds (1.46x).
+The 560-parameter actor adapter yields 6,257 response-trainable parameters when
+the critic is included. Peak process RSS is 68.09 MB. These measurements ran
+under Docker architecture emulation on Apple Silicon; they are not complete
+ABIDES-step or native production latency and do not support a negligible
+overhead claim.
 
 ## Earlier Independent Replication
 
@@ -115,6 +141,8 @@ used to replace the exact learner evidence or enlarge the current claim.
 - Brero-style and Banerjee-style adaptations:
   `revision/paper/artifacts/abides_audit_bundle_v1/` and
   `revision/paper/artifacts/abides_temporary_commitment_benchmark_v1/`
+- Frozen proxy, economic-effect, mechanism-latency, parameter, RAM, and storage
+  export: `revision/paper/artifacts/abides_abce_mechanism_profile_v1/`
 
 ## Supported Claim
 

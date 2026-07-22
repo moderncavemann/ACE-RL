@@ -21,6 +21,7 @@ protocols were frozen.
 | Dose curve | Mixed; matched random wins at dose 0.10 and the reversal is retained |
 | Forced-undercut diagnostic | Supports high-spread coordination only; punishment/retaliation claim rejected |
 | Brero/Banerjee ABIDES adaptations | Executable but descriptive because frozen convergence and/or matching gates failed |
+| Frozen efficiency profile | Complete as a non-outcome control-path microbenchmark; no production-efficiency claim |
 
 ## Included Evidence
 
@@ -37,6 +38,9 @@ protocols were frozen.
   bootstrap intervals, and the prespecified B/C Holm corrections;
 - deterministic exporters, strict-raw and bundle-only verifiers, release-local
   SHA-256 hashes, regression tests, and CI checks.
+- a frozen non-outcome mechanism profile with module/end-to-end latency,
+  parameter counts, peak RAM, trace storage, economic-effect export, passive
+  proxy records, and an independent verifier.
 
 Internal source-history provenance is withheld during double-blind review;
 third-party ABIDES and official MAPPO pins remain visible for dependency
@@ -53,6 +57,8 @@ execution in every state and is not a total-welfare result. Use
 Do not claim universal cross-learner performance, allocation-mechanism
 independence, superiority over original external mechanisms, larger-N
 robustness, cross-matching-engine validity, or real-market effectiveness.
+The emulated-container mechanism profile also does not establish native
+production latency, negligible overhead, or full exchange-step efficiency.
 
 The optional same-panel frozen no-intervention descriptive evaluation was not
 needed for A/B/C inference and was not added after seeing outcomes. No routing

@@ -1,0 +1,104 @@
+{
+  "final_two_feature": {
+    "auc_definition": "sklearn-compatible batch expit ROC AUC",
+    "probability_threshold": 0.681,
+    "risk_auc": 0.82840015187247,
+    "runtime_scalar_auc": 0.82840015187247,
+    "source_path": "revision/configs/abides_two_stage_gate_v1.json",
+    "source_sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7"
+  },
+  "offline_only_label": true,
+  "record_export": {
+    "path": "proxy_records.jsonl.gz",
+    "rows": 2000,
+    "sha256": "c204d22e8450df37db1d85d9e38bd08531e9ed22f45bf59ce1e8ae6297e8dd9d"
+  },
+  "runtime_feature_names": [
+    "public_volatility",
+    "absolute_lagged_return"
+  ],
+  "runtime_reads_latent_risk": false,
+  "single_feature": {
+    "return_only": {
+      "activation_rate": 0.217,
+      "feature_name": "absolute_lagged_return",
+      "risk_auc": 0.797648650527543,
+      "runtime_scalar_auc": 0.797648650527543,
+      "source_path": "revision/configs/abides_public_risk_proxies_v1/return_only.json",
+      "source_sha256": "cea9244aa68bfcc8050e53c684c5d54d9851067bd3a9d6f7ceff7d7309682077"
+    },
+    "volatility_only": {
+      "activation_rate": 0.212,
+      "feature_name": "public_volatility",
+      "risk_auc": 0.7572954935587891,
+      "runtime_scalar_auc": 0.757298167369879,
+      "source_path": "revision/configs/abides_public_risk_proxies_v1/volatility_only.json",
+      "source_sha256": "915406c111b5d950a796dd3d74ca99321b74fd407b289aaa6fbcae1b7abcd6fd"
+    }
+  },
+  "split_is_disjoint": true,
+  "spread_only_control": {
+    "dose_cells": {
+      "dose_010": {
+        "realized_budget_within_passive_tolerances": true,
+        "routing_tv_ratio": 0.9941228839448075,
+        "spread_only_minus_risk_aware": {
+          "ci_high": 0.010673795358485082,
+          "ci_low": 0.006193233390100527,
+          "mean": 0.008433514374292805,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 1.339041868239837e-05,
+          "positive": 10,
+          "se": 0.0009903295053849308,
+          "ties": 0
+        },
+        "target_dose": 0.1
+      },
+      "dose_020": {
+        "realized_budget_within_passive_tolerances": true,
+        "routing_tv_ratio": 0.9337775449210112,
+        "spread_only_minus_risk_aware": {
+          "ci_high": 0.026609562406035948,
+          "ci_low": 0.02023372035778456,
+          "mean": 0.023421641381910253,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 4.6153118878108867e-08,
+          "positive": 10,
+          "se": 0.001409239409389039,
+          "ties": 0
+        },
+        "target_dose": 0.2
+      },
+      "dose_030": {
+        "realized_budget_within_passive_tolerances": false,
+        "routing_tv_ratio": 0.8859057639640731,
+        "spread_only_minus_risk_aware": {
+          "ci_high": 0.06361333905771183,
+          "ci_low": 0.05628822079416692,
+          "mean": 0.059950779925939376,
+          "n": 10,
+          "negative": 0,
+          "p_value_two_sided": 3.7883448355107644e-11,
+          "positive": 10,
+          "se": 0.001619056001905504,
+          "ties": 0
+        },
+        "target_dose": 0.3
+      }
+    },
+    "role": "outcome comparator, not a risk classifier",
+    "source_path": "revision/paper/artifacts/abides_dose_routing_sensitivity_v1/statistics.json",
+    "source_sha256": "d281882640bef8a4233dc300da48941120ef2c9f1881d59a5f42daa6f986a079"
+  },
+  "train_records": {
+    "count": 1000,
+    "source_sha256": "2f8ed6644785301cd5e4679d4bf31ea04c44c6f2473a576010322712586d5a0c"
+  },
+  "training_label": "simulator_low_risk",
+  "validation_records": {
+    "count": 1000,
+    "source_sha256": "08e3395a9d054dfdd3ff0cd2cc6682665d2f32a76a25fded474630437807433f"
+  }
+}

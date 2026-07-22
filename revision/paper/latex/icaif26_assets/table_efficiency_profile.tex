@@ -1,0 +1,30 @@
+\begin{table}[t]
+\centering
+\caption{Frozen ABCE online control-path profile. Values are microseconds over
+100,000 measured calls after 10,000 warm-up calls, with one CPU/thread and
+$N=10$. This is not full exchange-step or native production latency.}
+\label{tab:efficiency-profile}
+\footnotesize
+\setlength{\tabcolsep}{2.8pt}
+\begin{tabular}{lrrr}
+\toprule
+Module & Median & p95 & p99 \\
+\midrule
+M1 logistic core & 5.36 & 6.58 & 7.48 \\
+M1 state to proposal & 154.54 & 177.26 & 209.80 \\
+M2 threshold/pacing & 9.69 & 10.77 & 12.03 \\
+M3 soft-rank & 59.10 & 63.66 & 71.10 \\
+M3 hard-best & 43.84 & 50.40 & 63.72 \\
+Contract end-to-end & 247.90 & 294.13 & 333.79 \\
+Announced no-routing & 169.80 & 196.74 & 226.46 \\
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\parbox{0.98\columnwidth}{\scriptsize
+The median routing increment over announced no-routing is 78.10 $\mu$s
+(1.46$\times$). The compact base actor-critic has 14,919 parameters; the actor
+adapter has 560, and 6,257 parameters are response-trainable including the
+critic. Peak process RSS is 68.09 MB. The formal \texttt{linux/amd64} Docker
+image ran under architecture emulation on Apple Silicon, so no negligible-
+overhead or deployment-efficiency claim is made.}
+\end{table}

@@ -1,0 +1,14 @@
+{
+  "aggregate_dealer_reward_difference": 39.04794000000038,
+  "all_state_direction": "aligned_is_worse",
+  "all_state_execution_half_spread_aligned": 6.3510525,
+  "all_state_execution_half_spread_aligned_minus_random": 0.00906750000000045,
+  "all_state_execution_half_spread_random": 6.341984999999999,
+  "comparison": "aligned_soft_rank versus exact_random_soft_rank",
+  "high_risk_announced_exposure_relative_reduction": 0.5155899030384365,
+  "interpretation": "selective low-risk improvement, not all-state spread dominance",
+  "inventory_sd_relative_reduction": 0.055736987645647884,
+  "low_risk_customer_tick_units_saved_per_episode": 47.92000000000007,
+  "low_risk_execution_improvement_ticks": 0.03995670931651611,
+  "low_risk_execution_relative_improvement": 0.006295276137879224
+}

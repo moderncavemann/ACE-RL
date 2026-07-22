@@ -1,0 +1,50 @@
+{
+  "config_path": "revision/configs/abides_abce_mechanism_profile_v1.json",
+  "config_sha256": "3e13db4dedb00d9123d6d2ae38b3230778060f61defc4f3acdd81fd7974e9bc8",
+  "git": {
+    "commit_before_profile": "b55e445bc9e565a8bd1fd1333916d91d8a570a7b",
+    "status_source": "explicit host launch environment",
+    "worktree_dirty_before_profile": true
+  },
+  "outcome_data_generated": false,
+  "profiler_source": {
+    "path": "revision/experiments/profile_abides_abce_mechanism_v1.py",
+    "sha256": "7793210b45d5a6dd4ebc2ae81c4062390f43d3db6dffc2a10171fce7cf80eabd"
+  },
+  "protocol_version": "abides_abce_mechanism_profile_v1",
+  "sources": {
+    "abides_mappo_source": {
+      "path": "revision/src/agents/abides_mappo.py",
+      "sha256": "da8ec9eb000212e888e6b708230de13c34bb40756f271bfd7a1eef8ba41a9ad9"
+    },
+    "allocation_source": {
+      "path": "revision/src/interventions/abides_literature_baselines.py",
+      "sha256": "ff3255d92d89d1c80b923a22d22cfe6bc673280b2de6db542223d9790539c146"
+    },
+    "dose_statistics": {
+      "path": "revision/paper/artifacts/abides_dose_routing_sensitivity_v1/statistics.json",
+      "sha256": "d281882640bef8a4233dc300da48941120ef2c9f1881d59a5f42daa6f986a079"
+    },
+    "gate_model": {
+      "path": "revision/configs/abides_two_stage_gate_v1.json",
+      "sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7"
+    },
+    "gate_source": {
+      "path": "revision/src/interventions/abides_gate.py",
+      "sha256": "df663d3acd566008a115073b8dadb608f284594e34b267d63c56b01e72f41c33"
+    },
+    "mappo_source": {
+      "path": "revision/src/agents/mappo.py",
+      "sha256": "92f373583367fb3969b7c8d119815b88b2341ab5c906cff1b0c9e8f5f3e04c7f"
+    },
+    "primary_statistics": {
+      "path": "revision/paper/artifacts/abides_abce_primary_followup_v1/statistics.json",
+      "sha256": "f25d346b5b2a769171daff71550e3939c34ac0c124e9f401a1d30bc805ca5fc3"
+    },
+    "proxy_calibration": {
+      "path": "revision/configs/abides_public_risk_proxies_v1/calibration_summary.json",
+      "sha256": "452627fa686389ff4a1f96523f3ee7b19e50070fc1e5080d481b6a4b3aec4732"
+    }
+  },
+  "training_performed": false
+}

@@ -1,0 +1,75 @@
+{
+  "protocol_version": "abides_abce_mechanism_profile_v1",
+  "status": "frozen_non_outcome_profile",
+  "formal_outcome_experiment": false,
+  "docker_image": "ace-rl-abides-ace:abce-v1",
+  "docker_image_id": "sha256:351dd23c02b950cd986004ec2695901fe379e561375cc16f2548b041a3bcbff3",
+  "container_platform": "linux/amd64",
+  "n_agents": 10,
+  "episode_steps": 100,
+  "warmup_iterations": 10000,
+  "measured_iterations": 100000,
+  "batch_size": 10,
+  "pacing_target_rate": 0.35,
+  "routing_target_kappa": 4.0,
+  "routing_routable_fraction": 0.5,
+  "fixed_half_spreads": [6.0, 6.0, 5.0, 6.0, 4.0, 6.0, 5.0, 6.0, 6.0, 5.0],
+  "fixed_lagged_actions": [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  "thread_limits": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1"
+  },
+  "model_dimensions": {
+    "actor_observation": 7,
+    "critic_observation": 22,
+    "hidden": 64,
+    "actions": 7,
+    "agents": 10
+  },
+  "sources": {
+    "gate_model": {
+      "path": "revision/configs/abides_two_stage_gate_v1.json",
+      "sha256": "e27b36f896a2659fd6dd1f2a6cfe1656cf36f52df32d951f6e2c62daf74d6cf7"
+    },
+    "proxy_calibration": {
+      "path": "revision/configs/abides_public_risk_proxies_v1/calibration_summary.json",
+      "sha256": "452627fa686389ff4a1f96523f3ee7b19e50070fc1e5080d481b6a4b3aec4732"
+    },
+    "primary_statistics": {
+      "path": "revision/paper/artifacts/abides_abce_primary_followup_v1/statistics.json",
+      "sha256": "f25d346b5b2a769171daff71550e3939c34ac0c124e9f401a1d30bc805ca5fc3"
+    },
+    "dose_statistics": {
+      "path": "revision/paper/artifacts/abides_dose_routing_sensitivity_v1/statistics.json",
+      "sha256": "d281882640bef8a4233dc300da48941120ef2c9f1881d59a5f42daa6f986a079"
+    },
+    "mappo_source": {
+      "path": "revision/src/agents/mappo.py",
+      "sha256": "92f373583367fb3969b7c8d119815b88b2341ab5c906cff1b0c9e8f5f3e04c7f"
+    },
+    "abides_mappo_source": {
+      "path": "revision/src/agents/abides_mappo.py",
+      "sha256": "da8ec9eb000212e888e6b708230de13c34bb40756f271bfd7a1eef8ba41a9ad9"
+    },
+    "gate_source": {
+      "path": "revision/src/interventions/abides_gate.py",
+      "sha256": "df663d3acd566008a115073b8dadb608f284594e34b267d63c56b01e72f41c33"
+    },
+    "allocation_source": {
+      "path": "revision/src/interventions/abides_literature_baselines.py",
+      "sha256": "ff3255d92d89d1c80b923a22d22cfe6bc673280b2de6db542223d9790539c146"
+    }
+  },
+  "primary_artifact": {
+    "path": "revision/paper/artifacts/abides_abce_primary_followup_v1",
+    "step_records": 180000
+  },
+  "exact_learner_artifact": {
+    "path": "revision/paper/artifacts/abides_abce_exact_risk_only_learner_holdout_v1",
+    "step_records": 80000
+  },
+  "expected_proxy_auc": 0.82840015187247,
+  "output_dir": "revision/paper/artifacts/abides_abce_mechanism_profile_v1"
+}

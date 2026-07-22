@@ -102,6 +102,12 @@ compression. Relative to random, aligned routing also has higher aggregate
 dealer reward and lower inventory dispersion, but these components do not
 constitute a total-welfare theorem.
 
+In economic units, the 0.03996-tick effect is a 0.63% improvement over the
+random arm and saves 47.92 low-risk customer tick-units per episode. High-risk
+announced exposure falls by 51.6%, aggregate dealer reward is 39.05 units
+higher, and inventory SD is 5.6% lower. All-state spread is nevertheless 0.0091
+ticks worse, preserving the selective rather than Pareto-dominance reading.
+
 ### B. Timely Pre-Quote Revelation
 
 One-step-lagged revelation worsens low-risk spread by 0.03389 ticks
@@ -132,6 +138,23 @@ CI [0.04909, 0.18541]. MAPPO therefore passes the frozen rule. IPPO has mean
 zero. It remains inconclusive even though the supporting bootstrap interval is
 positive.
 
+### Proxy Validation And Implementation Cost
+
+The simulator-supervised two-feature public-risk proxy uses disjoint 1,000-row
+passive train and validation panels and attains validation AUC 0.8284;
+volatility-only and return-only AUCs are 0.7573 and 0.7976. Runtime reads only
+public volatility and absolute lagged return, never latent simulator risk.
+Spread-only remains an outcome comparator rather than a risk classifier.
+
+A frozen one-CPU `N=10` microbenchmark in the formal ABCE Docker image measures
+median contract control-path latency of 247.90 microseconds (p95 294.13, p99
+333.79). The announced no-routing path is 169.80 microseconds, giving a
+78.10-microsecond median routing increment. The actor adapter has 560
+parameters; response training updates 6,257 parameters including the critic.
+Because the `linux/amd64` image runs under architecture emulation on the
+recorded Apple Silicon host, these are reproducibility/accounting measurements,
+not native production latency or a negligible-overhead claim.
+
 ## Limitations Paragraph
 
 The evidence is intentionally narrow. Experiments use a controlled N=10
@@ -155,10 +178,10 @@ Use exactly two figures and two tables in the eight-page main text:
    earlier replication.
 4. `figure_abce_trace.tex`: preregistered median-effect population/path trace.
 
-Move `figure_paired_seeds.tex`, `figure_sensitivity.tex`, and
-`table_behavioral_boundary.tex` to the supplement. Brero/Banerjee ABIDES
-adaptations remain descriptive supplement material because their frozen
-admissibility gates did not pass.
+Move `figure_paired_seeds.tex`, `figure_sensitivity.tex`,
+`table_behavioral_boundary.tex`, and `table_efficiency_profile.tex` to the
+supplement. Brero/Banerjee ABIDES adaptations remain descriptive supplement
+material because their frozen admissibility gates did not pass.
 
 ## Source Map
 
@@ -175,6 +198,8 @@ admissibility gates did not pass.
 - retained sensitivity and diagnostic boundaries:
   `revision/paper/artifacts/abides_dose_routing_sensitivity_v1/` and
   `revision/paper/artifacts/abides_collusion_diagnostic_v1/`
+- frozen proxy/economic/efficiency export:
+  `revision/paper/artifacts/abides_abce_mechanism_profile_v1/`
 
 ## Prohibited Upgrades
 
@@ -186,3 +211,4 @@ Do not write any of the following without new preregistered evidence:
 - The method is learner-independent; IPPO is not confirmatory.
 - ACE-RL outperforms the original Brero or Banerjee mechanisms.
 - The result generalizes to larger N, another matching engine, or real markets.
+- The mechanism has negligible overhead or production deployment latency.
